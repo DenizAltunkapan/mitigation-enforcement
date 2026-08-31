@@ -1,0 +1,22 @@
+# VM downloads and local disks
+*.iso
+*.qcow2
+*.img
+*.raw
+downloads/
+images/
+tmp/
+
+# QEMU runtime artifacts
+*.pid
+*.monitor
+*.sock
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Editor/OS noise
+.DS_Store
+*.swp
