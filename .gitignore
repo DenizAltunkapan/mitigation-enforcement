@@ -12,6 +12,10 @@ tmp/
 *.monitor
 *.sock
 
+# Lab build artifacts
+labs/01-process-memory-layout/memory_layout
+labs/02-stack-frames/stack_frames
+
 # Python
 __pycache__/
 *.pyc

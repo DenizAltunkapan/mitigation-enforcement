@@ -39,7 +39,38 @@ ssh lab@localhost -p 2223
 The lab password is `lab`. This VM uses QEMU user-mode networking and should
 not be bridged onto a real LAN.
 
-### Legacy 32-bit LiveCD
+### Scriptable Legacy 32-bit VM
+
+The preferred legacy baseline is a scriptable Debian 7 ("Wheezy") i386 VM.
+Unlike the book LiveCD, this VM is installable, persistent and reachable over
+SSH, so lab output can be captured without relying on a graphical session.
+
+- image: `debian-7.11.0-i386-netinst.iso`
+- source: <https://cdimage.debian.org/mirror/cdimage/archive/7.11.0/i386/iso-cd/>
+- checksum file: <https://cdimage.debian.org/mirror/cdimage/archive/7.11.0/i386/iso-cd/SHA256SUMS>
+
+Install it:
+
+```bash
+./scripts/setup-legacy-vm.sh
+```
+
+Start it:
+
+```bash
+./scripts/run-legacy-vm.sh
+```
+
+SSH is forwarded to `localhost:2222`.
+
+```bash
+ssh root@localhost -p 2222
+```
+
+The lab password is `toor`. This VM uses QEMU user-mode networking and should
+not be bridged onto a real LAN.
+
+### Optional Legacy 32-bit LiveCD
 
 The legacy baseline uses the official LiveCD distributed through O'Reilly's
 example-material repository for *Hacking: The Art of Exploitation, 2nd
@@ -61,8 +92,20 @@ Start it:
 ./scripts/run-legacy-livecd.sh
 ```
 
-This is a read-only LiveCD baseline. Store any notes or results in this host
-repository, not only inside the VM session.
+This is a read-only historical reference. Store any notes or results in this
+host repository, not only inside the VM session.
+
+## Labs
+
+The first labs build the vocabulary needed before touching memory-corruption
+bugs:
+
+- [Lab 01 - Process Memory Layout](labs/01-process-memory-layout/README.md)
+- [Lab 02 - Stack Frames and Calling Conventions](labs/02-stack-frames/README.md)
+
+Run labs inside each VM and copy the observed output back into the matching
+lab notes. The interesting part is the comparison between legacy 32-bit Linux
+and modern x86-64 Linux, not just the program output itself.
 
 ## Non-Goals
 
