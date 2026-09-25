@@ -39,11 +39,11 @@ ssh lab@localhost -p 2223
 The lab password is `lab`. This VM uses QEMU user-mode networking and should
 not be bridged onto a real LAN.
 
-### Scriptable Legacy 32-bit VM
+### Legacy 32-bit VM
 
-The preferred legacy baseline is a scriptable Debian 7 ("Wheezy") i386 VM.
-Unlike the book LiveCD, this VM is installable, persistent and reachable over
-SSH, so lab output can be captured without relying on a graphical session.
+The legacy baseline is a scriptable Debian 7 ("Wheezy") i386 VM. It is
+installable, persistent and reachable over SSH, so lab output can be
+captured without relying on a graphical session.
 
 - image: `debian-7.11.0-i386-netinst.iso`
 - source: <https://cdimage.debian.org/mirror/cdimage/archive/7.11.0/i386/iso-cd/>
@@ -54,6 +54,10 @@ Install it:
 ```bash
 ./scripts/setup-legacy-vm.sh
 ```
+
+This builds a self-installing ISO (preseed baked into the default boot
+entry) and runs the install fully unattended — no keyboard input required.
+Let the installer finish and reboot on its own before closing the window.
 
 Start it:
 
@@ -69,31 +73,6 @@ ssh root@localhost -p 2222
 
 The lab password is `toor`. This VM uses QEMU user-mode networking and should
 not be bridged onto a real LAN.
-
-### Optional Legacy 32-bit LiveCD
-
-The legacy baseline uses the official LiveCD distributed through O'Reilly's
-example-material repository for *Hacking: The Art of Exploitation, 2nd
-Edition*:
-
-- image: `hacking-live-1.0.iso`
-- source: <https://resources.oreilly.com/examples/9781593271442/-/tree/master/Hacking%20The%20Art%20of%20Exploitation%202nd%20Edition%20Jon%20Erickson%20Official%20LiveCD%20ISO%20No%20Starch%20Press>
-- MD5: `bd7a7dfa2e0ce37e3115cdd8f3830783`
-
-Download and verify it:
-
-```bash
-./scripts/setup-legacy-livecd.sh
-```
-
-Start it:
-
-```bash
-./scripts/run-legacy-livecd.sh
-```
-
-This is a read-only historical reference. Store any notes or results in this
-host repository, not only inside the VM session.
 
 ## Labs
 
