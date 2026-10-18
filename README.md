@@ -81,10 +81,43 @@ bugs:
 
 - [Lab 01 - Process Memory Layout](labs/01-process-memory-layout/README.md)
 - [Lab 02 - Stack Frames and Calling Conventions](labs/02-stack-frames/README.md)
+- [Lab 03 - Binary Mitigation Baseline](labs/03-binary-mitigation-baseline/README.md)
 
-Run labs inside each VM and copy the observed output back into the matching
-lab notes. The interesting part is the comparison between legacy 32-bit Linux
-and modern x86-64 Linux, not just the program output itself.
+## Capture Baselines
+
+Run inside each VM, using a new output directory whose parent exists:
+
+```bash
+./scripts/capture-baseline.sh legacy /tmp/exploit-evolution-legacy
+# In the modern VM:
+./scripts/capture-baseline.sh modern /tmp/exploit-evolution-modern
+```
+
+Captures environment versions, build commands, source copies, checksums,
+three runs per binary, ELF metadata and disassembly. `COMPLETE` marks a
+successful capture; failed captures remain available for diagnosis. Existing
+output directories are never overwritten.
+
+Requires Bash, a compiler, Make, Binutils and coreutils; GDB is optional.
+Override builds with `CC` (compiler executable), `CFLAGS` and `LDFLAGS`.
+Use the `host` label for local smoke tests; it does not replace VM results.
+
+The current lab tables mix historical LiveCD, Debian VM and Ubuntu host
+measurements. Treat them as preliminary until recaptured on consistent
+baselines. To isolate mitigation effects, vary one protection at a time
+within the same environment. ELF indicators alone do not prove protection
+of a particular code path. VM downloads and packages are not pinned, so
+recorded versions do not guarantee identical future installations.
+
+### Local validation
+
+```bash
+for script in scripts/*.sh; do bash -n "$script" || exit; done
+python3 -m unittest discover -s tests -v
+```
+
+Tests build and run the examples on the host without booting VMs or requiring
+root.
 
 ## Non-Goals
 

@@ -1,0 +1,32 @@
+name: Lab validation
+
+on:
+  pull_request:
+    paths:
+      - "labs/**"
+      - "scripts/**"
+      - "tests/**"
+      - ".github/workflows/labs.yml"
+  push:
+    branches: [main]
+    paths:
+      - "labs/**"
+      - "scripts/**"
+      - "tests/**"
+      - ".github/workflows/labs.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check shell syntax
+        run: |
+          for script in scripts/*.sh; do
+            bash -n "$script" || exit
+          done
+      - name: Exercise captures and VM launcher arguments
+        run: python3 -m unittest discover -s tests -v

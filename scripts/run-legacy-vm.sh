@@ -30,5 +30,5 @@ exec qemu-system-i386 \
     "${ACCEL_OPTS[@]}" \
     -m 512 \
     -drive file="${DISK}",format=qcow2 \
-    -net nic -net user,hostfwd=tcp::2222-:22 \
+    -net nic -net user,hostfwd=tcp:127.0.0.1:2222-:22 \
     "${DISPLAY_OPTS[@]}"

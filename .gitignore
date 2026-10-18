@@ -15,6 +15,9 @@ tmp/
 # Lab build artifacts
 labs/01-process-memory-layout/memory_layout
 labs/02-stack-frames/stack_frames
+labs/03-binary-mitigation-baseline/mitigation_default
+labs/03-binary-mitigation-baseline/mitigation_hardened
+labs/03-binary-mitigation-baseline/mitigation_no_pie
 
 # Python
 __pycache__/

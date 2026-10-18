@@ -31,5 +31,5 @@ exec qemu-system-x86_64 \
     -drive file="${DISK}",if=virtio,format=qcow2 \
     -drive file="${SEED}",if=virtio,format=raw \
     -net nic,model=virtio \
-    -net user,hostfwd=tcp::2223-:22 \
+    -net user,hostfwd=tcp:127.0.0.1:2223-:22 \
     "${DISPLAY_OPTS[@]}"
