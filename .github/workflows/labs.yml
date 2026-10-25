@@ -28,5 +28,5 @@ jobs:
           for script in scripts/*.sh; do
             bash -n "$script" || exit
           done
-      - name: Exercise captures and VM launcher arguments
+      - name: Validate baselines, stack-canary experiments and VM launchers
         run: python3 -m unittest discover -s tests -v

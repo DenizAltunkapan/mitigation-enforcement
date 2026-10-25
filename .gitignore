@@ -19,6 +19,10 @@ labs/03-binary-mitigation-baseline/mitigation_default
 labs/03-binary-mitigation-baseline/mitigation_hardened
 labs/03-binary-mitigation-baseline/mitigation_no_pie
 
+labs/04-stack-canary/stack_unprotected
+labs/04-stack-canary/stack_canary
+labs/04-stack-canary/stack_fixed
+
 # Python
 __pycache__/
 *.pyc

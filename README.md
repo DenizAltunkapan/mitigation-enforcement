@@ -76,12 +76,13 @@ not be bridged onto a real LAN.
 
 ## Labs
 
-The first labs build the vocabulary needed before touching memory-corruption
-bugs:
+Labs 01–03 establish the baseline; Lab 04 introduces a controlled
+memory-corruption experiment:
 
 - [Lab 01 - Process Memory Layout](labs/01-process-memory-layout/README.md)
 - [Lab 02 - Stack Frames and Calling Conventions](labs/02-stack-frames/README.md)
 - [Lab 03 - Binary Mitigation Baseline](labs/03-binary-mitigation-baseline/README.md)
+- [Lab 04 - Stack Canary: Detection Versus Repair](labs/04-stack-canary/README.md)
 
 ## Capture Baselines
 
@@ -108,6 +109,16 @@ baselines. To isolate mitigation effects, vary one protection at a time
 within the same environment. ELF indicators alone do not prove protection
 of a particular code path. VM downloads and packages are not pinned, so
 recorded versions do not guarantee identical future installations.
+
+Lab 04 uses a dedicated collector with repeated safe/oversized inputs, signal
+recording and checks of guard detection versus bounds-check rejection:
+
+```bash
+python3 scripts/capture-stack-canary.py host /tmp/exploit-evolution-canary
+```
+
+Requires Linux and Python 3.8+; see the Lab 04 instructions for legacy-toolchain
+limitations and interpretation. Its results complement the Labs 01–03 baseline.
 
 ### Local validation
 

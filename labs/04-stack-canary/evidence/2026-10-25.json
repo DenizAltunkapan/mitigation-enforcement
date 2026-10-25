@@ -1,0 +1,901 @@
+{
+  "description": "Selected text evidence from four complete Lab 04 captures. Full binaries and disassembly remain in local ignored tmp/commit-review/.",
+  "captures": [
+    {
+      "name": "host-final-o0",
+      "environment": {
+        "label": "host",
+        "label_is_operator_supplied": true,
+        "captured_at_utc": "2026-10-25T12:54:26.379491+00:00",
+        "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+        "architecture": "x86_64",
+        "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+        "CC": "gcc",
+        "CFLAGS": "-O0 -g -Wall -Wextra -fno-omit-frame-pointer",
+        "LDFLAGS": "",
+        "aslr": "2"
+      },
+      "versions": {
+        "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "compiler-target": "x86_64-linux-gnu\n",
+        "linker": "GNU ld (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+        "binutils": "GNU readelf (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n",
+        "libc": "glibc 2.43\n",
+        "os-release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n"
+      },
+      "build_command": [
+        "make",
+        "--always-make",
+        "CC=gcc",
+        "CFLAGS=-O0 -g -Wall -Wextra -fno-omit-frame-pointer",
+        "LDFLAGS="
+      ],
+      "build_log": "gcc -O0 -g -Wall -Wextra -fno-omit-frame-pointer  -U_FORTIFY_SOURCE -Wl,-z,relro,-z,now,-z,noexecstack -fno-stack-protector -o stack_unprotected src/stack_copy.c\ngcc -O0 -g -Wall -Wextra -fno-omit-frame-pointer  -U_FORTIFY_SOURCE -Wl,-z,relro,-z,now,-z,noexecstack -fstack-protector-all -o stack_canary src/stack_copy.c\ngcc -O0 -g -Wall -Wextra -fno-omit-frame-pointer  -U_FORTIFY_SOURCE -Wl,-z,relro,-z,now,-z,noexecstack -fstack-protector-all -DFIXED -o stack_fixed src/stack_copy.c\n",
+      "artifact_sha256": {
+        "src/stack_copy.c": "626d49e0dae2ba0ff73cb43db03d5caad7fb6bd5a7aba0087875f8644a21ee43",
+        "Makefile": "de3ece4298d2dc70945b35afc3ee1719d1e78515bb96fa8e1832159519d27f79",
+        "safe.input": "991204fba2b6216d476282d375ab88d20e6108d109aecded97ef424ddd114706",
+        "overflow.input": "b6ac3cc10386331c765f04f041c147d0f278f2aed8eaa021e2d0057fc6f6ff9e",
+        "stack_unprotected": "cb71e94b50cc5f11ca4807ee249b2ff705decd5b6816d9cbbbda5276a7f45b06",
+        "stack_canary": "f375d820200d912d9c1f5282b4f634ba95b14baf6e805fc0e21c24d8964d004c",
+        "stack_fixed": "e31f515c8531863063d339be0c3fc70c963408f293d7ede643778738c0ac9d36"
+      },
+      "collector_sha256": "1445942072847f1959fbb809301836844a6176c4061628e6cba5b93afd280751",
+      "full_manifest_sha256": "12e10fda9eef08dc8f0cb875cf5706641c1e9427f256d3fd0d938a9649d869cc",
+      "observations": [
+        {
+          "binary": "stack_unprotected",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "overflow",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "overflow",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "overflow",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "overflow",
+          "repeat": 1,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "overflow",
+          "repeat": 2,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "overflow",
+          "repeat": 3,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "overflow",
+          "repeat": 1,
+          "returncode": 2,
+          "signal": null,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "overflow",
+          "repeat": 2,
+          "returncode": 2,
+          "signal": null,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "overflow",
+          "repeat": 3,
+          "returncode": 2,
+          "signal": null,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        }
+      ]
+    },
+    {
+      "name": "host-final-o2",
+      "environment": {
+        "label": "host",
+        "label_is_operator_supplied": true,
+        "captured_at_utc": "2026-10-25T12:54:33.459175+00:00",
+        "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+        "architecture": "x86_64",
+        "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+        "CC": "gcc",
+        "CFLAGS": "-O2 -g -Wall -Wextra -Werror -fno-omit-frame-pointer",
+        "LDFLAGS": "",
+        "aslr": "2"
+      },
+      "versions": {
+        "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "compiler-target": "x86_64-linux-gnu\n",
+        "linker": "GNU ld (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+        "binutils": "GNU readelf (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n",
+        "libc": "glibc 2.43\n",
+        "os-release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n"
+      },
+      "build_command": [
+        "make",
+        "--always-make",
+        "CC=gcc",
+        "CFLAGS=-O2 -g -Wall -Wextra -Werror -fno-omit-frame-pointer",
+        "LDFLAGS="
+      ],
+      "build_log": "gcc -O2 -g -Wall -Wextra -Werror -fno-omit-frame-pointer  -U_FORTIFY_SOURCE -Wl,-z,relro,-z,now,-z,noexecstack -fno-stack-protector -o stack_unprotected src/stack_copy.c\ngcc -O2 -g -Wall -Wextra -Werror -fno-omit-frame-pointer  -U_FORTIFY_SOURCE -Wl,-z,relro,-z,now,-z,noexecstack -fstack-protector-all -o stack_canary src/stack_copy.c\ngcc -O2 -g -Wall -Wextra -Werror -fno-omit-frame-pointer  -U_FORTIFY_SOURCE -Wl,-z,relro,-z,now,-z,noexecstack -fstack-protector-all -DFIXED -o stack_fixed src/stack_copy.c\n",
+      "artifact_sha256": {
+        "src/stack_copy.c": "626d49e0dae2ba0ff73cb43db03d5caad7fb6bd5a7aba0087875f8644a21ee43",
+        "Makefile": "de3ece4298d2dc70945b35afc3ee1719d1e78515bb96fa8e1832159519d27f79",
+        "safe.input": "991204fba2b6216d476282d375ab88d20e6108d109aecded97ef424ddd114706",
+        "overflow.input": "b6ac3cc10386331c765f04f041c147d0f278f2aed8eaa021e2d0057fc6f6ff9e",
+        "stack_unprotected": "41526eb2c6def7513116791d83e26d5755a3237dea10c22a3e59ec4fe30a4cab",
+        "stack_canary": "62b9b3923b9b15387d9c9e47e8fb062535633b5b1f99524bd001dc1943067a44",
+        "stack_fixed": "7abc353d686c03c992aca0b85c684e266e4fde0b3b992741e2d0aa9b763fe029"
+      },
+      "collector_sha256": "1445942072847f1959fbb809301836844a6176c4061628e6cba5b93afd280751",
+      "full_manifest_sha256": "55b90be785e05664ccb6e1e6b1af1e63fd8a5dfcee40a2db7970225a0a000746",
+      "observations": [
+        {
+          "binary": "stack_unprotected",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "overflow",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "overflow",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "overflow",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "overflow",
+          "repeat": 1,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "overflow",
+          "repeat": 2,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "overflow",
+          "repeat": 3,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "overflow",
+          "repeat": 1,
+          "returncode": 2,
+          "signal": null,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "overflow",
+          "repeat": 2,
+          "returncode": 2,
+          "signal": null,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "overflow",
+          "repeat": 3,
+          "returncode": 2,
+          "signal": null,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        }
+      ]
+    },
+    {
+      "name": "lab04-modern-final-o0",
+      "environment": {
+        "label": "modern",
+        "label_is_operator_supplied": true,
+        "captured_at_utc": "2026-10-25T12:54:12.746771+00:00",
+        "platform": "Linux-6.12.105+deb13-amd64-x86_64-with-glibc2.41",
+        "architecture": "x86_64",
+        "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+        "CC": "gcc",
+        "CFLAGS": "-O0 -g -Wall -Wextra -fno-omit-frame-pointer",
+        "LDFLAGS": "",
+        "aslr": "2"
+      },
+      "versions": {
+        "compiler": "gcc (Debian 14.2.0-19) 14.2.0\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "compiler-target": "x86_64-linux-gnu\n",
+        "linker": "GNU ld (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+        "binutils": "GNU readelf (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n",
+        "libc": "glibc 2.41\n",
+        "os-release": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.6\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\n"
+      },
+      "build_command": [
+        "make",
+        "--always-make",
+        "CC=gcc",
+        "CFLAGS=-O0 -g -Wall -Wextra -fno-omit-frame-pointer",
+        "LDFLAGS="
+      ],
+      "build_log": "gcc -O0 -g -Wall -Wextra -fno-omit-frame-pointer  -U_FORTIFY_SOURCE -Wl,-z,relro,-z,now,-z,noexecstack -fno-stack-protector -o stack_unprotected src/stack_copy.c\ngcc -O0 -g -Wall -Wextra -fno-omit-frame-pointer  -U_FORTIFY_SOURCE -Wl,-z,relro,-z,now,-z,noexecstack -fstack-protector-all -o stack_canary src/stack_copy.c\ngcc -O0 -g -Wall -Wextra -fno-omit-frame-pointer  -U_FORTIFY_SOURCE -Wl,-z,relro,-z,now,-z,noexecstack -fstack-protector-all -DFIXED -o stack_fixed src/stack_copy.c\n",
+      "artifact_sha256": {
+        "src/stack_copy.c": "626d49e0dae2ba0ff73cb43db03d5caad7fb6bd5a7aba0087875f8644a21ee43",
+        "Makefile": "de3ece4298d2dc70945b35afc3ee1719d1e78515bb96fa8e1832159519d27f79",
+        "safe.input": "991204fba2b6216d476282d375ab88d20e6108d109aecded97ef424ddd114706",
+        "overflow.input": "b6ac3cc10386331c765f04f041c147d0f278f2aed8eaa021e2d0057fc6f6ff9e",
+        "stack_unprotected": "dbb701aeba60d3bf42514b79b301f647689968fcab479d64b0d4a9b99d40b055",
+        "stack_canary": "059b7399d983853f05e551ece010e801ba0f33d9a759a9a4c847de7b7e471193",
+        "stack_fixed": "1820f0a1d3750dd6a255243de999eafe02dcbdba571516001a9b073e76b7a140"
+      },
+      "collector_sha256": "1445942072847f1959fbb809301836844a6176c4061628e6cba5b93afd280751",
+      "full_manifest_sha256": "a58487170264dfccd94bc175a04bb8d33df9905c76907fa7e965aaf940d5a7e8",
+      "observations": [
+        {
+          "binary": "stack_unprotected",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "overflow",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "overflow",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "overflow",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "overflow",
+          "repeat": 1,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "overflow",
+          "repeat": 2,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "overflow",
+          "repeat": 3,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "overflow",
+          "repeat": 1,
+          "returncode": 2,
+          "signal": null,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "overflow",
+          "repeat": 2,
+          "returncode": 2,
+          "signal": null,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "overflow",
+          "repeat": 3,
+          "returncode": 2,
+          "signal": null,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        }
+      ]
+    },
+    {
+      "name": "lab04-modern-final-o2",
+      "environment": {
+        "label": "modern",
+        "label_is_operator_supplied": true,
+        "captured_at_utc": "2026-10-25T12:54:12.969979+00:00",
+        "platform": "Linux-6.12.105+deb13-amd64-x86_64-with-glibc2.41",
+        "architecture": "x86_64",
+        "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+        "CC": "gcc",
+        "CFLAGS": "-O2 -g -Wall -Wextra -Werror -fno-omit-frame-pointer",
+        "LDFLAGS": "",
+        "aslr": "2"
+      },
+      "versions": {
+        "compiler": "gcc (Debian 14.2.0-19) 14.2.0\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "compiler-target": "x86_64-linux-gnu\n",
+        "linker": "GNU ld (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+        "binutils": "GNU readelf (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n",
+        "libc": "glibc 2.41\n",
+        "os-release": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.6\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\n"
+      },
+      "build_command": [
+        "make",
+        "--always-make",
+        "CC=gcc",
+        "CFLAGS=-O2 -g -Wall -Wextra -Werror -fno-omit-frame-pointer",
+        "LDFLAGS="
+      ],
+      "build_log": "gcc -O2 -g -Wall -Wextra -Werror -fno-omit-frame-pointer  -U_FORTIFY_SOURCE -Wl,-z,relro,-z,now,-z,noexecstack -fno-stack-protector -o stack_unprotected src/stack_copy.c\ngcc -O2 -g -Wall -Wextra -Werror -fno-omit-frame-pointer  -U_FORTIFY_SOURCE -Wl,-z,relro,-z,now,-z,noexecstack -fstack-protector-all -o stack_canary src/stack_copy.c\ngcc -O2 -g -Wall -Wextra -Werror -fno-omit-frame-pointer  -U_FORTIFY_SOURCE -Wl,-z,relro,-z,now,-z,noexecstack -fstack-protector-all -DFIXED -o stack_fixed src/stack_copy.c\n",
+      "artifact_sha256": {
+        "src/stack_copy.c": "626d49e0dae2ba0ff73cb43db03d5caad7fb6bd5a7aba0087875f8644a21ee43",
+        "Makefile": "de3ece4298d2dc70945b35afc3ee1719d1e78515bb96fa8e1832159519d27f79",
+        "safe.input": "991204fba2b6216d476282d375ab88d20e6108d109aecded97ef424ddd114706",
+        "overflow.input": "b6ac3cc10386331c765f04f041c147d0f278f2aed8eaa021e2d0057fc6f6ff9e",
+        "stack_unprotected": "645ce0849e3f7111f3b7c30f865dc43b83a580f78169c564ed26a2e41e90b269",
+        "stack_canary": "9f724a88da8387d9666fb7cb2d078dfe96fee1be1447f631fd06f48704f28ce5",
+        "stack_fixed": "19d90703fdc89c2ef71e908f6cc3a4ea0cbb5a0134ef4225b2c94a0c6d74bd93"
+      },
+      "collector_sha256": "1445942072847f1959fbb809301836844a6176c4061628e6cba5b93afd280751",
+      "full_manifest_sha256": "8583c9eb9b606cd85836a50433434810fc515ae3ddf847aba35311f1a13a6d28",
+      "observations": [
+        {
+          "binary": "stack_unprotected",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "overflow",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "overflow",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_unprotected",
+          "mode": "overflow",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "overflow",
+          "repeat": 1,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "overflow",
+          "repeat": 2,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "stack_canary",
+          "mode": "overflow",
+          "repeat": 3,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "returned_from_copy": false,
+          "stdout": "copy completed: 128 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "overflow",
+          "repeat": 1,
+          "returncode": 2,
+          "signal": null,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "overflow",
+          "repeat": 2,
+          "returncode": 2,
+          "signal": null,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "binary": "stack_fixed",
+          "mode": "overflow",
+          "repeat": 3,
+          "returncode": 2,
+          "signal": null,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        }
+      ]
+    }
+  ]
+}
