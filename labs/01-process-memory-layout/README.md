@@ -84,7 +84,13 @@ DYN   position-independent executable or shared object
 
 ## What To Compare
 
-Measured baseline:
+The [26 October 2026 legacy capture](../../docs/BASELINE-RESULTS.md) provides
+verified Debian 7 runtime observations and all three address/mapping transcripts.
+The default executable's text stayed fixed while heap, stack and libc mappings
+moved. Use `/proc/self/maps` for libc placement: the printed `printf` pointer can
+lie inside the executable mapping rather than the loaded libc.
+
+Earlier exploratory baseline (not matched runtime measurements):
 
 | Property | Historical LiveCD | Modern VM |
 |---|---|---|
@@ -97,9 +103,9 @@ Measured baseline:
 | ASLR setting | configured as `kernel.randomize_va_space=0` in LiveCD rootfs | `2` |
 | NX support | not measured yet from interactive LiveCD shell | supported |
 
-The preferred scriptable legacy baseline is the Debian 7 i386 VM created by
-`scripts/setup-legacy-vm.sh`. Fill its runtime values after the VM install
-completes and SSH on `localhost:2222` works.
+The preferred legacy distribution is Debian 7 i386. The recorded runtime capture
+used a [recovered local installation](../../docs/LEGACY-DIAGNOSIS.md) over a serial
+console; its results do not validate the unattended installer or SSH transport.
 
 Observed comparison:
 

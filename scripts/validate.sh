@@ -3,7 +3,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT}"
-for tool in python3 gcc make readelf objdump getconf sha256sum; do
+for tool in python3 gcc make readelf objdump getconf sha256sum qemu-img mke2fs e2fsck debugfs; do
     if ! command -v "${tool}" >/dev/null 2>&1; then
         echo "Validation requires ${tool}. See README.md for prerequisites." >&2
         exit 1

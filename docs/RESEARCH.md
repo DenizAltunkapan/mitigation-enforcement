@@ -21,14 +21,18 @@ arbitrary code execution.
 
 | Lab | Available evidence | What remains open |
 |---|---|---|
-| 01: process layout | Preliminary modern address samples and historical image metadata | Matched runtime captures on both selected VMs |
-| 02: stack frames | Preliminary modern debugger observations and ABI expectations | Legacy runtime observations and preserved debugger transcripts |
-| 03: ELF mitigations | Preliminary Debian 7 and Ubuntu host measurements | Recapture on consistent VM baselines; ELF markers alone do not establish runtime protection |
-| 04: stack canary | 72 recorded trials across host/Debian VM and `-O0`/`-O2`, with selected text evidence | Historical 32-bit replication; repair or rebuild the non-booting legacy VM |
+| 01: process layout | Verified recovered Debian 7 runtime capture; earlier modern samples and image metadata | Matched modern recapture |
+| 02: stack frames | Verified recovered Debian 7 runtime capture; earlier modern debugger observations | Matched modern recapture and preserved debugger transcripts |
+| 03: ELF mitigations | Verified recovered Debian 7 ELF/runtime capture; earlier Ubuntu host samples | Matched modern recapture; no runtime NX claim for the default legacy CPU |
+| 04: stack canary | 72 recorded trials across host/Debian VM and `-O0`/`-O2`, with selected text evidence | Historical 32-bit replication after validating the recovered boot path |
 
-The Lab 01–03 README tables are exploratory notes. Some historical values were
+The earlier Lab 01–03 README tables are exploratory notes. Some historical values were
 read from a LiveCD filesystem or package manifest rather than a running program.
-They must not be treated as matched historical-versus-modern measurements.
+They must not be treated as matched historical-versus-modern measurements. The
+[26 October legacy results](BASELINE-RESULTS.md) now provide runtime evidence
+from a recovered installation, with source and build provenance. Its default
+QEMU CPU does not advertise NX; ELF stack flags alone cannot establish execution
+prevention in that environment.
 Lab 04's [results](../labs/04-stack-canary/RESULTS.md) distinguish host and VM
 observations and explicitly record the failed legacy attempt.
 
@@ -74,11 +78,15 @@ run fresh captures independently using the documented commands.
 
 ## Next experiments, in order
 
-1. Diagnose the legacy disk using a disposable overlay or snapshot. Preserve
-   boot logs and disk/tool versions; keep the original disk intact. If rebuilding
-   is necessary, verify a complete install and SSH before claiming a baseline.
-2. Capture Labs 01–03 on the selected Debian 7 i386 and Debian 13 amd64 VMs.
-   Replace preliminary tables only when their supporting transcripts are saved.
+1. Validate a clean legacy installation independently of the recovered image. The completed
+   [offline diagnosis](LEGACY-DIAGNOSIS.md) found a filesystem that passed the
+   read-only check, with kernel/initramfs present but no GRUB installation.
+   The recovered overlay passed normal GRUB boot, serial login and Labs 01–03;
+   its flattened local copy preserves those disk contents. A clean unattended
+   install and SSH transport remain unverified.
+2. Capture Labs 01–03 on Debian 13 amd64 using the same source and protocol as
+   the preserved Debian 7 capture. Replace preliminary comparison tables only
+   when the matched modern transcripts are saved.
 3. Replicate Lab 04 with the historical toolchain. Debian 7's stock Python cannot
    run the Python 3.8+ collector: document external collection rather than silently
    replacing the guest runtime or mislabelling host output.

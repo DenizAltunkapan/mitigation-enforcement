@@ -1,0 +1,205 @@
+{
+  "description": "Verified offline inspection of the original standalone legacy disk. Repository paths are normalized to $REPO. COMPLETE means inspection completed, not that the disk boots. Full raw copies remain local and ignored. Hashes establish consistency, not authenticity.",
+  "report": {
+    "captured_at_utc": "2026-10-26T20:11:54.133924+00:00",
+    "disk_name": "legacy.qcow2",
+    "source_sha256_before": "3e9ff4e04fa657d1f30d0bdffd977d48cbc37b6ade12a908a9defc156792263a",
+    "partition_number": 1,
+    "commands": [
+      {
+        "command": [
+          "qemu-img",
+          "--version"
+        ],
+        "returncode": 0,
+        "stdout": "qemu-img version 10.2.1 (Debian 1:10.2.1+ds-1ubuntu3.2)\nCopyright (c) 2003-2025 Fabrice Bellard and the QEMU Project developers\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "debugfs",
+          "-V"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "debugfs 1.47.2 (1-Jan-2025)\n\tUsing EXT2FS Library version 1.47.2\n"
+      },
+      {
+        "command": [
+          "e2fsck",
+          "-V"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "e2fsck 1.47.2 (1-Jan-2025)\n\tUsing EXT2FS Library version 1.47.2, 1-Jan-2025\n"
+      },
+      {
+        "command": [
+          "qemu-img",
+          "info",
+          "--output=json",
+          "-f",
+          "qcow2",
+          "$REPO/images/legacy.qcow2"
+        ],
+        "returncode": 0,
+        "stdout": "{\n    \"children\": [\n        {\n            \"name\": \"file\",\n            \"info\": {\n                \"children\": [\n                ],\n                \"virtual-size\": 938213376,\n                \"filename\": \"$REPO/images/legacy.qcow2\",\n                \"format\": \"file\",\n                \"actual-size\": 938233856,\n                \"format-specific\": {\n                    \"type\": \"file\",\n                    \"data\": {\n                    }\n                },\n                \"dirty-flag\": false\n            }\n        }\n    ],\n    \"virtual-size\": 8589934592,\n    \"filename\": \"$REPO/images/legacy.qcow2\",\n    \"cluster-size\": 65536,\n    \"format\": \"qcow2\",\n    \"actual-size\": 938233856,\n    \"format-specific\": {\n        \"type\": \"qcow2\",\n        \"data\": {\n            \"compat\": \"1.1\",\n            \"compression-type\": \"zlib\",\n            \"lazy-refcounts\": false,\n            \"refcount-bits\": 16,\n            \"corrupt\": false,\n            \"extended-l2\": false\n        }\n    },\n    \"dirty-flag\": false\n}\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "qemu-img",
+          "convert",
+          "-f",
+          "qcow2",
+          "-O",
+          "raw",
+          "$REPO/images/legacy.qcow2",
+          "$REPO/tmp/legacy-review/source-inspection/disk.raw"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "qemu-img",
+          "compare",
+          "-f",
+          "qcow2",
+          "-F",
+          "raw",
+          "$REPO/images/legacy.qcow2",
+          "$REPO/tmp/legacy-review/source-inspection/disk.raw"
+        ],
+        "returncode": 0,
+        "stdout": "Images are identical.\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "e2fsck",
+          "-f",
+          "-n",
+          "$REPO/tmp/legacy-review/source-inspection/root.ext"
+        ],
+        "returncode": 0,
+        "stdout": "Warning: skipping journal recovery because doing a read-only filesystem check.\nPass 1: Checking inodes, blocks, and sizes\nPass 2: Checking directory structure\nPass 3: Checking directory connectivity\nPass 4: Checking reference counts\nPass 5: Checking group summary information\nFree blocks count wrong (1790539, counted=1790969).\nFix? no\n\nFree inodes count wrong (479641, counted=479645).\nFix? no\n\n$REPO/tmp/legacy-review/source-inspection/root.ext: 20071/499712 files (0.2% non-contiguous), 207797/1998336 blocks\n",
+        "stderr": "e2fsck 1.47.2 (1-Jan-2025)\n"
+      },
+      {
+        "command": [
+          "debugfs",
+          "-R",
+          "ls -l /",
+          "$REPO/tmp/legacy-review/source-inspection/root.ext"
+        ],
+        "returncode": 0,
+        "stdout": "      2   40755 (2)      0      0    4096 28-Sep-2026 14:36 .\n      2   40755 (2)      0      0    4096 28-Sep-2026 14:36 ..\n     11   40700 (2)      0      0   16384 28-Sep-2026 14:32 lost+found\n 262145   40755 (2)      0      0    4096 28-Sep-2026 14:32 var\n     12   40755 (2)      0      0    4096 28-Sep-2026 15:13 etc\n     14   40755 (2)      0      0    4096 28-Sep-2026 14:32 media\n   4689  120777 (7)      0      0      28 28-Sep-2026 14:36 vmlinuz\n 131073   40755 (2)      0      0    4096 28-Sep-2026 15:09 sbin\n 131075   40755 (2)      0      0    4096 28-Sep-2026 14:32 usr\n     26   40755 (2)      0      0    4096 28-Sep-2026 15:10 lib\n     74   41777 (2)      0      0    4096 28-Sep-2026 15:13 tmp\n     75   40755 (2)      0      0    4096 18-Jul-2013 05:10 sys\n     76   40755 (2)      0      0    4096 28-Sep-2026 14:34 run\n     77   40700 (2)      0      0    4096 28-Sep-2026 15:10 root\n     78   40755 (2)      0      0    4096 30-May-2016 06:13 proc\n     79   40755 (2)      0      0    4096 30-May-2016 06:13 mnt\n     80   40755 (2)      0      0    4096 30-May-2016 06:13 home\n     81   40755 (2)      0      0    4096 28-Sep-2026 14:34 dev\n     82   40755 (2)      0      0    4096 28-Sep-2026 14:37 boot\n 262302   40755 (2)      0      0    4096 28-Sep-2026 14:38 bin\n 262306   40755 (2)      0      0    4096 10-Jun-2012 09:11 selinux\n 262414   40755 (2)      0      0    4096 28-Sep-2026 14:32 srv\n 262415   40755 (2)      0      0    4096 28-Sep-2026 14:32 opt\n   4690  120777 (7)      0      0      32 28-Sep-2026 14:36 initrd.img\n\n",
+        "stderr": "debugfs 1.47.2 (1-Jan-2025)\n"
+      },
+      {
+        "command": [
+          "debugfs",
+          "-R",
+          "ls -l /boot",
+          "$REPO/tmp/legacy-review/source-inspection/root.ext"
+        ],
+        "returncode": 0,
+        "stdout": "     82   40755 (2)      0      0    4096 28-Sep-2026 14:37 .\n      2   40755 (2)      0      0    4096 28-Sep-2026 14:36 ..\n   4678  100644 (1)      0      0   134818  9-Mar-2016 06:13 config-3.2.0-4-686-pae\n   4679  100644 (1)      0      0   2704032  9-Mar-2016 06:12 vmlinuz-3.2.0-4-686-pae\n   4677  100644 (1)      0      0   1671642  9-Mar-2016 06:13 System.map-3.2.0-4-686-pae\n   4694  100644 (1)      0      0   9905916 28-Sep-2026 14:37 initrd.img-3.2.0-4-686-pae\n\n",
+        "stderr": "debugfs 1.47.2 (1-Jan-2025)\n"
+      },
+      {
+        "command": [
+          "debugfs",
+          "-R",
+          "ls -l /boot/grub",
+          "$REPO/tmp/legacy-review/source-inspection/root.ext"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "debugfs 1.47.2 (1-Jan-2025)\n/boot/grub: File not found by ext2_lookup \n"
+      },
+      {
+        "command": [
+          "debugfs",
+          "-R",
+          "stat /usr/sbin/grub-install",
+          "$REPO/tmp/legacy-review/source-inspection/root.ext"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "debugfs 1.47.2 (1-Jan-2025)\n/usr/sbin/grub-install: File not found by ext2_lookup \n"
+      },
+      {
+        "command": [
+          "debugfs",
+          "-R",
+          "ls -l /var/log/installer",
+          "$REPO/tmp/legacy-review/source-inspection/root.ext"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "debugfs 1.47.2 (1-Jan-2025)\n/var/log/installer: File not found by ext2_lookup \n"
+      }
+    ],
+    "image_info": {
+      "children": [
+        {
+          "name": "file",
+          "info": {
+            "children": [],
+            "virtual-size": 938213376,
+            "filename": "$REPO/images/legacy.qcow2",
+            "format": "file",
+            "actual-size": 938233856,
+            "format-specific": {
+              "type": "file",
+              "data": {}
+            },
+            "dirty-flag": false
+          }
+        }
+      ],
+      "virtual-size": 8589934592,
+      "filename": "$REPO/images/legacy.qcow2",
+      "cluster-size": 65536,
+      "format": "qcow2",
+      "actual-size": 938233856,
+      "format-specific": {
+        "type": "qcow2",
+        "data": {
+          "compat": "1.1",
+          "compression-type": "zlib",
+          "lazy-refcounts": false,
+          "refcount-bits": 16,
+          "corrupt": false,
+          "extended-l2": false
+        }
+      },
+      "dirty-flag": false
+    },
+    "mbr_hex": "fab800108ed0bc00b0b800008ed88ec0fbbe007cbf0006b90002f3a4ea21060000bebe073804750b83c61081fefe0775f3eb16b402b001bb007cb2808a74018b4c02cd13ea007c0000ebfe00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006bcc06000000002021008340dde30008000000f0f3000060fce305fefffffefff30002f80b00000000000000000000000000000000000000000000000000000000000000000055aa",
+    "primary_partitions": [
+      {
+        "number": 1,
+        "type": 131,
+        "bootable": false,
+        "start_sector": 2048,
+        "sectors": 15986688
+      },
+      {
+        "number": 2,
+        "type": 5,
+        "bootable": false,
+        "start_sector": 15990782,
+        "sectors": 784386
+      }
+    ],
+    "partition_sha256": "5b8101821fdaea1a1cdfb6b3fb8a9b93067ccd4bda03771b05ff77768a5a7dab",
+    "filesystem_check_returncode": 0,
+    "source_sha256_after": "3e9ff4e04fa657d1f30d0bdffd977d48cbc37b6ade12a908a9defc156792263a"
+  },
+  "full_manifest_sha256": "afd58c6c0f1a25be8311c2b3c8766c4c44195dd4f2202d7d9518cec69f21031a",
+  "manifest": "15d31a4549a2dc5bad813b32c52a54ee46258359f6240cade580c0851f6a40ce  disk.raw\n152c0857f4fac098b2677ae241e638390200c457652a9976656f6c9b4ffd31a2  inspect-legacy-disk.py\n8542065550ebabe21feb5813855b217af2db8f2370e6c61f445da3c208082122  report.json\n5b8101821fdaea1a1cdfb6b3fb8a9b93067ccd4bda03771b05ff77768a5a7dab  root.ext\n"
+}

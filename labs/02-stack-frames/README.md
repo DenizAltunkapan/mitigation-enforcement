@@ -89,7 +89,12 @@ x/24wx $esp
 
 ## What To Compare
 
-Measured baseline:
+The [26 October 2026 legacy capture](../../docs/BASELINE-RESULTS.md) provides
+verified Debian 7 runtime observations: EBP matched the reported frame address,
+and argument addresses were EBP+8, EBP+12 and EBP+16 in the selected build.
+No legacy GDB transcript was obtained; the capture records source-level values.
+
+Earlier exploratory baseline (not matched runtime measurements):
 
 | Property | Historical LiveCD | Modern VM |
 |---|---|---|
@@ -100,9 +105,9 @@ Measured baseline:
 | GDB | 6.6 package in LiveCD manifest | Debian 16.3-1 |
 | glibc | 2.5 package in LiveCD manifest | 2.41-12+deb13u3 |
 
-The preferred scriptable legacy baseline is the Debian 7 i386 VM created by
-`scripts/setup-legacy-vm.sh`. Fill its runtime values after the VM install
-completes and SSH on `localhost:2222` works.
+The preferred legacy distribution is Debian 7 i386. The recorded runtime capture
+used a [recovered local installation](../../docs/LEGACY-DIAGNOSIS.md) over a serial
+console; its results do not validate the unattended installer or SSH transport.
 
 | Question | Legacy 32-bit | Modern x86-64 |
 |---|---|---|

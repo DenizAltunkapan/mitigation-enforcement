@@ -21,16 +21,17 @@ detects corruption after the invalid write; the bounds check prevents the write.
 The experiment includes two optimization levels, repeated trials, raw output
 and source/build hashes.
 
-This is an independent educational research project in progress. Labs 01–03
-contain preliminary observations from mixed environments. A complete historical
-32-bit versus modern comparison remains open: the current legacy disk did not
-reach SSH during the latest recorded attempt. See the
+This is an independent educational research project in progress. Labs 01–03 now
+include a [verified recovered Debian 7 capture](docs/BASELINE-RESULTS.md), alongside
+earlier exploratory observations from mixed environments. A matched modern
+recapture and the Lab 04 historical 32-bit replication remain open. See the
 [methodology, evidence status and next experiments](docs/RESEARCH.md) for the
 limits of the results and the remaining work.
 
 ## Review locally
 
-On x86 Linux, install Bash, Python 3.8+, GCC, GNU Make, Binutils and coreutils.
+On x86 Linux, install Bash, Python 3.8+, GCC, GNU Make, Binutils, coreutils,
+QEMU utilities (`qemu-img`) and e2fsprogs (`mke2fs`, `e2fsck`, `debugfs`).
 From the repository root:
 
 ```bash
@@ -117,6 +118,32 @@ service on that port before installation. QEMU user-mode networking allows
 outbound connections; it is not an air gap. Keep this obsolete guest disposable
 and do not bridge it onto a LAN or expose its SSH port to other hosts.
 
+### Disposable VM sessions
+
+Once a VM is installed, run it with temporary disk writes for experiments:
+
+```bash
+SNAPSHOT=1 HEADLESS=1 ./scripts/run-modern-vm.sh
+# Use a known bootable disk; the original local legacy disk lacks GRUB.
+LEGACY_DISK="$PWD/images/legacy-recovered-20261026.qcow2" \
+  SNAPSHOT=1 OFFLINE=1 HEADLESS=1 ./scripts/run-legacy-vm.sh
+```
+
+`SNAPSHOT=1` passes QEMU's `-snapshot` option. Guest disk writes are discarded
+when QEMU exits; copy evidence out before shutdown. Without it, writes persist.
+Snapshot mode does not repair a broken installation or replace network isolation.
+`OFFLINE=1` removes the guest network device and SSH forwarding. It applies to
+the running guest, not to setup downloads. Both options accept only `0` or `1`.
+The modern launcher's automatic setup can still create missing VM files; install
+the baseline before using this mode.
+
+The original local legacy disk does not boot normally: an
+[offline inspection](docs/LEGACY-DIAGNOSIS.md) found no GRUB installation despite
+a successful read-only filesystem check. The guide includes a reproducible inspection
+command, the verified recovery procedure and the acceptance criteria for a
+fresh installation. The recovered image is a local ignored artifact, unavailable
+in a fresh clone; it provides serial login but has no SSH or GDB installed.
+
 ## Labs
 
 Labs 01–03 establish the baseline; Lab 04 introduces a controlled
@@ -146,8 +173,10 @@ Requires Bash, a compiler, Make, Binutils and coreutils; GDB is optional.
 Override builds with `CC` (compiler executable), `CFLAGS` and `LDFLAGS`.
 Use the `host` label for local smoke tests; it does not replace VM results.
 
-The current lab tables mix historical LiveCD, Debian VM and Ubuntu host
-measurements. Treat them as preliminary until recaptured on consistent
+The earlier lab tables mix historical LiveCD, Debian VM and Ubuntu host
+measurements. Treat them as preliminary. The
+[26 October legacy results](docs/BASELINE-RESULTS.md) have preserved capture
+evidence, but still need a matched modern recapture on consistent
 baselines. To isolate mitigation effects, vary one protection at a time
 within the same environment. ELF indicators alone do not prove protection
 of a particular code path. VM downloads and packages are not pinned, so

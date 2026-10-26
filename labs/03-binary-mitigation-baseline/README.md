@@ -108,7 +108,12 @@ make CFLAGS="-O2 -g -Wall -Wextra -fno-omit-frame-pointer"
 
 ## What To Compare
 
-Measured baseline:
+The [26 October 2026 legacy capture](../../docs/BASELINE-RESULTS.md) preserves
+Debian 7 source/build hashes, all repeated runs and ELF metadata. The default
+guest CPU did not advertise `nx`: `GNU_STACK RW` is an ELF request, not evidence
+of hardware-enforced execution prevention in this VM.
+
+Earlier exploratory baseline (not a matched modern VM capture):
 
 | Property | Legacy 32-bit | Modern x86-64 |
 |---|---|---|

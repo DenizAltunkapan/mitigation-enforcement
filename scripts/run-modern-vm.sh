@@ -24,12 +24,26 @@ if [[ "${HEADLESS:-0}" == "1" ]]; then
     DISPLAY_OPTS=(-nographic)
 fi
 
+SNAPSHOT_OPTS=()
+case "${SNAPSHOT:-0}" in
+    0) ;;
+    1) SNAPSHOT_OPTS=(-snapshot) ;;
+    *) echo "SNAPSHOT must be 0 or 1." >&2; exit 2 ;;
+esac
+
+NETWORK_OPTS=(-net nic,model=virtio -net user,hostfwd=tcp:127.0.0.1:2223-:22)
+case "${OFFLINE:-0}" in
+    0) ;;
+    1) NETWORK_OPTS=(-net none) ;;
+    *) echo "OFFLINE must be 0 or 1." >&2; exit 2 ;;
+esac
+
 exec qemu-system-x86_64 \
     "${ACCEL_OPTS[@]}" \
+    "${SNAPSHOT_OPTS[@]}" \
     -m 2048 \
     -smp 2 \
     -drive file="${DISK}",if=virtio,format=qcow2 \
     -drive file="${SEED}",if=virtio,format=raw \
-    -net nic,model=virtio \
-    -net user,hostfwd=tcp:127.0.0.1:2223-:22 \
+    "${NETWORK_OPTS[@]}" \
     "${DISPLAY_OPTS[@]}"

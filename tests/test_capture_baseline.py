@@ -104,14 +104,54 @@ class VmLauncherTests(unittest.TestCase):
                 args_file = root / "args.txt"
                 env = dict(os.environ, HEADLESS="1", QEMU_ARGS=str(args_file))
                 env["PATH"] = str(root) + os.pathsep + env["PATH"]
+                for snapshot, offline in (("0", "0"), ("1", "0"), ("1", "1"),
+                                          ("invalid", "0"), ("0", "invalid")):
+                    with self.subTest(snapshot=snapshot, offline=offline):
+                        env["SNAPSHOT"] = snapshot
+                        env["OFFLINE"] = offline
+                        env.pop("LEGACY_DISK", None)
+                        disk = root / "images" / (kind + ".qcow2")
+                        if kind == "legacy" and snapshot == "1":
+                            disk = root / "images" / "separate-rebuild.qcow2"
+                            disk.touch()
+                            env["LEGACY_DISK"] = str(disk)
+                        args_file.unlink(missing_ok=True)
+                        result = subprocess.run(
+                            ["bash", str(launcher)], env=env,
+                            capture_output=True, text=True, timeout=10,
+                        )
+                        if "invalid" in (snapshot, offline):
+                            self.assertEqual(result.returncode, 2)
+                            self.assertFalse(args_file.exists())
+                            continue
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        args = args_file.read_text().splitlines()
+                        if offline == "1":
+                            self.assertIn("none", args)
+                            self.assertFalse(any("hostfwd" in arg or arg.startswith("nic") for arg in args))
+                        else:
+                            self.assertIn("user,hostfwd=tcp:127.0.0.1:" + str(port) + "-:22", args)
+                        self.assertIn("-nographic", args)
+                        self.assertEqual("-snapshot" in args, snapshot == "1")
+                        self.assertTrue(any(arg.startswith("file=" + str(disk) + ",") for arg in args))
+
+    def test_legacy_setup_preserves_existing_paths_before_downloading(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            disk = root / "existing.qcow2"
+            disk.write_bytes(b"preserve this disk")
+            link = root / "dangling.qcow2"
+            link.symlink_to(root / "missing")
+            for target in (disk, link, root):
                 result = subprocess.run(
-                    ["bash", str(launcher)], env=env,
-                    capture_output=True, text=True, timeout=10,
-                )
-                self.assertEqual(result.returncode, 0, result.stderr)
-                args = args_file.read_text().splitlines()
-                self.assertIn("user,hostfwd=tcp:127.0.0.1:" + str(port) + "-:22", args)
-                self.assertIn("-nographic", args)
+                    ["bash", str(ROOT / "scripts/setup-legacy-vm.sh")],
+                    env=dict(os.environ, LEGACY_DISK=str(target)),
+                    capture_output=True, text=True, timeout=5)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("Choose a new LEGACY_DISK path", result.stderr)
+            self.assertEqual(disk.read_bytes(), b"preserve this disk")
+            self.assertTrue(link.is_symlink())
+            self.assertFalse((root / "missing").exists())
 
 
 if __name__ == "__main__":

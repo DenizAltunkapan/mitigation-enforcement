@@ -12,9 +12,14 @@ IMAGES="${ROOT}/images"
 BASE_URL="https://cdimage.debian.org/mirror/cdimage/archive/7.11.0/i386/iso-cd"
 ISO_NAME="debian-7.11.0-i386-netinst.iso"
 ISO="${DOWNLOADS}/${ISO_NAME}"
-DISK="${IMAGES}/legacy.qcow2"
+DISK="${LEGACY_DISK:-${IMAGES}/legacy.qcow2}"
 DISK_SIZE="8G"
 PRESEED_PORT=8000
+
+if [[ -e "${DISK}" || -L "${DISK}" ]]; then
+    echo "${DISK} already exists. Choose a new LEGACY_DISK path for a separate installation." >&2
+    exit 1
+fi
 
 mkdir -p "${DOWNLOADS}" "${IMAGES}"
 
@@ -28,7 +33,7 @@ if ! command -v qemu-img >/dev/null 2>&1 || ! command -v qemu-system-i386 >/dev/
     exit 1
 fi
 
-for tool in udisksctl genisoimage; do
+for tool in udisksctl genisoimage python3; do
     if ! command -v "${tool}" >/dev/null 2>&1; then
         echo "${tool} is required to build the auto-installing ISO. Install it." >&2
         exit 1
@@ -44,11 +49,6 @@ curl -fsSL -o "${DOWNLOADS}/SHA256SUMS" "${BASE_URL}/SHA256SUMS"
     cd "${DOWNLOADS}"
     grep " ${ISO_NAME}\$" SHA256SUMS | sha256sum -c -
 )
-
-if [[ -f "${DISK}" ]]; then
-    echo "${DISK} already exists. Remove it manually first if you want to reinstall." >&2
-    exit 1
-fi
 
 qemu-img create -f qcow2 "${DISK}" "${DISK_SIZE}"
 
