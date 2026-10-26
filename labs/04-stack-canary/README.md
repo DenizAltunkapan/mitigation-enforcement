@@ -98,6 +98,19 @@ exploit, nor a bypass of those protections.
 
 ## Recorded results
 
+Export one or more complete captures to a new portable text snapshot:
+
+```bash
+python3 scripts/export-stack-canary.py /tmp/canary-host /tmp/canary-host-o2 \
+  --output /tmp/canary-evidence.json
+```
+
+The exporter checks manifest hashes and exact artifact coverage before writing.
+It rejects incomplete or modified captures and preserves existing output files.
+The JSON includes all 18 observations per capture, stdout/stderr, build commands,
+tool versions and hashes. Keep the full captures for binary/disassembly review;
+the snapshot is selected text evidence, not an authenticity guarantee.
+
 See [the 25 October 2026 results](RESULTS.md) for host and Debian VM observations,
 selected raw text evidence, exact toolchain versions and the legacy limitation.
 

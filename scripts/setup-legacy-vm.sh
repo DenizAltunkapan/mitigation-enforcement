@@ -138,7 +138,7 @@ if [[ ! -f "${PRESEEDED_ISO}" ]]; then
 fi
 
 PRESEED_DIR="${ROOT}/scripts"
-python3 -m http.server "${PRESEED_PORT}" --directory "${PRESEED_DIR}" &
+python3 -m http.server "${PRESEED_PORT}" --bind 127.0.0.1 --directory "${PRESEED_DIR}" &
 HTTP_PID=$!
 trap 'kill "${HTTP_PID}" 2>/dev/null || true' EXIT
 

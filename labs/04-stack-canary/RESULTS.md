@@ -71,3 +71,34 @@ legacy measurements were obtained. The original VM disks were not modified.
 A historical 32-bit comparison remains outstanding; these results do not close
 that research question. The modern VM also used a temporary snapshot, and all
 captured evidence was copied out before shutdown.
+
+## Evidence tooling verification — 26 October 2026
+
+The portable exporter was run against all four original complete captures. It
+verified their full manifests and reproduced every field in the committed
+`captures` array exactly, including all 72 observations. This verifies the export
+path against the preserved local artifacts; it is not a new VM experiment.
+
+From the repository root, with the original ignored captures available:
+
+```bash
+python3 scripts/export-stack-canary.py \
+  tmp/commit-review/host-final-o0 \
+  tmp/commit-review/host-final-o2 \
+  tmp/commit-review/modern/lab04-modern-final-o0 \
+  tmp/commit-review/modern/lab04-modern-final-o2 \
+  --output /tmp/lab04-original-evidence.json
+python3 - <<'PY'
+import json
+from pathlib import Path
+recorded = json.loads(Path('labs/04-stack-canary/evidence/2026-10-25.json').read_text())
+exported = json.loads(Path('/tmp/lab04-original-evidence.json').read_text())
+if recorded['captures'] != exported['captures']:
+    raise SystemExit('Evidence differs')
+print('All four captures match')
+PY
+```
+
+The local validation suite passed all 14 tests, including real host builds at
+`-O0` and `-O2`, portable export, modified/incomplete capture rejection and
+preservation of existing output. No VM was booted for this tooling review.

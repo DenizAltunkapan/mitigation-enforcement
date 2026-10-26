@@ -1,4 +1,4 @@
-# exploit-evolution
+# Exploit Evolution
 
 A systems-security lab for comparing classical exploitation primitives on
 legacy 32-bit Linux and modern x86-64 Linux.
@@ -7,6 +7,44 @@ The point is not to collect exploits. The point is to document why an old
 exploit path worked, which modern mitigation changes the path, what additional
 primitive would be needed today and how the underlying bug should actually be
 fixed.
+
+## Research question and current result
+
+How do architecture, toolchain defaults and runtime mitigations change the
+path from a memory-safety bug to an exploitation primitive?
+
+The strongest completed experiment is [Lab 04](labs/04-stack-canary/README.md):
+the same local buffer overwrite is compared with stack protection disabled,
+enabled, and with an explicit bounds check. In the
+[recorded host and Debian VM runs](labs/04-stack-canary/RESULTS.md), the guard
+detects corruption after the invalid write; the bounds check prevents the write.
+The experiment includes two optimization levels, repeated trials, raw output
+and source/build hashes.
+
+This is an independent educational research project in progress. Labs 01–03
+contain preliminary observations from mixed environments. A complete historical
+32-bit versus modern comparison remains open: the current legacy disk did not
+reach SSH during the latest recorded attempt. See the
+[methodology, evidence status and next experiments](docs/RESEARCH.md) for the
+limits of the results and the remaining work.
+
+## Review locally
+
+On x86 Linux, install Bash, Python 3.8+, GCC, GNU Make, Binutils and coreutils.
+From the repository root:
+
+```bash
+./scripts/validate.sh
+python3 scripts/capture-stack-canary.py host /tmp/canary-review
+python3 scripts/export-stack-canary.py /tmp/canary-review \
+  --output /tmp/canary-review.json
+```
+
+Use fresh output paths. Validation builds disposable examples, exercises failure
+handling and checks evidence integrity without root, networking or VM startup.
+The C examples intentionally include undefined behavior; use a disposable VM
+for manual experiments. A host test confirms the local tooling and does not
+substitute for VM measurements.
 
 ## VM Baselines
 
@@ -36,8 +74,10 @@ SSH is forwarded to `localhost:2223`.
 ssh lab@localhost -p 2223
 ```
 
-The lab password is `lab`. This VM uses QEMU user-mode networking and should
-not be bridged onto a real LAN.
+The lab password is `lab`. SSH binds only to host loopback. QEMU user-mode
+networking allows outbound connections; it is not an air gap. These public
+credentials are only for disposable local lab VMs. Do not bridge the guest
+onto a LAN or expose its SSH port to other hosts.
 
 ### Legacy 32-bit VM
 
@@ -71,8 +111,11 @@ SSH is forwarded to `localhost:2222`.
 ssh root@localhost -p 2222
 ```
 
-The lab password is `toor`. This VM uses QEMU user-mode networking and should
-not be bridged onto a real LAN.
+The lab password is `toor`. SSH binds only to host loopback. The installer
+temporarily serves the preseed configuration on `127.0.0.1:8000`; stop any other
+service on that port before installation. QEMU user-mode networking allows
+outbound connections; it is not an air gap. Keep this obsolete guest disposable
+and do not bridge it onto a LAN or expose its SSH port to other hosts.
 
 ## Labs
 
@@ -123,8 +166,7 @@ limitations and interpretation. Its results complement the Labs 01–03 baseline
 ### Local validation
 
 ```bash
-for script in scripts/*.sh; do bash -n "$script" || exit; done
-python3 -m unittest discover -s tests -v
+./scripts/validate.sh
 ```
 
 Tests build and run the examples on the host without booting VMs or requiring
