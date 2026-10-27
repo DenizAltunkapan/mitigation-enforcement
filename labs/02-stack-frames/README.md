@@ -87,58 +87,29 @@ On 32-bit x86, use:
 x/24wx $esp
 ```
 
-## What To Compare
+## Recorded comparison
 
-The [26 October 2026 legacy capture](../../docs/BASELINE-RESULTS.md) provides
-verified Debian 7 runtime observations: EBP matched the reported frame address,
-and argument addresses were EBP+8, EBP+12 and EBP+16 in the selected build.
-No legacy GDB transcript was obtained; the capture records source-level values.
+The [verified Debian 7 / Debian 13 comparison](../../docs/BASELINE-COMPARISON.md)
+includes three standalone runs per environment and one additional modern GDB
+transcript, with identical source and recorded build variables.
 
-Earlier exploratory baseline (not matched runtime measurements):
-
-| Property | Historical LiveCD | Modern VM |
+| Observation | Debian 7 i386 | Debian 13 amd64 |
 |---|---|---|
-| Distribution | Ubuntu 7.04 (from LiveCD rootfs) | Debian GNU/Linux 13 (trixie) |
-| Architecture | i386 | x86_64 |
-| Kernel | 2.6.20-15-generic | 6.12.105+deb13-amd64 |
-| GCC | 4.1.2 package in LiveCD manifest | Debian 14.2.0-19 |
-| GDB | 6.6 package in LiveCD manifest | Debian 16.3-1 |
-| glibc | 2.5 package in LiveCD manifest | 2.41-12+deb13u3 |
+| Stack / frame registers | ESP / EBP | RSP / RBP |
+| Frame pointer matches reported frame address | yes | yes |
+| Argument evidence | addresses EBP+8, EBP+12, EBP+16 in run 1 | GDB shows RDI=1, RSI=2, RDX=3 at the breakpoint |
+| Saved return-address slot | no debugger measurement | GDB reports saved RIP at RBP+8 |
 
-The preferred legacy distribution is Debian 7 i386. The recorded runtime capture
-used a [recovered local installation](../../docs/LEGACY-DIAGNOSIS.md) over a serial
-console; its results do not validate the unattended installer or SSH transport.
+The modern C argument variables have stack storage even though the breakpoint
+shows their values in argument registers. Their printed addresses alone do not
+establish the calling convention. The GDB run left ASLR enabled using
+`set disable-randomization off`; it is separate from the standalone executions.
+Do not combine addresses from those different processes into one stack diagram.
 
-| Question | Legacy 32-bit | Modern x86-64 |
-|---|---|---|
-| Which register is the stack pointer? | ESP | RSP |
-| Which register is the base pointer? | EBP | RBP |
-| Where is the return address stored? | typically at `[EBP + 4]`; run pending | saved RIP at `[RBP + 8]`, observed by GDB |
-| Are function arguments on the stack or in registers? | stack by the i386 cdecl convention | first integer args in RDI, RSI, RDX, observed by GDB |
-| Does the compiler keep a frame pointer? | expected with `-fno-omit-frame-pointer`; run pending | yes: RBP matched `__builtin_frame_address(0)` |
-
-Modern GDB snapshot at the `inspect_frame` breakpoint:
-
-```text
-rsp  0x7fffffffe310
-rbp  0x7fffffffe350
-rip  0x55555555514a <inspect_frame+17>
-rdi  0x1
-rsi  0x2
-rdx  0x3
-saved rip = 0x5555555552dd
-```
-
-The stack dump showed the saved frame pointer followed by the saved return
-address:
-
-```text
-0x7fffffffe350: 0x00007fffffffe360 0x00005555555552dd
-```
-
-Legacy note: the LiveCD kernel and rootfs were verified, but an interactive
-serial shell was not available in the tested QEMU boot path. Use the
-scriptable Debian 7 VM for the final legacy runtime measurements.
+The [full modern transcript](../../docs/evidence/modern-session-2026-10-27.json)
+contains register values, `info frame`, a memory dump and backtrace. Legacy GDB
+is not installed in the recovered image, so its saved return-address slot remains
+an inspection task rather than a new debugger result.
 
 ## Security Meaning
 

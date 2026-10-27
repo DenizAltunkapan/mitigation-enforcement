@@ -3,8 +3,10 @@
 Labs 01–03 completed in the recovered Debian 7 i386 VM as `lab` (UID 1000),
 with no guest network device. Five binaries ran three times each, for 15 runtime
 transcripts. All four capture manifests were verified after extracting the
-results from a separate data disk. These are legacy observations; the matched
-modern recapture and Lab 04 legacy experiment remain outstanding.
+results from a separate data disk. The subsequent
+[27 October comparison](BASELINE-COMPARISON.md) pairs this capture with Debian 13
+using matching source and build inputs. The Lab 04 legacy experiment remains
+outstanding.
 
 ## Environment and provenance
 
@@ -94,7 +96,6 @@ the additional recovery and environment transcripts.
 
 The recovered image is not a clean reinstall, the default QEMU CPU lacks NX,
 and GDB/SSH have not been installed or validated. The original failed installer
-was not reproduced. These limits prevent claiming a complete matched historical
-versus modern comparison. The next step is a Debian 13 recapture with the same
-source and protocol, followed by native legacy Lab 04 collection that does not
-silently upgrade the historical Python/toolchain.
+was not reproduced. The subsequent Debian 13 capture closes the missing modern
+baseline comparison, while these environment limitations still apply. Native
+legacy Lab 04 collection must not silently upgrade the historical Python/toolchain.

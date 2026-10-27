@@ -106,50 +106,32 @@ make clean
 make CFLAGS="-O2 -g -Wall -Wextra -fno-omit-frame-pointer"
 ```
 
-## What To Compare
+## Recorded comparison
 
-The [26 October 2026 legacy capture](../../docs/BASELINE-RESULTS.md) preserves
-Debian 7 source/build hashes, all repeated runs and ELF metadata. The default
-guest CPU did not advertise `nx`: `GNU_STACK RW` is an ELF request, not evidence
-of hardware-enforced execution prevention in this VM.
+The [verified Debian 7 / Debian 13 comparison](../../docs/BASELINE-COMPARISON.md)
+contains three runs and full ELF metadata for each variant in each environment.
+C sources, Makefiles, collector and build-variable values match; actual compiler
+versions and supported no-PIE options differ and are recorded in the build logs.
 
-Earlier exploratory baseline (not a matched modern VM capture):
-
-| Property | Legacy 32-bit | Modern x86-64 |
+| Observation | Debian 7 i386 | Debian 13 amd64 |
 |---|---|---|
-| Distribution | Debian 7.11 | Ubuntu 26.04.1 LTS |
-| Architecture | i686 | x86_64 |
-| Kernel | 3.2.0-4-686-pae | host kernel |
-| GCC | Debian 4.7.2-5 | Ubuntu 15.2.0-16ubuntu1 |
-| Binutils/readelf | GNU Binutils 2.22 | GNU Binutils 2.46 |
-| ASLR setting | `2` | `2` |
+| Default / hardened ELF type | `EXEC` / `EXEC` | `DYN` / `DYN` |
+| Default / hardened text address | stable / stable | moving / moving |
+| No-PIE `main` across three runs | fixed at `0x80484db` | fixed at `0x4011ac` |
+| Hardened guard symbol | `__stack_chk_fail` imported | `__stack_chk_fail` imported |
+| Hardened RELRO / NOW | present / present | present / present |
+| Hardened stack request | `GNU_STACK RW` | `GNU_STACK RW` |
+| CPU advertises NX | no | yes |
 
-Observed comparison:
+The no-PIE contrast within the modern environment is evidence that ASLR being
+set to 2 does not by itself relocate non-PIE text. The default-versus-hardened
+pair changes multiple protections, so it cannot isolate one mitigation's effect.
 
-| Question | Legacy 32-bit | Modern x86-64 |
-|---|---|---|
-| Is the default binary PIE? | no: `EXEC (Executable file)` | yes: `DYN (Position-Independent Executable file)` |
-| Does `mitigation_no_pie` stay at a stable text address? | yes: `main` stayed at `0x80484db` across three runs | yes: `main` stayed at `0x401223` across three runs |
-| Does the hardened binary import `__stack_chk_fail`? | yes | yes |
-| Does the hardened binary contain `GNU_RELRO`? | yes | yes |
-| Does the hardened binary use `BIND_NOW`? | yes | yes |
-| Is `GNU_STACK` non-executable? | yes: `RW`, not `RWE` | yes: `RW`, not `RWE` |
-
-Legacy address samples:
-
-```text
-mitigation_default:  0x80484db -> 0x80484db -> 0x80484db
-mitigation_hardened: 0x804857d -> 0x804857d -> 0x804857d
-mitigation_no_pie:   0x80484db -> 0x80484db -> 0x80484db
-```
-
-Modern address samples:
-
-```text
-mitigation_default:  0x5ffb89fc4227 -> 0x61f4b95ea227 -> 0x6188f1ad0227
-mitigation_hardened: 0x5c4182ea6227 -> 0x57aae1a94227 -> 0x558f6224e227
-mitigation_no_pie:   0x401223 -> 0x401223 -> 0x401223
-```
+Neither a non-executable-stack ELF request nor a CPU feature flag establishes
+runtime execution-permission enforcement for a particular memory region. This
+lab performs no execution-permission test. In particular, the selected legacy
+QEMU CPU does not advertise NX. Guard symbols also do not prove protection of
+a specific function; Lab 04 provides a separate runtime stack-guard experiment.
 
 ## Security Meaning
 

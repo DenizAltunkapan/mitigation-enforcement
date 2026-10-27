@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "description": "Selected modern VM session provenance accompanying the baseline comparison. Repository paths are normalized to $REPO. Supplemental files are separate from baseline capture manifests. Disk writes went to an overlay; the VM had no network device. Hashes establish consistency, not authenticity.",
+  "qemu_version": "QEMU emulator version 10.2.1 (Debian 1:10.2.1+ds-1ubuntu3.2)\nCopyright (c) 2003-2025 Fabrice Bellard and the QEMU Project developers\n",
+  "vm_launch_command": [
+    "qemu-system-x86_64",
+    "-enable-kvm",
+    "-m",
+    "2048",
+    "-smp",
+    "2",
+    "-drive",
+    "file=$REPO/tmp/baseline-comparison-20261027/modern-overlay.qcow2,if=virtio,format=qcow2",
+    "-drive",
+    "file=$REPO/tmp/baseline-comparison-20261027/results.ext,if=virtio,format=raw",
+    "-drive",
+    "file=$REPO/images/modern-seed.iso,if=virtio,format=raw,readonly=on",
+    "-cdrom",
+    "$REPO/tmp/baseline-comparison-20261027/source.iso",
+    "-display",
+    "none",
+    "-monitor",
+    "none",
+    "-chardev",
+    "stdio,id=console,signal=off,logfile=$REPO/tmp/baseline-comparison-20261027/modern-serial.log",
+    "-serial",
+    "chardev:console",
+    "-net",
+    "none"
+  ],
+  "source_image_sha256_before": "fdb51649c7febdcadc85d14fe5038c008d4e5a19e3b04cdd998e0a7b89318593",
+  "source_image_sha256_after": "fdb51649c7febdcadc85d14fe5038c008d4e5a19e3b04cdd998e0a7b89318593",
+  "source_image_info": [
+    {
+      "children": [
+        {
+          "name": "file",
+          "info": {
+            "children": [],
+            "virtual-size": 997195776,
+            "filename": "images/modern.qcow2",
+            "format": "file",
+            "actual-size": 997171200,
+            "format-specific": {
+              "type": "file",
+              "data": {}
+            },
+            "dirty-flag": false
+          }
+        }
+      ],
+      "backing-filename-format": "qcow2",
+      "virtual-size": 21474836480,
+      "filename": "images/modern.qcow2",
+      "cluster-size": 65536,
+      "format": "qcow2",
+      "actual-size": 997171200,
+      "format-specific": {
+        "type": "qcow2",
+        "data": {
+          "compat": "1.1",
+          "compression-type": "zlib",
+          "lazy-refcounts": false,
+          "refcount-bits": 16,
+          "corrupt": false,
+          "extended-l2": false
+        }
+      },
+      "full-backing-filename": "$REPO/downloads/debian-13-generic-amd64.qcow2",
+      "backing-filename": "$REPO/downloads/debian-13-generic-amd64.qcow2",
+      "dirty-flag": false
+    },
+    {
+      "children": [
+        {
+          "name": "file",
+          "info": {
+            "children": [],
+            "virtual-size": 433651712,
+            "filename": "$REPO/downloads/debian-13-generic-amd64.qcow2",
+            "format": "file",
+            "actual-size": 433655808,
+            "format-specific": {
+              "type": "file",
+              "data": {}
+            },
+            "dirty-flag": false
+          }
+        }
+      ],
+      "virtual-size": 3221225472,
+      "filename": "$REPO/downloads/debian-13-generic-amd64.qcow2",
+      "cluster-size": 65536,
+      "format": "qcow2",
+      "actual-size": 433655808,
+      "format-specific": {
+        "type": "qcow2",
+        "data": {
+          "compat": "1.1",
+          "compression-type": "zlib",
+          "lazy-refcounts": false,
+          "refcount-bits": 16,
+          "corrupt": false,
+          "extended-l2": false
+        }
+      },
+      "dirty-flag": false
+    }
+  ],
+  "source_iso_sha256": "39d83f327e861fa5ef92e40ba5a914ab91cc9f8fa06d2e28be39b7176bca2112",
+  "guest_text_artifacts": {
+    "capture-user.txt": "uid=1000(lab) gid=1000(lab) groups=1000(lab),27(sudo)\n",
+    "cpuinfo.txt": "processor\t: 0\nvendor_id\t: AuthenticAMD\ncpu family\t: 15\nmodel\t\t: 107\nmodel name\t: QEMU Virtual CPU version 2.5+\nstepping\t: 1\nmicrocode\t: 0x1000065\ncpu MHz\t\t: 3293.790\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 2\ncore id\t\t: 0\ncpu cores\t: 2\napicid\t\t: 0\ninitial apicid\t: 0\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx lm rep_good nopl xtopology cpuid extd_apicid tsc_known_freq pni cx16 x2apic hypervisor lahf_lm cmp_legacy svm 3dnowprefetch vmmcall\nbugs\t\t: fxsave_leak sysret_ss_attrs null_seg swapgs_fence amd_e400 spectre_v1 spectre_v2\nbogomips\t: 6587.58\nTLB size\t: 1024 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 40 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 1\nvendor_id\t: AuthenticAMD\ncpu family\t: 15\nmodel\t\t: 107\nmodel name\t: QEMU Virtual CPU version 2.5+\nstepping\t: 1\nmicrocode\t: 0x1000065\ncpu MHz\t\t: 3293.790\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 2\ncore id\t\t: 1\ncpu cores\t: 2\napicid\t\t: 1\ninitial apicid\t: 1\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx lm rep_good nopl xtopology cpuid extd_apicid tsc_known_freq pni cx16 x2apic hypervisor lahf_lm cmp_legacy svm 3dnowprefetch vmmcall\nbugs\t\t: fxsave_leak sysret_ss_attrs null_seg swapgs_fence amd_e400 spectre_v1 spectre_v2\nbogomips\t: 6587.58\nTLB size\t: 1024 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 40 bits physical, 48 bits virtual\npower management:\n\n",
+    "modern-stack-frame-gdb.txt": "Breakpoint 1 at 0x115a: file src/stack_frames.c, line 18.\n[Thread debugging using libthread_db enabled]\nUsing host libthread_db library \"/lib/x86_64-linux-gnu/libthread_db.so.1\".\n\nBreakpoint 1, inspect_frame (first=1, second=2, third=3) at src/stack_frames.c:18\n18\t    int local_a = 10;\nrsp            0x7ffe4c278400      0x7ffe4c278400\nrbp            0x7ffe4c278440      0x7ffe4c278440\nrip            0x562a62fc315a      0x562a62fc315a <inspect_frame+17>\nrdi            0x1                 1\nrsi            0x2                 2\nrdx            0x3                 3\nStack level 0, frame at 0x7ffe4c278450:\n rip = 0x562a62fc315a in inspect_frame (src/stack_frames.c:18); saved rip = 0x562a62fc32fc\n called by frame at 0x7ffe4c278460\n source language c.\n Arglist at 0x7ffe4c278440, args: first=1, second=2, third=3\n Locals at 0x7ffe4c278440, Previous frame's sp is 0x7ffe4c278450\n Saved registers:\n  rbp at 0x7ffe4c278440, rip at 0x7ffe4c278448\n0x7ffe4c278440:\t0x00007ffe4c278450\t0x0000562a62fc32fc\n0x7ffe4c278450:\t0x0000000000000001\t0x00007fc4eddb7ca8\n#0  inspect_frame (first=1, second=2, third=3) at src/stack_frames.c:18\n#1  0x0000562a62fc32fc in main () at src/stack_frames.c:43\n",
+    "normal-boot-cmdline.txt": "BOOT_IMAGE=/boot/vmlinuz-6.12.105+deb13-amd64 root=PARTUUID=288b604d-65de-4b09-b1b5-f6f188b3649f ro console=tty0 console=ttyS0,115200 earlyprintk=ttyS0,115200 consoleblank=0\n",
+    "packages.txt": "adduser\t3.152\napparmor\t4.1.0-1\napt\t3.0.3\napt-listchanges\t4.8\napt-utils\t3.0.3\nbase-files\t13.8+deb13u6\nbase-passwd\t3.6.7\nbash\t5.2.37-2+b9\nbash-completion\t1:2.16.0-7\nbind9-host\t1:9.20.26-1~deb13u1\nbind9-libs:amd64\t1:9.20.26-1~deb13u1\nbinutils\t2.44-3\nbinutils-common:amd64\t2.44-3\nbinutils-x86-64-linux-gnu\t2.44-3\nbsdextrautils\t2.41.5-0+deb13u1\nbsdutils\t1:2.41.5-0+deb13u1\nbuild-essential\t12.12\nbzip2\t1.0.8-6\nca-certificates\t20250419\ncloud-guest-utils\t0.33-1\ncloud-image-utils\t0.33-1\ncloud-init\t25.1.4-1+deb13u1\ncloud-initramfs-growroot\t0.18.debian14\ncloud-utils\t0.33-1\ncoreutils\t9.7-3\ncpio\t2.15+dfsg-2\ncpp\t4:14.2.0-1\ncpp-14\t14.2.0-19\ncpp-14-x86-64-linux-gnu\t14.2.0-19\ncpp-x86-64-linux-gnu\t4:14.2.0-1\ncurl\t8.14.1-2+deb13u4\ndash\t0.5.12-12\ndbus\t1.16.2-2\ndbus-bin\t1.16.2-2\ndbus-daemon\t1.16.2-2\ndbus-session-bus-common\t1.16.2-2\ndbus-system-bus-common\t1.16.2-2\ndebconf\t1.5.91\ndebian-archive-keyring\t2025.1\ndebianutils\t5.23.2\ndhcpcd-base\t1:10.1.0-11+deb13u3\ndiffutils\t1:3.10-4\ndistro-info-data\t0.66+deb13u2\ndmsetup\t2:1.02.205-2\ndosfstools\t4.2-1.2\ndpkg\t1.22.22\ndpkg-dev\t1.22.22\ndracut-install\t106-6\ne2fsprogs\t1.47.2-3+b11\neject\t2.41.5-0+deb13u1\nethtool\t1:6.14.2-1\nfakeroot\t1.37.1.1-1\nfdisk\t2.41.5-0+deb13u1\nfile\t1:5.46-5\nfindutils\t4.10.0-3\ng++\t4:14.2.0-1\ng++-14\t14.2.0-19\ng++-14-x86-64-linux-gnu\t14.2.0-19\ng++-x86-64-linux-gnu\t4:14.2.0-1\ngcc\t4:14.2.0-1\ngcc-14\t14.2.0-19\ngcc-14-base:amd64\t14.2.0-19\ngcc-14-x86-64-linux-gnu\t14.2.0-19\ngcc-x86-64-linux-gnu\t4:14.2.0-1\ngdb\t16.3-1\ngdisk\t1.0.10-2\ngenisoimage\t9:1.1.11-4\ngettext-base\t0.23.1-2\ngit\t1:2.47.3-0+deb13u1\ngit-man\t1:2.47.3-0+deb13u1\ngrep\t3.11-4\ngroff-base\t1.23.0-9\ngrub-cloud-amd64\t0.1.1\ngrub-common\t2.12-9+deb13u2\ngrub-efi-amd64-bin\t2.12-9+deb13u2\ngrub-efi-amd64-signed\t1+2.12+9+deb13u2\ngrub-efi-amd64-unsigned\t2.12-9+deb13u2\ngrub-pc-bin\t2.12-9+deb13u2\ngrub2-common\t2.12-9+deb13u2\ngzip\t1.13-1\nhostname\t3.25\ninit\t1.69~deb13u1\ninit-system-helpers\t1.69~deb13u1\ninitramfs-tools\t0.148.4\ninitramfs-tools-bin\t0.148.4\ninitramfs-tools-core\t0.148.4\niproute2\t6.15.0-1\niptables\t1.8.11-2\niputils-ping\t3:20240905-3\nklibc-utils\t2.0.14-1\nkmod\t34.2-2\nless\t668-1\nlibacl1:amd64\t2.3.2-2+b1\nlibaio1t64:amd64\t0.3.113-8+b1\nlibalgorithm-diff-perl\t1.201-1\nlibalgorithm-diff-xs-perl\t0.04-9\nlibalgorithm-merge-perl\t0.08-5\nlibapparmor1:amd64\t4.1.0-1\nlibapt-pkg7.0:amd64\t3.0.3\nlibasan8:amd64\t14.2.0-19\nlibatomic1:amd64\t14.2.0-19\nlibattr1:amd64\t1:2.5.2-3\nlibaudit-common\t1:4.0.2-2\nlibaudit1:amd64\t1:4.0.2-2+b2\nlibbabeltrace1:amd64\t1.5.11-4+b2\nlibbinutils:amd64\t2.44-3\nlibblkid1:amd64\t2.41.5-0+deb13u1\nlibbpf1:amd64\t1:1.5.0-3\nlibbrotli1:amd64\t1.1.0-2+b7\nlibbsd0:amd64\t0.12.2-2\nlibbz2-1.0:amd64\t1.0.8-6\nlibc-bin\t2.41-12+deb13u3\nlibc-dev-bin\t2.41-12+deb13u3\nlibc-l10n\t2.41-12+deb13u3\nlibc6:amd64\t2.41-12+deb13u3\nlibc6-dev:amd64\t2.41-12+deb13u3\nlibcap-ng0:amd64\t0.8.5-4+b1\nlibcap2:amd64\t1:2.75-10+deb13u1+b1\nlibcap2-bin\t1:2.75-10+deb13u1+b1\nlibcbor0.10:amd64\t0.10.2-2\nlibcc1-0:amd64\t14.2.0-19\nlibcom-err2:amd64\t1.47.2-3+b11\nlibcrypt-dev:amd64\t1:4.4.38-1\nlibcrypt1:amd64\t1:4.4.38-1\nlibctf-nobfd0:amd64\t2.44-3\nlibctf0:amd64\t2.44-3\nlibcurl3t64-gnutls:amd64\t8.14.1-2+deb13u4\nlibcurl4t64:amd64\t8.14.1-2+deb13u4\nlibdb5.3t64:amd64\t5.3.28+dfsg2-9\nlibdbus-1-3:amd64\t1.16.2-2\nlibdebconfclient0:amd64\t0.280\nlibdebuginfod-common\t0.192-4\nlibdebuginfod1t64:amd64\t0.192-4\nlibdevmapper1.02.1:amd64\t2:1.02.205-2\nlibdpkg-perl\t1.22.22\nlibduktape207:amd64\t2.7.0-2+b2\nlibdw1t64:amd64\t0.192-4\nlibedit2:amd64\t3.1-20250104-1\nlibefiboot1t64:amd64\t38-3.1+b1\nlibefivar1t64:amd64\t38-3.1+b1\nlibelf1t64:amd64\t0.192-4\nliberror-perl\t0.17030-1\nlibexpat1:amd64\t2.8.3-1~deb13u1\nlibext2fs2t64:amd64\t1.47.2-3+b11\nlibfakeroot:amd64\t1.37.1.1-1\nlibfdisk1:amd64\t2.41.5-0+deb13u1\nlibffi8:amd64\t3.4.8-2\nlibfido2-1:amd64\t1.15.0-1+b1\nlibfile-fcntllock-perl\t0.22-4+b4\nlibfreetype6:amd64\t2.13.3+dfsg-1+deb13u1\nlibfstrm0:amd64\t0.6.1-1+b3\nlibfuse3-4:amd64\t3.17.2-3\nlibgcc-14-dev:amd64\t14.2.0-19\nlibgcc-s1:amd64\t14.2.0-19\nlibgdbm-compat4t64:amd64\t1.24-2\nlibgdbm6t64:amd64\t1.24-2\nlibglib2.0-0t64:amd64\t2.84.4-3~deb13u3\nlibgmp10:amd64\t2:6.3.0+dfsg-3\nlibgnutls30t64:amd64\t3.8.9-3+deb13u4\nlibgomp1:amd64\t14.2.0-19\nlibgpm2:amd64\t1.20.7-11+b2\nlibgprofng0:amd64\t2.44-3\nlibgssapi-krb5-2:amd64\t1.21.3-5+deb13u1\nlibhogweed6t64:amd64\t3.10.1-1\nlibhwasan0:amd64\t14.2.0-19\nlibidn2-0:amd64\t2.3.8-2\nlibip4tc2:amd64\t1.8.11-2\nlibip6tc2:amd64\t1.8.11-2\nlibipt2\t2.1.2-1\nlibisl23:amd64\t0.27-1\nlibitm1:amd64\t14.2.0-19\nlibjansson4:amd64\t2.14-2+b3\nlibjemalloc2:amd64\t5.3.0-3\nlibjson-c5:amd64\t0.18+ds-1\nlibk5crypto3:amd64\t1.21.3-5+deb13u1\nlibkeyutils1:amd64\t1.6.3-6\nlibklibc:amd64\t2.0.14-1\nlibkmod2:amd64\t34.2-2\nlibkrb5-3:amd64\t1.21.3-5+deb13u1\nlibkrb5support0:amd64\t1.21.3-5+deb13u1\nliblastlog2-2:amd64\t2.41.5-0+deb13u1\nlibldap2:amd64\t2.6.10+dfsg-1\nliblmdb0:amd64\t0.9.31-1+b2\nliblocale-gettext-perl\t1.07-7+b1\nliblsan0:amd64\t14.2.0-19\nliblz4-1:amd64\t1.10.0-4\nliblzma5:amd64\t5.8.1-1+deb13u1\nlibmagic-mgc\t1:5.46-5\nlibmagic1t64:amd64\t1:5.46-5\nlibmaxminddb0:amd64\t1.12.2-1\nlibmd0:amd64\t1.1.0-2+b1\nlibmnl0:amd64\t1.0.5-3\nlibmount1:amd64\t2.41.5-0+deb13u1\nlibmpc3:amd64\t1.3.1-1+b3\nlibmpfr6:amd64\t4.2.2-1\nlibncursesw6:amd64\t6.5+20250216-2\nlibnetfilter-conntrack3:amd64\t1.1.0-1\nlibnetplan1:amd64\t1.1.2-7\nlibnettle8t64:amd64\t3.10.1-1\nlibnewt0.52:amd64\t0.52.25-1\nlibnfnetlink0:amd64\t1.0.2-3\nlibnftnl11:amd64\t1.2.9-1\nlibnghttp2-14:amd64\t1.64.0-1.1+deb13u1\nlibnghttp3-9:amd64\t1.8.0-1\nlibngtcp2-16:amd64\t1.11.0-1+deb13u1\nlibngtcp2-crypto-gnutls8:amd64\t1.11.0-1+deb13u1\nlibnss-myhostname:amd64\t257.13-1~deb13u1\nlibnss-resolve:amd64\t257.13-1~deb13u1\nlibnuma1:amd64\t2.0.19-1\nlibp11-kit0:amd64\t0.25.5-3\nlibpam-modules:amd64\t1.7.0-5\nlibpam-modules-bin\t1.7.0-5\nlibpam-runtime\t1.7.0-5\nlibpam-systemd:amd64\t257.13-1~deb13u1\nlibpam0g:amd64\t1.7.0-5\nlibpcap0.8t64:amd64\t1.10.5-2\nlibpci3:amd64\t1:3.13.0-2\nlibpcre2-8-0:amd64\t10.46-1~deb13u1\nlibperl5.40:amd64\t5.40.1-6\nlibpipeline1:amd64\t1.5.8-1\nlibpng16-16t64:amd64\t1.6.48-1+deb13u5\nlibpolkit-agent-1-0:amd64\t126-2\nlibpolkit-gobject-1-0:amd64\t126-2\nlibpopt0:amd64\t1.19+dfsg-2\nlibproc2-0:amd64\t2:4.0.4-9\nlibprotobuf-c1:amd64\t1.5.1-1\nlibpsl5t64:amd64\t0.21.2-1.1+b1\nlibpython3-stdlib:amd64\t3.13.5-1\nlibpython3.13:amd64\t3.13.5-2+deb13u4\nlibpython3.13-minimal:amd64\t3.13.5-2+deb13u4\nlibpython3.13-stdlib:amd64\t3.13.5-2+deb13u4\nlibquadmath0:amd64\t14.2.0-19\nlibreadline8t64:amd64\t8.2-6\nlibrtmp1:amd64\t2.4+20151223.gitfa8646d.1-2+b5\nlibsasl2-2:amd64\t2.1.28+dfsg1-9\nlibsasl2-modules-db:amd64\t2.1.28+dfsg1-9\nlibseccomp2:amd64\t2.6.0-2\nlibselinux1:amd64\t3.8.1-1\nlibsemanage-common\t3.8.1-1\nlibsemanage2:amd64\t3.8.1-1\nlibsepol2:amd64\t3.8.1-1\nlibsframe1:amd64\t2.44-3\nlibslang2:amd64\t2.3.3-5+b2\nlibsmartcols1:amd64\t2.41.5-0+deb13u1\nlibsodium23:amd64\t1.0.18-1+deb13u1\nlibsource-highlight-common\t3.1.9-4.3\nlibsource-highlight4t64:amd64\t3.1.9-4.3+b1\nlibsqlite3-0:amd64\t3.46.1-7+deb13u1\nlibss2:amd64\t1.47.2-3+b11\nlibssh2-1t64:amd64\t1.11.1-1+deb13u1\nlibssl3t64:amd64\t3.5.7-1~deb13u2\nlibstdc++-14-dev:amd64\t14.2.0-19\nlibstdc++6:amd64\t14.2.0-19\nlibsystemd-shared:amd64\t257.13-1~deb13u1\nlibsystemd0:amd64\t257.13-1~deb13u1\nlibtasn1-6:amd64\t4.20.0-2+deb13u1\nlibtext-charwidth-perl:amd64\t0.04-11+b4\nlibtext-wrapi18n-perl\t0.06-10\nlibtinfo6:amd64\t6.5+20250216-2\nlibtirpc-common\t1.3.6+ds-1\nlibtirpc3t64:amd64\t1.3.6+ds-1\nlibtsan2:amd64\t14.2.0-19\nlibubsan1:amd64\t14.2.0-19\nlibuchardet0:amd64\t0.0.8-1+b2\nlibudev1:amd64\t257.13-1~deb13u1\nlibunistring5:amd64\t1.3-2\nliburcu8t64:amd64\t0.15.2-2\nliburing2:amd64\t2.9-1\nlibuuid1:amd64\t2.41.5-0+deb13u1\nlibuv1t64:amd64\t1.50.0-2\nlibwrap0:amd64\t7.6.q-36\nlibwtmpdb0:amd64\t0.73.0-3+deb13u1\nlibxml2:amd64\t2.12.7+dfsg+really2.9.14-2.1+deb13u3\nlibxtables12:amd64\t1.8.11-2\nlibxxhash0:amd64\t0.8.3-2\nlibyaml-0-2:amd64\t0.2.5-2\nlibzstd1:amd64\t1.5.7+dfsg-1\nlinux-base\t4.12.1\nlinux-image-6.12.105+deb13-amd64\t6.12.105-1\nlinux-image-amd64\t6.12.105-1\nlinux-libc-dev\t6.12.107-1\nlinux-sysctl-defaults\t4.12.1\nlocales\t2.41-12+deb13u3\nlogin\t1:4.16.0-2+really2.41.5-0+deb13u1\nlogin.defs\t1:4.17.4-2\nlogsave\t1.47.2-3+b11\nlsb-release\t12.1-1\nmake\t4.4.1-2\nman-db\t2.13.1-1\nmanpages\t6.9.1-1\nmanpages-dev\t6.9.1-1\nmawk\t1.3.4.20250131-1\nmedia-types\t13.0.0\nmokutil\t0.7.2-1\nmount\t2.41.5-0+deb13u1\nnano\t8.4-1+deb13u1\nncurses-base\t6.5+20250216-2\nncurses-bin\t6.5+20250216-2\nnetbase\t6.5\nnetcat-openbsd\t1.229-1\nnetplan-generator\t1.1.2-7\nnetplan.io\t1.1.2-7\nopenssh-client\t1:10.0p1-7+deb13u4\nopenssh-server\t1:10.0p1-7+deb13u4\nopenssh-sftp-server\t1:10.0p1-7+deb13u4\nopenssl\t3.5.7-1~deb13u2\nopenssl-provider-legacy\t3.5.7-1~deb13u2\npasswd\t1:4.17.4-2\npatch\t2.8-2\npci.ids\t0.0~2025.06.09-1\npciutils\t1:3.13.0-2\nperl\t5.40.1-6\nperl-base\t5.40.1-6\nperl-modules-5.40\t5.40.1-6\npolkitd\t126-2\nprocps\t2:4.0.4-9\npsmisc\t23.7-2\npython-apt-common\t3.0.0\npython3\t3.13.5-1\npython3-apt\t3.0.0\npython3-attr\t25.3.0-1\npython3-bcrypt\t4.2.0-2.1+b1\npython3-blinker\t1.9.0-1\npython3-certifi\t2025.1.31+ds-1\npython3-cffi-backend:amd64\t1.17.1-3\npython3-chardet\t5.2.0+dfsg-2\npython3-charset-normalizer\t3.4.2-1\npython3-configobj\t5.0.9-1\npython3-cryptography\t43.0.0-3+deb13u1\npython3-dbus\t1.4.0-1\npython3-debconf\t1.5.91\npython3-debian\t1.0.1\npython3-debianbts\t4.1.1\npython3-distro\t1.9.0-1\npython3-distro-info\t1.13\npython3-idna\t3.10-1+deb13u1\npython3-jinja2\t3.1.6-1\npython3-json-pointer\t2.4-3\npython3-jsonpatch\t1.32-5\npython3-jsonschema\t4.19.2-6\npython3-jsonschema-specifications\t2023.12.1-2\npython3-jwt\t2.10.1-2+deb13u1\npython3-markupsafe\t2.1.5-1+b3\npython3-minimal\t3.13.5-1\npython3-netplan\t1.1.2-7\npython3-oauthlib\t3.2.2-3\npython3-referencing\t0.36.2-1\npython3-reportbug\t13.2.0\npython3-requests\t2.32.3+dfsg-5+deb13u1\npython3-rpds-py\t0.21.0-2+b1\npython3-urllib3\t2.3.0-3+deb13u2\npython3-yaml\t6.0.2-1+b2\npython3.13\t3.13.5-2+deb13u4\npython3.13-minimal\t3.13.5-2+deb13u4\nqemu-utils\t1:10.0.11+ds-0+deb13u1\nreadline-common\t8.2-6\nreportbug\t13.2.0\nrpcsvc-proto\t1.4.3-1\nrunit-helper\t2.16.4\nscreen\t4.9.1-3\nsed\t4.9-2+deb13u1\nsensible-utils\t0.0.25\nsgml-base\t1.31+nmu1\nshim-helpers-amd64-signed\t1+16.1+2~deb13u1\nshim-signed:amd64\t1.51~1+deb13u1+16.1-2~deb13u1\nshim-signed-common\t1.51~1+deb13u1+16.1-2~deb13u1\nshim-unsigned:amd64\t16.1-2~deb13u1\nsocat\t1.8.0.3-1\nsq\t1.3.1-2+b2\nsqv\t1.3.0-3+b2\nssh-import-id\t5.10-3\nsudo\t1.9.16p2-3+deb13u2\nsystemd\t257.13-1~deb13u1\nsystemd-resolved\t257.13-1~deb13u1\nsystemd-sysv\t257.13-1~deb13u1\nsystemd-timesyncd\t257.13-1~deb13u1\nsysvinit-utils\t3.14-4\ntar\t1.35+dfsg-3.1\ntcpdump\t4.99.5-2\ntraceroute\t1:2.1.6-1\ntzdata\t2026b-0+deb13u1\nucf\t3.0052\nudev\t257.13-1~deb13u1\nunattended-upgrades\t2.12\nutil-linux\t2.41.5-0+deb13u1\nuuid-runtime\t2.41.5-0+deb13u1\nvim\t2:9.1.1230-2\nvim-common\t2:9.1.1230-2\nvim-runtime\t2:9.1.1230-2\nvim-tiny\t2:9.1.1230-2\nwget\t1.25.0-2\nwhiptail\t0.52.25-1\nxml-core\t0.19\nxz-utils\t5.8.1-1+deb13u1\nzlib1g:amd64\t1:1.3.dfsg+really1.3.1-1+b1\nzstd\t1.5.7+dfsg-1\n"
+  },
+  "artifact_sha256": {
+    "capture-user.txt": "1d8ae018dc509ea9ea0eb02e348d192e6cc06555a74ee72e704cac65bb7ddccf",
+    "cpuinfo.txt": "8af5a0ce2b1d1207afa6a541da46bbe4197fbc28d7f9fbb8762f09a172dc44d6",
+    "modern-stack-frame-gdb.txt": "47f945cffc540b439e80def178122193ea7f60f4ed9dfa5a9c2a27f32e9d18c9",
+    "normal-boot-cmdline.txt": "c67b50a3b294c7fbc6768d52eda37a5149c83539c05406ed44d21fe836bb2f40",
+    "packages.txt": "e0b4828f42e38f5f511961bc929b158cb90a7ca6e0d1a2fb708043578a50aa50"
+  },
+  "debugger_command": [
+    "gdb",
+    "--batch",
+    "-ex",
+    "set disable-randomization off",
+    "-ex",
+    "break inspect_frame",
+    "-ex",
+    "run",
+    "-ex",
+    "info registers rsp rbp rip rdi rsi rdx",
+    "-ex",
+    "info frame",
+    "-ex",
+    "x/4gx $rbp",
+    "-ex",
+    "bt",
+    "/mnt/results/captures/modern-baseline/02-stack-frames/stack_frames"
+  ],
+  "serial_log_sha256": "704fcf5540faf3c768437a636406d4d8b807859449cef704c1fce62a1f5a3e8f",
+  "exporter_sha256": "4a44b1bbc6ca89ee5975291c769887ca31010673f53c09ba152c0808f237dff3"
+}

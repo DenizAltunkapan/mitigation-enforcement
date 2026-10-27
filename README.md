@@ -21,10 +21,13 @@ detects corruption after the invalid write; the bounds check prevents the write.
 The experiment includes two optimization levels, repeated trials, raw output
 and source/build hashes.
 
-This is an independent educational research project in progress. Labs 01–03 now
-include a [verified recovered Debian 7 capture](docs/BASELINE-RESULTS.md), alongside
-earlier exploratory observations from mixed environments. A matched modern
-recapture and the Lab 04 historical 32-bit replication remain open. See the
+Labs 01–03 now include a [Debian 7 i386 / Debian 13 amd64 comparison](docs/BASELINE-COMPARISON.md):
+matching source and build inputs, 30 runtime transcripts, verified manifests and
+a modern GDB transcript. Non-PIE text remained fixed while the modern default
+PIE text moved; heap, stack and libc mappings moved in both environments.
+
+This is an independent educational research project in progress. The historical
+installation was recovered, and native legacy Lab 04 replication remains open. See the
 [methodology, evidence status and next experiments](docs/RESEARCH.md) for the
 limits of the results and the remaining work.
 
@@ -39,6 +42,10 @@ From the repository root:
 python3 scripts/capture-stack-canary.py host /tmp/canary-review
 python3 scripts/export-stack-canary.py /tmp/canary-review \
   --output /tmp/canary-review.json
+# Optional Labs 01–03 host capture and verified text export:
+bash scripts/capture-baseline.sh host /tmp/baseline-review
+python3 scripts/export-baseline.py /tmp/baseline-review \
+  --output /tmp/baseline-review.json
 ```
 
 Use fresh output paths. Validation builds disposable examples, exercises failure
@@ -82,9 +89,10 @@ onto a LAN or expose its SSH port to other hosts.
 
 ### Legacy 32-bit VM
 
-The legacy baseline is a scriptable Debian 7 ("Wheezy") i386 VM. It is
-installable, persistent and reachable over SSH, so lab output can be
-captured without relying on a graphical session.
+The selected legacy distribution is Debian 7 ("Wheezy") i386. The setup script
+is intended to produce a persistent installation with SSH. The recorded baseline
+uses a recovered installation with serial login; a fresh unattended install and
+its SSH transport still need independent validation.
 
 - image: `debian-7.11.0-i386-netinst.iso`
 - source: <https://cdimage.debian.org/mirror/cdimage/archive/7.11.0/i386/iso-cd/>
@@ -96,9 +104,10 @@ Install it:
 ./scripts/setup-legacy-vm.sh
 ```
 
-This builds a self-installing ISO (preseed baked into the default boot
-entry) and runs the install fully unattended — no keyboard input required.
-Let the installer finish and reboot on its own before closing the window.
+This builds an ISO with preseed in the default boot entry and starts the
+installer. Let it finish and reboot before closing the window, then verify
+normal disk boot and login. The earlier local installation required a separate
+bootloader recovery; the script's end-to-end success is not yet established.
 
 Start it:
 
@@ -173,14 +182,21 @@ Requires Bash, a compiler, Make, Binutils and coreutils; GDB is optional.
 Override builds with `CC` (compiler executable), `CFLAGS` and `LDFLAGS`.
 Use the `host` label for local smoke tests; it does not replace VM results.
 
-The earlier lab tables mix historical LiveCD, Debian VM and Ubuntu host
-measurements. Treat them as preliminary. The
-[26 October legacy results](docs/BASELINE-RESULTS.md) have preserved capture
-evidence, but still need a matched modern recapture on consistent
-baselines. To isolate mitigation effects, vary one protection at a time
-within the same environment. ELF indicators alone do not prove protection
-of a particular code path. VM downloads and packages are not pinned, so
-recorded versions do not guarantee identical future installations.
+The [current comparison](docs/BASELINE-COMPARISON.md) uses preserved Debian VM
+captures with matching source, Makefiles, collector and build variables. Export
+one or more complete capture directories on the review machine:
+
+```bash
+python3 scripts/export-baseline.py /path/to/legacy-baseline /path/to/modern-baseline \
+  --output /tmp/baseline-comparison.json
+```
+
+The exporter verifies every manifest and exact artifact coverage before writing.
+For multiple captures it rejects mismatched inputs. It does not identify VMs,
+authenticate measurements or isolate architecture from compiler/libc/kernel
+differences. ELF indicators alone do not prove protection of a particular code
+path. VM downloads and packages are not pinned, so recorded versions do not
+guarantee identical future installations.
 
 Lab 04 uses a dedicated collector with repeated safe/oversized inputs, signal
 recording and checks of guard detection versus bounds-check rejection:

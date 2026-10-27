@@ -82,45 +82,27 @@ EXEC  traditional non-PIE executable
 DYN   position-independent executable or shared object
 ```
 
-## What To Compare
+## Recorded comparison
 
-The [26 October 2026 legacy capture](../../docs/BASELINE-RESULTS.md) provides
-verified Debian 7 runtime observations and all three address/mapping transcripts.
-The default executable's text stayed fixed while heap, stack and libc mappings
-moved. Use `/proc/self/maps` for libc placement: the printed `printf` pointer can
-lie inside the executable mapping rather than the loaded libc.
+The [verified Debian 7 / Debian 13 comparison](../../docs/BASELINE-COMPARISON.md)
+uses identical sources, Makefiles, collector and recorded build variables.
+Each environment has three runs of this program:
 
-Earlier exploratory baseline (not matched runtime measurements):
-
-| Property | Historical LiveCD | Modern VM |
+| Observation | Debian 7 i386 | Debian 13 amd64 |
 |---|---|---|
-| Distribution | Ubuntu 7.04 (from LiveCD rootfs) | Debian GNU/Linux 13 (trixie) |
-| Architecture | i386 | x86_64 |
-| Kernel | 2.6.20-15-generic | 6.12.105+deb13-amd64 |
-| GCC | 4.1.2 package in LiveCD manifest | Debian 14.2.0-19 |
-| GDB | 6.6 package in LiveCD manifest | Debian 16.3-1 |
-| glibc | 2.5 package in LiveCD manifest | 2.41-12+deb13u3 |
-| ASLR setting | configured as `kernel.randomize_va_space=0` in LiveCD rootfs | `2` |
-| NX support | not measured yet from interactive LiveCD shell | supported |
+| Default ELF type | `EXEC` | `DYN` (PIE) |
+| `main` across three runs | fixed at `0x8048688` | changes in all three runs |
+| Heap and stack placement | changes in all three runs | changes in all three runs |
+| libc executable mapping | changes in all three runs | changes in all three runs |
 
-The preferred legacy distribution is Debian 7 i386. The recorded runtime capture
-used a [recovered local installation](../../docs/LEGACY-DIAGNOSIS.md) over a serial
-console; its results do not validate the unattended installer or SSH transport.
+The legacy `printf from libc` pointer lies in the executable mapping, while
+its modern counterpart lies in the libc mapping. Use `/proc/self/maps` to
+identify the actual libc mapping rather than treating that pointer as its base.
 
-Observed comparison:
-
-| Question | Legacy 32-bit | Modern x86-64 |
-|---|---|---|
-| Are addresses 32-bit or 64-bit sized? | 32-bit expected from i386 LiveCD; run pending | 64-bit addresses observed |
-| Does `main` move between runs? | run pending | yes: `0x55bc98c88150` -> `0x564ec8d08150` |
-| Does the stack move between runs? | run pending | yes: `0x7ffd5a38ebf4` -> `0x7fff71153ca4` |
-| Does the heap move between runs? | run pending | yes: `0x55bcbdaab2a0` -> `0x564f049e42a0` |
-| Does libc move between runs? | run pending | yes: `0x7f7e9d331900` -> `0x7f50a0eb8900` |
-| Is the binary PIE by default? | run pending | yes: `DYN (Position-Independent Executable file)` |
-
-Legacy note: the LiveCD boots under QEMU and exposes kernel output over serial,
-but did not provide an interactive serial shell in the tested boot path. Use
-the scriptable Debian 7 VM for the final legacy runtime measurements.
+The comparison report links all runtime transcripts, ELF metadata and source
+hashes. The legacy installation was recovered; this is not a clean-install
+validation or an experiment isolating architecture from toolchain differences.
+Three samples do not measure ASLR entropy.
 
 ## Security Meaning
 
