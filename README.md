@@ -33,7 +33,7 @@ limits of the results and the remaining work.
 
 ## Review locally
 
-On x86 Linux, install Bash, Python 3.8+, GCC, GNU Make, Binutils, coreutils,
+On x86 Linux, install Bash, Python 3.8+, GCC, GDB, GNU Make, Binutils, coreutils,
 QEMU utilities (`qemu-img`) and e2fsprogs (`mke2fs`, `e2fsck`, `debugfs`).
 From the repository root:
 
@@ -42,6 +42,7 @@ From the repository root:
 python3 scripts/capture-stack-canary.py host /tmp/canary-review
 python3 scripts/export-stack-canary.py /tmp/canary-review \
   --output /tmp/canary-review.json
+python3 scripts/capture-return-overwrite.py host /tmp/overwrite-review
 # Optional Labs 01–03 host capture and verified text export:
 bash scripts/capture-baseline.sh host /tmp/baseline-review
 python3 scripts/export-baseline.py /tmp/baseline-review \
@@ -155,13 +156,14 @@ in a fresh clone; it provides serial login but has no SSH or GDB installed.
 
 ## Labs
 
-Labs 01–03 establish the baseline; Lab 04 introduces a controlled
-memory-corruption experiment:
+Labs 01–03 establish the baseline; Labs 04–05 introduce controlled
+memory-corruption experiments:
 
 - [Lab 01 - Process Memory Layout](labs/01-process-memory-layout/README.md)
 - [Lab 02 - Stack Frames and Calling Conventions](labs/02-stack-frames/README.md)
 - [Lab 03 - Binary Mitigation Baseline](labs/03-binary-mitigation-baseline/README.md)
 - [Lab 04 - Stack Canary: Detection Versus Repair](labs/04-stack-canary/README.md)
+- [Lab 05 - Return-Address Overwrite Under Mitigations](labs/05-return-address-overwrite/README.md)
 
 ## Capture Baselines
 

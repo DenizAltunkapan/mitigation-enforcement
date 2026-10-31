@@ -25,6 +25,7 @@ arbitrary code execution.
 | 02: stack frames | Verified VM comparison plus modern GDB register/frame transcript | Legacy debugger transcript |
 | 03: ELF mitigations | Verified VM comparison, repeated runs and ELF metadata | Runtime execution-permission experiment; no NX claim for the default legacy CPU |
 | 04: stack canary | 72 recorded trials across host/Debian VM and `-O0`/`-O2`, with selected text evidence | Historical 32-bit replication after validating the recovered boot path |
+| 05: return-address overwrite | Automated x86-64 capture across 4 binary variants (plain, canary, PIE, fixed) with 27 recorded trials | Portable JSON evidence exporter |
 
 The Lab 01–03 guides now use the [verified VM comparison](BASELINE-COMPARISON.md).
 It pairs the recovered Debian 7 capture from 26 October with the Debian 13

@@ -23,6 +23,11 @@ labs/04-stack-canary/stack_unprotected
 labs/04-stack-canary/stack_canary
 labs/04-stack-canary/stack_fixed
 
+labs/05-return-address-overwrite/overwrite_plain
+labs/05-return-address-overwrite/overwrite_canary
+labs/05-return-address-overwrite/overwrite_pie
+labs/05-return-address-overwrite/overwrite_fixed
+
 # Python
 __pycache__/
 *.pyc
