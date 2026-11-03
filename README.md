@@ -184,7 +184,7 @@ memory-corruption experiments:
 | [02](labs/02-stack-frames/README.md) | Stack frames | i386 / x86-64 | VM comparison and modern GDB transcript |
 | [03](labs/03-binary-mitigation-baseline/README.md) | ELF mitigations | i386 / x86-64 | Verified VM metadata and runs |
 | [04](labs/04-stack-canary/README.md) | Stack canary | x86-64 host / VM | [72 trials](labs/04-stack-canary/RESULTS.md), `-O0` / `-O2` |
-| [05](labs/05-return-address-overwrite/README.md) | Return-address overwrite | x86-64 host | [4 variants, 27 trials](labs/05-return-address-overwrite/RESULTS.md) |
+| [05](labs/05-return-address-overwrite/README.md) | Return-address overwrite | x86-64 host / VM | [4 variants, 54 trials](labs/05-return-address-overwrite/RESULTS.md) |
 
 Labs 01–03 share a cross-lab [baseline report](docs/BASELINE-RESULTS.md) and
 [comparison evidence](docs/evidence/). The independent Lab 04 and 05 captures

@@ -25,7 +25,7 @@ arbitrary code execution.
 | 02: stack frames | Verified VM comparison plus modern GDB register/frame transcript | Legacy debugger transcript |
 | 03: ELF mitigations | Verified VM comparison, repeated runs and ELF metadata | Runtime execution-permission experiment; no NX claim for the default legacy CPU |
 | 04: stack canary | 72 recorded trials across host/Debian VM and `-O0`/`-O2`, with selected text evidence | Historical 32-bit replication after validating the recovered boot path |
-| 05: return-address overwrite | [Host results](../labs/05-return-address-overwrite/RESULTS.md) and portable JSON evidence across 4 binary variants and 27 trials | Independent VM and historical i386 replication |
+| 05: return-address overwrite | [Verified host / Debian 13 VM comparison](../labs/05-return-address-overwrite/RESULTS.md) and portable JSON evidence across 4 binary variants (54 recorded trials) | Historical 32-bit i386 replication using an architecture-adapted test setup |
 
 The Lab 01–03 guides now use the [verified VM comparison](BASELINE-COMPARISON.md).
 It pairs the recovered Debian 7 capture from 26 October with the Debian 13
@@ -35,8 +35,9 @@ The default legacy QEMU CPU does not advertise NX; ELF stack flags alone cannot
 establish execution prevention in that environment.
 Lab 04's [results](../labs/04-stack-canary/RESULTS.md) distinguish host and VM
 observations and explicitly record the failed legacy attempt.
-Lab 05's [results](../labs/05-return-address-overwrite/RESULTS.md) record one
-x86-64 host capture; no Lab 05 VM comparison has been completed.
+Lab 05's [results](../labs/05-return-address-overwrite/RESULTS.md) compare host
+and Debian 13 VM observations under identical build flags; historical 32-bit
+replication remains open.
 
 ## Experiment protocol
 
