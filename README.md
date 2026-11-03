@@ -1,5 +1,9 @@
 # Exploit Evolution
 
+[![Lab validation](https://github.com/DenizAltunkapan/exploit-evolution/actions/workflows/labs.yml/badge.svg)](https://github.com/DenizAltunkapan/exploit-evolution/actions/workflows/labs.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](README.md#quickstart)
+
 A systems-security lab for comparing classical exploitation primitives on
 legacy 32-bit Linux and modern x86-64 Linux.
 
@@ -7,6 +11,21 @@ The point is not to collect exploits. The point is to document why an old
 exploit path worked, which modern mitigation changes the path, what additional
 primitive would be needed today and how the underlying bug should actually be
 fixed.
+
+## Quickstart
+
+On x86 Linux, install Bash, Python 3.8+, GCC, GDB, GNU Make, Binutils,
+coreutils, QEMU utilities (`qemu-img`) and e2fsprogs (`mke2fs`, `e2fsck`,
+`debugfs`). From the repository root:
+
+```bash
+./scripts/validate.sh
+```
+
+This verifies builds, tooling and evidence integrity locally. No VM startup,
+ISO download, root access or network access is needed. For a new host capture,
+see [local review commands](#review-locally). A host run does not substitute
+for the recorded VM measurements.
 
 ## Research question and current result
 
@@ -33,16 +52,16 @@ limits of the results and the remaining work.
 
 ## Review locally
 
-On x86 Linux, install Bash, Python 3.8+, GCC, GDB, GNU Make, Binutils, coreutils,
-QEMU utilities (`qemu-img`) and e2fsprogs (`mke2fs`, `e2fsck`, `debugfs`).
-From the repository root:
+With the [Quickstart prerequisites](#quickstart) installed, run these optional
+host captures from the repository root:
 
 ```bash
-./scripts/validate.sh
 python3 scripts/capture-stack-canary.py host /tmp/canary-review
 python3 scripts/export-stack-canary.py /tmp/canary-review \
   --output /tmp/canary-review.json
 python3 scripts/capture-return-overwrite.py host /tmp/overwrite-review
+python3 scripts/export-return-overwrite.py /tmp/overwrite-review \
+  --output /tmp/overwrite-review.json
 # Optional Labs 01–03 host capture and verified text export:
 bash scripts/capture-baseline.sh host /tmp/baseline-review
 python3 scripts/export-baseline.py /tmp/baseline-review \
@@ -159,11 +178,17 @@ in a fresh clone; it provides serial login but has no SSH or GDB installed.
 Labs 01–03 establish the baseline; Labs 04–05 introduce controlled
 memory-corruption experiments:
 
-- [Lab 01 - Process Memory Layout](labs/01-process-memory-layout/README.md)
-- [Lab 02 - Stack Frames and Calling Conventions](labs/02-stack-frames/README.md)
-- [Lab 03 - Binary Mitigation Baseline](labs/03-binary-mitigation-baseline/README.md)
-- [Lab 04 - Stack Canary: Detection Versus Repair](labs/04-stack-canary/README.md)
-- [Lab 05 - Return-Address Overwrite Under Mitigations](labs/05-return-address-overwrite/README.md)
+| Lab | Topic | Target | Recorded evidence |
+|---|---|---|---|
+| [01](labs/01-process-memory-layout/README.md) | Process memory layout | i386 / x86-64 | Verified Debian VM comparison |
+| [02](labs/02-stack-frames/README.md) | Stack frames | i386 / x86-64 | VM comparison and modern GDB transcript |
+| [03](labs/03-binary-mitigation-baseline/README.md) | ELF mitigations | i386 / x86-64 | Verified VM metadata and runs |
+| [04](labs/04-stack-canary/README.md) | Stack canary | x86-64 host / VM | [72 trials](labs/04-stack-canary/RESULTS.md), `-O0` / `-O2` |
+| [05](labs/05-return-address-overwrite/README.md) | Return-address overwrite | x86-64 host | [4 variants, 27 trials](labs/05-return-address-overwrite/RESULTS.md) |
+
+Labs 01–03 share a cross-lab [baseline report](docs/BASELINE-RESULTS.md) and
+[comparison evidence](docs/evidence/). The independent Lab 04 and 05 captures
+have `RESULTS.md` and `evidence/` within their own lab directories.
 
 ## Capture Baselines
 

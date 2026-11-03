@@ -25,7 +25,7 @@ arbitrary code execution.
 | 02: stack frames | Verified VM comparison plus modern GDB register/frame transcript | Legacy debugger transcript |
 | 03: ELF mitigations | Verified VM comparison, repeated runs and ELF metadata | Runtime execution-permission experiment; no NX claim for the default legacy CPU |
 | 04: stack canary | 72 recorded trials across host/Debian VM and `-O0`/`-O2`, with selected text evidence | Historical 32-bit replication after validating the recovered boot path |
-| 05: return-address overwrite | Automated x86-64 capture across 4 binary variants (plain, canary, PIE, fixed) with 27 recorded trials | Portable JSON evidence exporter |
+| 05: return-address overwrite | [Host results](../labs/05-return-address-overwrite/RESULTS.md) and portable JSON evidence across 4 binary variants and 27 trials | Independent VM and historical i386 replication |
 
 The Lab 01–03 guides now use the [verified VM comparison](BASELINE-COMPARISON.md).
 It pairs the recovered Debian 7 capture from 26 October with the Debian 13
@@ -35,6 +35,8 @@ The default legacy QEMU CPU does not advertise NX; ELF stack flags alone cannot
 establish execution prevention in that environment.
 Lab 04's [results](../labs/04-stack-canary/RESULTS.md) distinguish host and VM
 observations and explicitly record the failed legacy attempt.
+Lab 05's [results](../labs/05-return-address-overwrite/RESULTS.md) record one
+x86-64 host capture; no Lab 05 VM comparison has been completed.
 
 ## Experiment protocol
 
@@ -57,12 +59,12 @@ isolate the effect of any one of those variables.
 
 ## Reproduction and evidence integrity
 
-[The root README](../README.md#review-locally) provides the local entry point.
-The baseline collector covers Labs 01–03; the dedicated Python collector covers
-Lab 04. Both build copies outside the source tree and refuse existing output
-directories. Captures include their collector source.
+[The root README](../README.md#quickstart) provides the local entry point.
+The baseline collector covers Labs 01–03; dedicated Python collectors cover
+Labs 04 and 05. All build copies outside the source tree and refuse existing
+output directories. Captures include their collector source.
 
-Full capture manifests permit integrity checks. The baseline and Lab 04 exporters
+Full capture manifests permit integrity checks. The baseline, Lab 04 and Lab 05 exporters
 verify every manifest entry and exact artifact coverage before creating portable
 JSON snapshots. They reject incomplete captures, modified files, extra artifacts,
 duplicate entries and symlinks. They read data only and never execute captured

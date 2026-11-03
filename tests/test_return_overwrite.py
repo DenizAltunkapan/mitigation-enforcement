@@ -13,6 +13,7 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "capture-return-overwrite.py"
+EXPORTER = ROOT / "scripts" / "export-return-overwrite.py"
 TOOLS = ("gcc", "make", "nm", "readelf", "objdump", "gdb", "getconf")
 
 
@@ -45,6 +46,16 @@ class ReturnOverwriteTests(unittest.TestCase):
 
             observations = json.loads((output / "observations.json").read_text())
             self.assertEqual(len(observations), 27)
+            exported = Path(directory) / "portable.json"
+            export = subprocess.run([sys.executable, str(EXPORTER), str(output),
+                                     "--output", str(exported)], capture_output=True, text=True)
+            self.assertEqual(export.returncode, 0, export.stderr)
+            portable = json.loads(exported.read_text())["captures"][0]
+            self.assertEqual(len(portable["observations"]), 27)
+            self.assertEqual(portable["full_manifest_sha256"],
+                             hashlib.sha256((output / "SHA256SUMS").read_bytes()).hexdigest())
+            self.assertEqual(subprocess.run([sys.executable, str(EXPORTER), str(output),
+                                             "--output", str(exported)], capture_output=True).returncode, 1)
 
             for row in observations:
                 binary = row["binary"]
@@ -80,6 +91,11 @@ class ReturnOverwriteTests(unittest.TestCase):
                 self.assertEqual(hashlib.sha256((output / name).read_bytes()).hexdigest(), digest)
             expected = {str(path.relative_to(output)) for path in output.rglob("*") if path.is_file()}
             self.assertEqual(artifacts, expected - {"SHA256SUMS", "COMPLETE"})
+            (output / "safe.input").write_bytes(b"tampered")
+            rejected = Path(directory) / "rejected.json"
+            self.assertEqual(subprocess.run([sys.executable, str(EXPORTER), str(output),
+                                             "--output", str(rejected)], capture_output=True).returncode, 1)
+            self.assertFalse(rejected.exists())
 
             lab = output / "05-return-address-overwrite"
             for binary in ("overwrite_plain", "overwrite_canary", "overwrite_pie", "overwrite_fixed"):

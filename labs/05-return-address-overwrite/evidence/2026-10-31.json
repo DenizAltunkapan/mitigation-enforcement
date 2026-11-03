@@ -1,0 +1,366 @@
+{
+  "description": "Selected text evidence from verified complete Lab 05 captures. Full binaries and disassembly remain in the original capture directories. Checksums establish consistency, not authenticity.",
+  "captures": [
+    {
+      "name": "return-overwrite-host-initial",
+      "environment": {
+        "schema_version": 1,
+        "label": "host",
+        "label_is_operator_supplied": true,
+        "captured_at_utc": "2026-10-31T21:56:18.992630+00:00",
+        "platform": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+        "architecture": "x86_64",
+        "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+        "CC": "gcc",
+        "CFLAGS": "-Wall -Wextra",
+        "LDFLAGS": "",
+        "aslr_before": "2",
+        "aslr_after": "2"
+      },
+      "versions": {
+        "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "compiler-target": "x86_64-linux-gnu\n",
+        "binutils": "GNU readelf (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n",
+        "gdb-version": "GNU gdb (Ubuntu 17.1-2ubuntu1) 17.1\nCopyright (C) 2025 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n",
+        "libc": "glibc 2.43\n"
+      },
+      "os_release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+      "build_command": [
+        "make",
+        "--always-make",
+        "CC=gcc",
+        "CFLAGS=-Wall -Wextra",
+        "LDFLAGS="
+      ],
+      "build_stdout": "gcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls -U_FORTIFY_SOURCE -fcf-protection=none -Wl,-z,relro,-z,now,-z,noexecstack -fno-stack-protector -fno-pie -no-pie -o overwrite_plain src/return_overwrite.c\ngcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls -U_FORTIFY_SOURCE -fcf-protection=none -Wl,-z,relro,-z,now,-z,noexecstack -fstack-protector-all -fno-pie -no-pie -o overwrite_canary src/return_overwrite.c\ngcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls -U_FORTIFY_SOURCE -fcf-protection=none -Wl,-z,relro,-z,now,-z,noexecstack -fno-stack-protector -fPIE -pie -o overwrite_pie src/return_overwrite.c\ngcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls -U_FORTIFY_SOURCE -fcf-protection=none -Wl,-z,relro,-z,now,-z,noexecstack -fno-stack-protector -fno-pie -no-pie -DFIXED -o overwrite_fixed src/return_overwrite.c\n",
+      "build_stderr": "",
+      "payload": {
+        "offsets": {
+          "overwrite_plain": 40,
+          "overwrite_canary": 56,
+          "overwrite_pie": 40,
+          "overwrite_fixed": 40
+        },
+        "padding_bytes": 40,
+        "payload_bytes": 56,
+        "alignment_ret": "0x4012c9",
+        "target_address": "0x4011a6",
+        "address_source": "local non-PIE build artifacts; not an information disclosure",
+        "layout": "A * saved-return offset | little-endian ret | little-endian redirect_target"
+      },
+      "target_trace": "Breakpoint 1 at 0x4011a6: file src/return_overwrite.c, line 10.\n\nThis GDB supports auto-downloading debuginfo from the following URLs:\n  <https://debuginfod.ubuntu.com>\nEnable debuginfod for this session? (y or [n]) [answered N; input not from terminal]\nDebuginfod has been disabled.\nTo make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.\n[Thread debugging using libthread_db enabled]\nUsing host libthread_db library \"/usr/lib/x86_64-linux-gnu/libthread_db.so.1\".\ncopy completed: 56 bytes, first byte 65\n\nBreakpoint 1, redirect_target () at src/return_overwrite.c:10\n10\t{\nLAB05_TARGET_RSP_MOD16=8\n=> 0x4011a6 <redirect_target>:\tpush   %rbp\nTARGET: control flow redirected\n[Inferior 1 (process 67781) exited with code 052]\n",
+      "artifact_sha256": {
+        "src/return_overwrite.c": "652a7a9cae8c569eac30e3eaa5836666497c22adcb58c93115de95dd5ad27d46",
+        "Makefile": "a3e3a9f11f88f6f44eefb883ef4b8d336c8ee59d522300243eb0343fd1425232",
+        "safe.input": "991204fba2b6216d476282d375ab88d20e6108d109aecded97ef424ddd114706",
+        "attack.input": "0bbd72fc717cabb84e03ed60efa8c4e73ca6f2ab1a485f06cb058436b96c92fb",
+        "padding.input": "6ea719cefa4b31862035a7fa606b7cc3602f46231117d135cc7119b3c1412314",
+        "overwrite_plain": "30250a3108719f693c7af285eca5057cea1eb655a5f61d78d49f24446f1fab40",
+        "overwrite_canary": "ee155d37042ae770c4aa245d9d0f23b32cc9c74e18ace8915039c8186c461373",
+        "overwrite_pie": "b601b6ba45659af62184442a2a12085592a18cc116256337b3c1e1205eaaa872",
+        "overwrite_fixed": "fa0b39e485ef71de9a93917d73ea5c29f4f9635a0c8d29ce387b5cc83b4ce5e8"
+      },
+      "collector_sha256": "01fc8045061717b960d095583ee240344af0cf2805e8e8c09c68b01dd4e290eb",
+      "full_manifest_sha256": "1fab90f302bcd05dbe38d8364d20e901084cedeb26ce3cb0f1c237d29d61a799",
+      "observations": [
+        {
+          "binary": "overwrite_plain",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_plain",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_plain",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_plain",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "returned_from_copy": false,
+          "stdout": "copy completed: 56 bytes, first byte 65\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_plain",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "returned_from_copy": false,
+          "stdout": "copy completed: 56 bytes, first byte 65\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_plain",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "returned_from_copy": false,
+          "stdout": "copy completed: 56 bytes, first byte 65\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_plain",
+          "mode": "padding",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "returned_from_copy": false,
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_plain",
+          "mode": "padding",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "returned_from_copy": false,
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_plain",
+          "mode": "padding",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "returned_from_copy": false,
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_canary",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_canary",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_canary",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_canary",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "target_reached": false,
+          "returned_from_copy": false,
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "overwrite_canary",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "target_reached": false,
+          "returned_from_copy": false,
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "overwrite_canary",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "target_reached": false,
+          "returned_from_copy": false,
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": "*** stack smashing detected ***: terminated\n"
+        },
+        {
+          "binary": "overwrite_pie",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_pie",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_pie",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_pie",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "returned_from_copy": false,
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_pie",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "returned_from_copy": false,
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_pie",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "returned_from_copy": false,
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_fixed",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_fixed",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_fixed",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": true,
+          "stdout": "copy completed: 16 bytes, first byte 65\nreturned from copy_input\n",
+          "stderr": ""
+        },
+        {
+          "binary": "overwrite_fixed",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": 2,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "binary": "overwrite_fixed",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": 2,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "binary": "overwrite_fixed",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": 2,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_copy": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        }
+      ]
+    }
+  ]
+}

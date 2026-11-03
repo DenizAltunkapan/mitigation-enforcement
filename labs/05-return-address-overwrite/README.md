@@ -180,3 +180,15 @@ headers (`ET_EXEC` vs. `ET_DYN`, `__stack_chk_fail`, `GNU_RELRO`, `BIND_NOW`,
 the `redirect_target()` entry stack alignment (`LAB05_TARGET_RSP_MOD16=8`),
 executes 27 trials with core dumps disabled, and writes `observations.json`,
 `payload.json`, `SHA256SUMS` and `COMPLETE`.
+
+The [recorded host results](RESULTS.md) summarize the 27 trials. The committed
+[portable evidence](evidence/2026-10-31.json) can be regenerated from a complete
+capture with:
+
+```bash
+python3 scripts/export-return-overwrite.py /tmp/overwrite-host \
+  --output /tmp/overwrite-host.json
+```
+
+The exporter verifies the full manifest and refuses to overwrite an existing
+JSON file. Use a fresh capture path and output path for each run.
