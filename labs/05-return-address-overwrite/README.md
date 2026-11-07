@@ -10,7 +10,7 @@ as an ordinary user inside a disposable VM or on a local review host. The
 overflow has undefined behavior in C; its outcome is an empirical observation
 for a specific compiler, ABI and binary configuration.
 
-## Underlying Mechanism and Local Control-Flow Oracle
+## Concepts
 
 The experiment separates three concepts that are often conflated in informal
 write-ups:
@@ -20,7 +20,7 @@ write-ups:
    buffer (`char buffer[32]`) and reads `count` bytes (up to 128) via
    `receive_bytes()` without checking `count <= sizeof(buffer)` unless `FIXED`
    is defined.
-2. **Exploitation primitive:** **Saved-return-address overwrite** (stack-based
+2. **Exploitation primitive:** saved-return-address overwrite (stack-based
    control-flow redirection). A contiguous write past `buffer` corrupts the
    caller's saved frame pointer and the saved return address on the stack. When
    `copy_input()` executes its epilogue `ret`, the CPU pops the corrupted stack
@@ -34,7 +34,7 @@ write-ups:
    - **External `libc` or multi-gadget ROP chains**, which depend on library
      versions and additional gadget availability.
 
-## Difference 1: Within-Environment Mitigation Comparison (x86-64)
+## Mitigation comparison (x86-64)
 
 All four binaries are built from [src/return_overwrite.c](src/return_overwrite.c)
 with the same compiler, optimization level and base flags
@@ -56,47 +56,57 @@ negative control faults with `SIGSEGV` (`-11`) and never prints the target
 marker, demonstrating that status `42` requires deliberate target-address
 placement rather than overflow length alone.
 
-### What Each Mitigation Actually Changes
+### What each mitigation changes
 
-- **Stack Canary (`overwrite_canary`):** The compiler inserts an 8-byte guard
+- **Stack canary (`overwrite_canary`):** The compiler inserts an 8-byte guard
   word between `buffer` and saved `%rbp`, shifting the saved return address from
   offset `40` to `56`. Because `receive_bytes()` writes contiguously from
   `buffer[0]`, reaching the saved return address overwrites the guard. In the
   epilogue, the guard comparison fails and calls `__stack_chk_fail()` before
-  `ret` executes. This is **post-write detection**, not prevention of the
+  `ret` executes. This is post-write detection, not prevention of the
   out-of-bounds write.
-- **PIE + ASLR (`overwrite_pie`):** The stack frame layout is identical to
+- **PIE and ASLR (`overwrite_pie`):** The stack frame layout is identical to
   `overwrite_plain` (saved `%rip` at offset `40`), and `ret` still loads the
   corrupted stack slot into `%rip`. However, because the executable is linked as
   `ET_DYN` and relocated by the kernel per process (`randomize_va_space = 2`),
   the static non-PIE address (`0x401...`) points to unmapped memory and triggers
   a page fault (`SIGSEGV`).
-- **Explicit Bounds Check (`overwrite_fixed`):** Checking `count > sizeof(buffer)`
+- **Explicit bounds check (`overwrite_fixed`):** Checking `count > sizeof(buffer)`
   before `receive_bytes()` repairs the programming error on this path; no
   out-of-bounds stack write occurs.
 
-## Difference 2: Architectural & Toolchain Evolution (Legacy i386 vs. Modern x86-64)
+## Legacy i386 versus modern x86-64
 
-Connecting this experiment to the repository's [Debian 7 `i386` / Debian 13 `amd64` baseline](../../docs/BASELINE-COMPARISON.md)
-highlights the structural differences between classical 32-bit stack
-exploitation and modern 64-bit systems:
+The modern x86-64 column below is measured; see [RESULTS.md](RESULTS.md) and the
+[portable evidence](evidence/2026-11-03.json). The legacy i386 column separates
+ABI properties from binary-specific details that remain unmeasured for this lab.
+With a conventional `%ebp` frame, the i386 calling convention locates the saved
+return address at `%ebp + 4`; it does not determine where this compiler places
+`buffer` or whether a direct return to the target has suitable stack alignment.
+Lab 05 has not been captured with the Debian 7 i386 toolchain, so its
+saved-return offset, payload length and target address are unknown. Legacy
+replication remains open (see
+[RESEARCH.md](../../docs/RESEARCH.md)). The toolchain-default row comes from the
+verified [Debian 7 `i386` / Debian 13 `amd64` baseline](../../docs/BASELINE-COMPARISON.md)
+(Labs 01–03); it is not a Lab 05 measurement. The 16-byte preferred stack
+boundary for GCC 4.7 is documented in the
+[compiler manual](https://gcc.gnu.org/onlinedocs/gcc-4.7.4/gcc/i386-and-x86-64-Options.html).
 
-| Dimension | Legacy 32-bit (`i386`, Debian 7 GCC 4.7.2) | Modern 64-bit (`x86-64`, Debian 13 GCC 14.2.0) |
+| Dimension | Legacy 32-bit (`i386`, Debian 7 GCC 4.7.2) — Lab 05 unmeasured | Modern 64-bit (`x86-64`, Debian 13 GCC 14.2.0) — Lab 05 measured |
 |---|---|---|
-| **Frame geometry (`overwrite_plain`)** | `buffer` at `%ebp - 0x28`; 4B saved `%ebp` at `%ebp`; 4B saved `%eip` at `%ebp + 4` (**offset `44`**) | `buffer` at `%rbp - 0x20`; 8B saved `%rbp` at `%rbp`; 8B saved `%rip` at `%rbp + 8` (**offset `40`**, `56` with canary) |
-| **Payload structure & length** | **48 bytes:** `44B 'A'` + `4B redirect_target` (`0x0804862c`) | **56 bytes:** `40B 'A'` + `8B alignment_ret` (`0x4012c9`) + `8B redirect_target` (`0x4011a6`) |
-| **Argument passing** | Passed on the stack above `%ebp + 8` (`cdecl`) | First six integer/pointer arguments in `%rdi, %rsi, %rdx, %rcx, %r8, %r9` |
-| **Stack alignment at `call`** | Direct 4-byte return-address overwrite (`44B + 4B target`) suffices | Strictly 16-byte aligned before `call` (`%rsp % 16 == 8` at function entry; requires 8B `alignment_ret` before target) |
-| **Toolchain default (Lab 03)** | Emits non-PIE `ET_EXEC` (`0x08048...`) without stack guard by default | Emits PIE `ET_DYN` and stack protection by default; requires `-fno-stack-protector -fno-pie -no-pie` to recreate `overwrite_plain` |
+| **Frame geometry (`overwrite_plain`)** | With a conventional `%ebp` frame: 4B saved `%ebp` at `%ebp`, 4B saved `%eip` at `%ebp + 4`; `buffer` placement and its saved-return offset are unmeasured | `buffer` at `%rbp - 0x20`; 8B saved `%rbp` at `%rbp`; 8B saved `%rip` at `%rbp + 8` (**offset `40`**, `56` with canary) |
+| **Payload structure & length** | A saved return address occupies 4B; required padding, possible stack adjustment, total length and target address remain unmeasured | **56 bytes:** `40B 'A'` + `8B alignment_ret` (`0x4012c9`) + `8B redirect_target` (`0x4011a6`) |
+| **Argument passing** | Passed on the stack above `%ebp + 8` (`cdecl`), per the i386 ABI | First six integer/pointer arguments in `%rdi, %rsi, %rdx, %rcx, %r8, %r9` |
+| **Stack alignment at `call`** | GCC 4.7 defaults to a 16B preferred stack boundary; the target's entry alignment and any needed adjustment are unmeasured | Strictly 16-byte aligned before `call` (`%rsp % 16 == 8` at function entry; requires 8B `alignment_ret` before target) |
+| **Toolchain default (Lab 03, measured)** | Emits non-PIE `ET_EXEC` (`0x08048...`) without stack guard by default | Emits PIE `ET_DYN` and stack protection by default; requires `-fno-stack-protector -fno-pie -no-pie` to recreate `overwrite_plain` |
 
-### Why x86-64 Requires the `alignment_ret` Gadget
+### Why the measured x86-64 payload uses the `alignment_ret` gadget
 
-On 32-bit `i386`, overwriting saved `%eip` directly with the 4-byte target
-function address redirects execution cleanly. On 64-bit `x86-64`, the System V
-AMD64 ABI requires `%rsp` to be a multiple of 16 immediately before a `call`
-instruction. Because `call` pushes an 8-byte return address, any function entry
-point expects `%rsp % 16 == 8` (which becomes `%rsp % 16 == 0` after
-`push %rbp`).
+On x86-64, the System V AMD64 ABI requires `%rsp` to be a multiple of 16
+immediately before a `call` instruction. Because `call` pushes an 8-byte return
+address, any function entry point expects `%rsp % 16 == 8` (which becomes
+`%rsp % 16 == 0` after `push %rbp`). The i386 payload and its entry alignment
+remain to be measured separately.
 
 When `copy_input()` returns via `ret`, it pops 8 bytes from the stack without a
 corresponding `call`. Jumping directly to a function entry leaves
@@ -113,20 +123,20 @@ The first `ret` pops `alignment_ret` and advances `%rsp` by 8 bytes; executing
 that `ret` pops `target_address` into `%rip` with `%rsp % 16 == 8` (verified in
 the collector's GDB trace via `LAB05_TARGET_RSP_MOD16=8`).
 
-## Attacker Assumptions and Limits
+## Attacker assumptions and limits
 
 1. **White-box static addresses:** `alignment_ret` and `target_address` are read
    from the local non-PIE `overwrite_plain` binary via `objdump` and `nm`
    (`address_source: "local non-PIE build artifacts; not an information disclosure"`).
 2. **Scope of the PIE result:** The crash in `overwrite_pie` proves only that a
-   hardcoded non-PIE address fails under ASLR. It does **not** prove that PIE
+   hardcoded non-PIE address fails under ASLR. It does not prove that PIE
    alone prevents exploitation when combined with a separate runtime pointer
    disclosure (information leak) that reveals the randomized text base.
-3. **Scope of the Canary result:** The abort in `overwrite_canary` applies to a
-   **contiguous linear overflow** starting before the guard. It does not model
+3. **Scope of the canary result:** The abort in `overwrite_canary` applies to a
+   contiguous linear overflow starting before the guard. It does not model
    arbitrary indexed writes or canary disclosure bugs.
 
-## Build, Standalone Reproduction, and Automated Capture
+## Build and capture
 
 Build the four variants locally:
 
@@ -134,7 +144,7 @@ Build the four variants locally:
 make -C labs/05-return-address-overwrite
 ```
 
-### Standalone Reproduction Outside GDB
+### Standalone reproduction outside GDB
 
 To verify the mechanism directly from the shell without GDB, extract the `ret`
 gadget and `redirect_target()` symbol from `overwrite_plain` and feed the
@@ -166,7 +176,7 @@ for name, data in (
 EOF
 ```
 
-### Automated Evidence Capture
+### Automated evidence capture
 
 Run the collector in a fresh output directory:
 
