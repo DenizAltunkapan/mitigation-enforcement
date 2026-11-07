@@ -23,6 +23,7 @@ research project in progress.
 
 | Finding | Evidence |
 |---|---|
+| A single same-process text-pointer leak makes a saved-return overwrite redirect control flow under PIE+ASLR settings comparable to Lab 05's faulting case; a bounds check still prevents it. | [Lab 06](labs/06-pie-leak-bypass/RESULTS.md) — 3 cases, 9 trials on x86-64 host, 9 distinct leaked bases |
 | The same linear stack overflow is detected after the write by a stack canary, prevented before the write by a bounds check, and faults under PIE+ASLR when a static address is reused. | [Lab 05](labs/05-return-address-overwrite/RESULTS.md) — 4 variants, 54 trials on x86-64 host and Debian 13 VM |
 | A stack-canary guard detects corruption but does not prevent the out-of-bounds write; an explicit bounds check does. Holds at `-O0` and `-O2`. | [Lab 04](labs/04-stack-canary/RESULTS.md) — 72 trials, host and Debian VM |
 | Non-PIE text stays at a fixed address while modern default-PIE text moves; heap, stack and libc mappings move in both environments. | [Labs 01–03 baseline](docs/BASELINE-COMPARISON.md) — Debian 7 i386 / Debian 13 amd64, matching inputs, verified manifests |
@@ -35,7 +36,7 @@ limits of the results and the remaining work.
 
 ## Labs
 
-Labs 01–03 establish the baseline; Labs 04–05 introduce controlled
+Labs 01–03 establish the baseline; Labs 04–06 introduce controlled
 memory-corruption experiments.
 
 | Lab | Topic | Target | Recorded evidence |
@@ -45,9 +46,10 @@ memory-corruption experiments.
 | [03](labs/03-binary-mitigation-baseline/README.md) | ELF mitigations | i386 / x86-64 | Verified VM metadata and runs |
 | [04](labs/04-stack-canary/README.md) | Stack canary | x86-64 host / VM | [72 trials](labs/04-stack-canary/RESULTS.md), `-O0` / `-O2` |
 | [05](labs/05-return-address-overwrite/README.md) | Return-address overwrite | x86-64 host / VM | [4 variants, 54 trials](labs/05-return-address-overwrite/RESULTS.md) |
+| [06](labs/06-pie-leak-bypass/README.md) | Defeating PIE with a leak | x86-64 host | [3 cases, 9 trials](labs/06-pie-leak-bypass/RESULTS.md) |
 
 Labs 01–03 share a cross-lab [baseline report](docs/BASELINE-RESULTS.md) and
-[comparison evidence](docs/evidence/). The independent Lab 04 and 05 captures
+[comparison evidence](docs/evidence/). The independent Lab 04, 05 and 06 captures
 have `RESULTS.md` and `evidence/` within their own lab directories.
 
 ## Quickstart
@@ -78,6 +80,9 @@ python3 scripts/export-stack-canary.py /tmp/canary-review \
 python3 scripts/capture-return-overwrite.py host /tmp/overwrite-review
 python3 scripts/export-return-overwrite.py /tmp/overwrite-review \
   --output /tmp/overwrite-review.json
+python3 scripts/capture-pie-leak.py host /tmp/pie-leak-review
+python3 scripts/export-pie-leak.py /tmp/pie-leak-review \
+  --output /tmp/pie-leak-review.json
 # Optional Labs 01–03 host capture and verified text export:
 bash scripts/capture-baseline.sh host /tmp/baseline-review
 python3 scripts/export-baseline.py /tmp/baseline-review \

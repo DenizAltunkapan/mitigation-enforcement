@@ -26,6 +26,7 @@ arbitrary code execution.
 | 03: ELF mitigations | Verified VM comparison, repeated runs and ELF metadata | Runtime execution-permission experiment; no NX claim for the default legacy CPU |
 | 04: stack canary | 72 recorded trials across host/Debian VM and `-O0`/`-O2`, with selected text evidence | Historical 32-bit replication after validating the recovered boot path |
 | 05: return-address overwrite | [Verified host / Debian 13 VM comparison](../labs/05-return-address-overwrite/RESULTS.md) and portable JSON evidence across 4 binary variants (54 recorded trials) | Historical 32-bit i386 replication using an architecture-adapted test setup |
+| 06: defeating PIE with a leak | [Host capture](../labs/06-pie-leak-bypass/RESULTS.md) with portable JSON evidence across 3 cases (9 trials, 9 distinct leaked bases) | Debian 13 VM replication; the leak is assumed, not derived from a specific bug class |
 
 The Lab 01–03 guides now use the [verified VM comparison](BASELINE-COMPARISON.md).
 It pairs the recovered Debian 7 capture from 26 October with the Debian 13
@@ -38,6 +39,12 @@ observations and explicitly record the failed legacy attempt.
 Lab 05's [results](../labs/05-return-address-overwrite/RESULTS.md) compare host
 and Debian 13 VM observations under identical build flags; historical 32-bit
 replication remains open.
+Lab 06's [results](../labs/06-pie-leak-bypass/RESULTS.md) use a separate program
+under PIE build settings comparable to Lab 05's `overwrite_pie`, not a rerun of
+Lab 05's binary: a same-process pointer leak makes the overwrite redirect
+control flow where ASLR alone made it crash, while an equivalent bounds check
+still prevents it. The leak is modelled as an explicit disclosure; deriving it
+from a concrete bug class and replicating in the VM remain open.
 
 ## Experiment protocol
 
@@ -93,7 +100,9 @@ run fresh captures independently using the documented commands.
    replacing the guest runtime or mislabelling host output.
 3. Pin VM image identifiers/checksums and record package manifests, then perform
    a clean-machine reproduction before extending the number of labs.
-4. Add a narrowly scoped NX experiment that distinguishes executable-memory
+4. Replicate Lab 06 in the Debian 13 VM and record a second capture, so the
+   PIE-leak result is not host-only.
+5. Add a narrowly scoped NX experiment that distinguishes executable-memory
    permission from memory corruption, with a stated failure criterion and repair.
 
 ## Scope

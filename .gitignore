@@ -28,6 +28,9 @@ labs/05-return-address-overwrite/overwrite_canary
 labs/05-return-address-overwrite/overwrite_pie
 labs/05-return-address-overwrite/overwrite_fixed
 
+labs/06-pie-leak-bypass/pie_bypass
+labs/06-pie-leak-bypass/pie_fixed
+
 # Python
 __pycache__/
 *.pyc
