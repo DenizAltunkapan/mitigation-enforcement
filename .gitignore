@@ -31,6 +31,8 @@ labs/05-return-address-overwrite/overwrite_fixed
 labs/06-pie-leak-bypass/pie_bypass
 labs/06-pie-leak-bypass/pie_fixed
 
+labs/07-execution-permission/wx_probe
+
 # Python
 __pycache__/
 *.pyc

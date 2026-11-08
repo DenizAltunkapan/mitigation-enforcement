@@ -23,10 +23,11 @@ arbitrary code execution.
 |---|---|---|
 | 01: process layout | Verified Debian 7 / Debian 13 comparison with matching source and build inputs | More samples if estimating randomization rather than observing it |
 | 02: stack frames | Verified VM comparison plus modern GDB register/frame transcript | Legacy debugger transcript |
-| 03: ELF mitigations | Verified VM comparison, repeated runs and ELF metadata | Runtime execution-permission experiment; no NX claim for the default legacy CPU |
+| 03: ELF mitigations | Verified VM comparison, repeated runs and ELF metadata | Runtime execution-permission enforcement is now measured in Lab 07; no NX claim for the default legacy CPU |
 | 04: stack canary | 72 recorded trials across host/Debian VM and `-O0`/`-O2`, with selected text evidence | Historical 32-bit replication after validating the recovered boot path |
 | 05: return-address overwrite | [Verified host / Debian 13 VM comparison](../labs/05-return-address-overwrite/RESULTS.md) and portable JSON evidence across 4 binary variants (54 recorded trials) | Historical 32-bit i386 replication using an architecture-adapted test setup |
 | 06: defeating PIE with a leak | [Host capture](../labs/06-pie-leak-bypass/RESULTS.md) with portable JSON evidence across 3 cases (9 trials, 9 distinct leaked bases) | Debian 13 VM replication; the leak is assumed, not derived from a specific bug class |
+| 07: runtime execution permission | [Host capture](../labs/07-execution-permission/RESULTS.md) with portable JSON evidence across 3 page-protection modes (9 trials), confirming NX enforcement and an unenforced W^X policy | Debian 13 VM replication; hosts with an LSM or hardened kernel may reject the writable-executable mapping |
 
 The Lab 01–03 guides now use the [verified VM comparison](BASELINE-COMPARISON.md).
 It pairs the recovered Debian 7 capture from 26 October with the Debian 13
@@ -45,6 +46,16 @@ Lab 05's binary: a same-process pointer leak makes the overwrite redirect
 control flow where ASLR alone made it crash, while an equivalent bounds check
 still prevents it. The leak is modelled as an explicit disclosure; deriving it
 from a concrete bug class and replicating in the VM remain open.
+
+Lab 07's [results](../labs/07-execution-permission/RESULTS.md) supply the runtime
+execution-permission test Lab 03 left open. Copying one in-binary oracle into an
+anonymous mapping and calling it under three page protections shows that, for
+this mapping on this host, the page's execute permission decides whether the
+identical bytes run (fault under `rw`, success under `rx`), and that this host
+enforces NX but not W^X: it allowed a writable-executable mapping. The result is
+scoped to this anonymous-mapping probe, not to loaded segments, stacks or heaps. NX (a CPU feature) and W^X (a software policy) are
+recorded as distinct claims; a hardened host may reject the writable-executable
+mapping, which a VM replication would show.
 
 ## Experiment protocol
 
@@ -102,8 +113,9 @@ run fresh captures independently using the documented commands.
    a clean-machine reproduction before extending the number of labs.
 4. Replicate Lab 06 in the Debian 13 VM and record a second capture, so the
    PIE-leak result is not host-only.
-5. Add a narrowly scoped NX experiment that distinguishes executable-memory
-   permission from memory corruption, with a stated failure criterion and repair.
+5. Lab 07 now measures runtime execution permission (NX enforced, W^X not) on
+   the host. Replicate it on a hardened or LSM-restricted host, and in the VM, to
+   record where a writable-executable mapping is instead rejected.
 
 ## Scope
 

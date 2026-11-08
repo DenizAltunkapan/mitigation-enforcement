@@ -125,6 +125,16 @@ class ResultsConsistencyTests(unittest.TestCase):
              for name in ("Compiler", "Assembler / Linker", "C library", "Debugger")},
         )
 
+    def test_lab07_results_match_evidence(self):
+        # Host-only, no debugger column (the probe needs none).
+        self._check(
+            "Lab 07",
+            "labs/07-execution-permission/evidence/2026-11-08.json",
+            "labs/07-execution-permission/RESULTS.md",
+            {name: {1: ("host", name)}
+             for name in ("Compiler", "Assembler / Linker", "C library")},
+        )
+
 
 class CellCheckGuaranteesTests(unittest.TestCase):
     """Pins the strictness of the cell check against drift in the check itself,
