@@ -54,6 +54,10 @@ Labs 01–03 share a cross-lab [baseline report](docs/BASELINE-RESULTS.md) and
 [comparison evidence](docs/evidence/). The independent Lab 04, 05, 06 and 07 captures
 have `RESULTS.md` and `evidence/` within their own lab directories.
 
+The [synthesis across labs](docs/SYNTHESIS.md) states the guiding question, what
+each lab measures, which observation carries which claim, the negative and failed
+cases, the shared limits, and the planned replications.
+
 ## Quickstart
 
 On x86 Linux, install Bash, Python 3.8+, GCC, GDB, GNU Make, Binutils,
