@@ -1,0 +1,165 @@
+"""Guards committed RESULTS.md prose against drift from the recorded evidence.
+
+Labs 04-06 state toolchain versions in prose. The verified numbers live in each
+capture's recorded `versions` strings, one field per tool. These checks assert
+that every version written in a RESULTS.md environment table matches the field
+of the matching capture, so the prose can never silently diverge from what was
+measured.
+
+The checks are strict on purpose:
+
+- Each table row is tied to one evidence field (compiler, debugger, ...), so a
+  binutils number cannot be satisfied by the compiler's version and vice versa.
+- Every version-like token in the cell, including a distribution package suffix
+  such as ``15.2.0-16ubuntu1``, must appear verbatim in that field, so a wrong
+  suffix is rejected, not ignored.
+- A cell that states no version at all fails: a tool column must carry a version.
+- Each environment column is checked against its own captures, so with several
+  captures per environment none can mask another.
+
+Expected values are read from the evidence, not hard-coded, so regenerating a
+capture cannot leave a stale assertion that still passes. No build tools are
+required; this reads only committed JSON and Markdown.
+"""
+import json
+from pathlib import Path
+import re
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+# A version token is x.y or x.y.z, optionally with a distribution package suffix
+# (-16ubuntu1, ~deb13u3, +really...). The suffix is part of the claim and is
+# matched verbatim against the evidence field.
+TOKEN = re.compile(r"\d+\.\d+(?:\.\d+)?(?:[-~+][0-9A-Za-z.~+]+)?")
+# Which evidence `versions` field each RESULTS table row is a claim about.
+FIELD_FOR_ROW = {
+    "Compiler": "compiler",
+    "Debugger": "gdb-version",
+    "Assembler / Linker": "binutils",
+    "C library": "libc",
+}
+
+
+def captures_by_label(evidence_path):
+    data = json.loads((ROOT / evidence_path).read_text())
+    by_label = {}
+    for capture in data["captures"]:
+        by_label.setdefault(capture["environment"]["label"], []).append(capture)
+    return by_label
+
+
+def table_row(markdown, starts_with):
+    for line in markdown.splitlines():
+        stripped = line.lstrip()
+        if stripped.startswith("| " + starts_with):
+            return [cell.strip() for cell in stripped.strip().strip("|").split("|")]
+    return None
+
+
+class ResultsConsistencyTests(unittest.TestCase):
+    def _assert_cell(self, lab, row_name, cell, captures):
+        """Every version token in `cell` must appear in this row's evidence field
+        of at least one of `captures` (the environment's captures)."""
+        field = FIELD_FOR_ROW[row_name]
+        tokens = TOKEN.findall(cell)
+        self.assertTrue(
+            tokens,
+            f"{lab}: RESULTS row '{row_name}' cell {cell!r} states no version",
+        )
+        field_values = []
+        for capture in captures:
+            self.assertIn(field, capture["versions"],
+                          f"{lab}: capture has no '{field}' version field")
+            field_values.append(capture["versions"][field])
+        for token in tokens:
+            self.assertTrue(
+                any(token in value for value in field_values),
+                f"{lab}: RESULTS row '{row_name}' states {token!r}, absent from "
+                f"the recorded '{field}' version(s): {field_values}",
+            )
+
+    def _check(self, lab, evidence_path, results_path, rows):
+        """`rows` maps a table row prefix to {cell_index: evidence_label}."""
+        by_label = captures_by_label(evidence_path)
+        markdown = (ROOT / results_path).read_text()
+        for prefix, columns in rows.items():
+            cells = table_row(markdown, prefix)
+            self.assertIsNotNone(cells, f"{lab}: table row '{prefix}' not found")
+            # The row name used for the field mapping is the prefix itself for
+            # property-per-row tables; Lab 04 passes it explicitly via `rows`.
+            for index, (label, row_name) in columns.items():
+                self.assertLess(index, len(cells), f"{lab}: '{prefix}' has no cell {index}")
+                self.assertIn(label, by_label, f"{lab}: evidence has no '{label}' capture")
+                self._assert_cell(lab, row_name, cells[index], by_label[label])
+
+    def test_lab04_results_match_evidence(self):
+        # Lab 04's environment row carries the environment in the first cell,
+        # then Compiler (cell 1) and C library (cell 2).
+        self._check(
+            "Lab 04",
+            "labs/04-stack-canary/evidence/2026-10-25.json",
+            "labs/04-stack-canary/RESULTS.md",
+            {
+                "Ubuntu": {1: ("host", "Compiler"), 2: ("host", "C library")},
+                "Debian": {1: ("modern", "Compiler"), 2: ("modern", "C library")},
+            },
+        )
+
+    def test_lab05_results_match_evidence(self):
+        # Property-per-row: host is cell 1, modern is cell 2.
+        self._check(
+            "Lab 05",
+            "labs/05-return-address-overwrite/evidence/2026-11-03.json",
+            "labs/05-return-address-overwrite/RESULTS.md",
+            {name: {1: ("host", name), 2: ("modern", name)}
+             for name in ("Compiler", "Assembler / Linker", "Debugger", "C library")},
+        )
+
+    def test_lab06_results_match_evidence(self):
+        # Host-only: one environment column (cell 1).
+        self._check(
+            "Lab 06",
+            "labs/06-pie-leak-bypass/evidence/2026-11-07.json",
+            "labs/06-pie-leak-bypass/RESULTS.md",
+            {name: {1: ("host", name)}
+             for name in ("Compiler", "Assembler / Linker", "C library", "Debugger")},
+        )
+
+
+class CellCheckGuaranteesTests(unittest.TestCase):
+    """Pins the strictness of the cell check against drift in the check itself,
+    using a synthetic capture so it never depends on the real RESULTS files."""
+
+    CAPTURE = {"versions": {
+        "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+        "gdb-version": "GNU gdb (Ubuntu 17.1-2ubuntu1) 17.1",
+        "binutils": "GNU readelf (GNU Binutils for Ubuntu) 2.46",
+        "libc": "glibc 2.43",
+    }}
+
+    def check(self, row, cell):
+        ResultsConsistencyTests()._assert_cell("synthetic", row, cell, [self.CAPTURE])
+
+    def test_accepts_the_recorded_version_with_suffix(self):
+        self.check("Compiler", "GCC 15.2.0 (Ubuntu 15.2.0-16ubuntu1)")
+
+    def test_rejects_a_wrong_package_suffix(self):
+        with self.assertRaises(AssertionError):
+            self.check("Compiler", "GCC 15.2.0 (Ubuntu 15.2.0-999bogus)")
+
+    def test_rejects_another_tools_number_in_this_field(self):
+        # The compiler's version must not satisfy the binutils row.
+        with self.assertRaises(AssertionError):
+            self.check("Assembler / Linker", "GNU Binutils 15.2.0")
+
+    def test_rejects_a_cell_without_any_version(self):
+        with self.assertRaises(AssertionError):
+            self.check("Compiler", "unrecorded compiler")
+
+    def test_rejects_a_drifted_number(self):
+        with self.assertRaises(AssertionError):
+            self.check("C library", "glibc 2.99")
+
+
+if __name__ == "__main__":
+    unittest.main()

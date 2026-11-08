@@ -4,7 +4,6 @@ import importlib.util
 import json
 import os
 from pathlib import Path
-import re
 import shutil
 import subprocess
 import sys
@@ -183,7 +182,6 @@ class ReturnOverwriteTests(unittest.TestCase):
 
 
 EVIDENCE_FILE = ROOT / "labs/05-return-address-overwrite/evidence/2026-11-03.json"
-RESULTS_FILE = ROOT / "labs/05-return-address-overwrite/RESULTS.md"
 
 
 class RecordedEvidenceTests(unittest.TestCase):
@@ -199,33 +197,8 @@ class RecordedEvidenceTests(unittest.TestCase):
             self.assertEqual(capture_entry["payload"]["padding_bytes"], 40)
             self.assertEqual(capture_entry["payload"]["payload_bytes"], 56)
 
-    def test_results_versions_match_evidence(self):
-        """Every toolchain version in the RESULTS.md table must appear in the
-        matching capture's recorded version strings, so the prose cannot drift
-        from the verified evidence."""
-        captures = {c["environment"]["label"]: c for c in json.loads(EVIDENCE_FILE.read_text())["captures"]}
-        blobs = {label: "\n".join(cap["versions"].values()) for label, cap in captures.items()}
-        # (column index in the RESULTS.md table, capture label) for the two tool columns.
-        columns = {"Host review environment": ("host", 2), "Modern Debian 13 VM": ("modern", 3)}
-        rows = {
-            "Compiler": [re.compile(r"\b15\.2\.0-16ubuntu1\b"), re.compile(r"\b14\.2\.0-19\b")],
-            "Assembler / Linker": [re.compile(r"\b2\.46\b"), re.compile(r"\b2\.44\b")],
-            "Debugger": [re.compile(r"\b17\.1\b"), re.compile(r"\b16\.3\b")],
-        }
-        text = RESULTS_FILE.read_text()
-        for label, (_, _) in columns.items():
-            self.assertIn(label, text)
-        for row_name, (host_pat, modern_pat) in rows.items():
-            table_row = next(line for line in text.splitlines()
-                             if line.lstrip().startswith("| " + row_name + " "))
-            cells = [c.strip() for c in table_row.strip().strip("|").split("|")]
-            host_cell, modern_cell = cells[1], cells[2]
-            self.assertRegex(host_cell, host_pat)
-            self.assertRegex(modern_cell, modern_pat)
-            self.assertRegex(blobs["host"], host_pat,
-                             row_name + ": host version not found in recorded evidence")
-            self.assertRegex(blobs["modern"], modern_pat,
-                             row_name + ": modern version not found in recorded evidence")
+    # RESULTS.md toolchain versions are checked against the evidence for every
+    # lab by tests/test_results_consistency.py.
 
 
 if __name__ == "__main__":
