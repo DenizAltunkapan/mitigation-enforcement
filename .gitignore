@@ -33,6 +33,9 @@ labs/06-pie-leak-bypass/pie_fixed
 
 labs/07-execution-permission/wx_probe
 
+labs/08-code-reuse-chain/code_reuse
+labs/08-code-reuse-chain/code_reuse_fixed
+
 # Python
 __pycache__/
 *.pyc

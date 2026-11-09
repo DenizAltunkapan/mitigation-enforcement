@@ -135,6 +135,16 @@ class ResultsConsistencyTests(unittest.TestCase):
              for name in ("Compiler", "Assembler / Linker", "C library")},
         )
 
+    def test_lab08_results_match_evidence(self):
+        # Host-only.
+        self._check(
+            "Lab 08",
+            "labs/08-code-reuse-chain/evidence/2026-11-09.json",
+            "labs/08-code-reuse-chain/RESULTS.md",
+            {name: {1: ("host", name)}
+             for name in ("Compiler", "Assembler / Linker", "C library", "Debugger")},
+        )
+
 
 class CellCheckGuaranteesTests(unittest.TestCase):
     """Pins the strictness of the cell check against drift in the check itself,

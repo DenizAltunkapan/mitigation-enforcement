@@ -1,0 +1,187 @@
+{
+  "description": "Selected text evidence from verified complete Lab 08 captures. Full binaries and disassembly remain in the original capture directories. Checksums establish consistency, not authenticity.",
+  "captures": [
+    {
+      "name": "l8ev",
+      "environment": {
+        "schema_version": 1,
+        "label": "host",
+        "label_is_operator_supplied": true,
+        "captured_at_utc": "2026-11-09T14:31:42.109447+00:00",
+        "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
+        "architecture": "x86_64",
+        "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+        "CC": "gcc",
+        "CFLAGS": "-Wall -Wextra",
+        "LDFLAGS": "",
+        "aslr_before": "2",
+        "aslr_after": "2"
+      },
+      "versions": {
+        "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "compiler-target": "x86_64-linux-gnu\n",
+        "binutils": "GNU readelf (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n",
+        "gdb-version": "GNU gdb (Ubuntu 17.1-2ubuntu1) 17.1\nCopyright (C) 2025 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n",
+        "libc": "glibc 2.43\n"
+      },
+      "os_release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+      "build_command": [
+        "make",
+        "--always-make",
+        "CC=gcc",
+        "CFLAGS=-Wall -Wextra",
+        "LDFLAGS="
+      ],
+      "build_stdout": "gcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls -U_FORTIFY_SOURCE -fcf-protection=none -fno-stack-protector -fno-pie -no-pie -Wl,-z,relro,-z,now,-z,noexecstack -o code_reuse src/code_reuse.c\ngcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls -U_FORTIFY_SOURCE -fcf-protection=none -fno-stack-protector -fno-pie -no-pie -Wl,-z,relro,-z,now,-z,noexecstack -DFIXED -o code_reuse_fixed src/code_reuse.c\n",
+      "build_stderr": "",
+      "payload": {
+        "saved_return_offset": 40,
+        "ret_gadget": "0x40132c",
+        "stage_one": "0x4011a6",
+        "stage_two": "0x4011cb",
+        "oracle": "0x4011fb",
+        "address_source": "local non-PIE build artifacts; not an information disclosure",
+        "chain_layout": "A * offset | (ret, stage_one) | (ret, stage_two) | (ret, oracle)",
+        "shellcode_layout": "0xc3 * offset | saved return overwritten with the in-process stack buffer address"
+      },
+      "nx_fault": {
+        "fault_pc": "0x7fffffffd060",
+        "stack_buffer": "0x7fffffffd060",
+        "stack_mapping": [
+          "0x7ffffffdd000",
+          "0x7ffffffff000"
+        ],
+        "stack_perms": "rw-p",
+        "fault_pc_equals_stack_buffer": true,
+        "fault_pc_in_stack_mapping": true,
+        "stack_mapping_non_executable": true
+      },
+      "finding": {
+        "stack_shellcode_blocked_by_nx": true,
+        "nx_fault_pc_equals_stack_buffer": true,
+        "nx_fault_in_non_executable_stack": true,
+        "code_reuse_chain_reached_oracle": true,
+        "chain_required_correct_order": true,
+        "bounds_check_prevented_redirection": true
+      },
+      "artifact_sha256": {
+        "src/code_reuse.c": "e7e86e080f623b32e058e2892b2ee820aff9779479339737088f053bdbca5ef3",
+        "Makefile": "057859d8fc11e73579f3ec0fd046800339026be9306158b9b47513ddc2a7b4db",
+        "code_reuse": "b24a7a5f4b8de3b55b6749e95bcb07d69a01dab6be1375bac7a94cc7d62c11b9",
+        "code_reuse_fixed": "19b1ea4deb93a4a2d6e25b2b7408c7394f8c9618e7e0cca63a628385b7dd4f6c"
+      },
+      "collector_sha256": "56e87cd8aef3758fd68bb29ce596a593d47e4cbb7d0baa66d7ca9fbae9d29c0c",
+      "full_manifest_sha256": "3ccf225af616355429a41d99365c2793f97b2fe7cd121a71c47e297dc7ba33f0",
+      "observations": [
+        {
+          "mode": "chain",
+          "binary": "code_reuse",
+          "repeat": 1,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "stage_one_ran": true,
+          "stage_two_ran": true,
+          "stdout": "copy completed: 88 bytes\nONE\nTWO\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "chain",
+          "binary": "code_reuse",
+          "repeat": 2,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "stage_one_ran": true,
+          "stage_two_ran": true,
+          "stdout": "copy completed: 88 bytes\nONE\nTWO\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "chain",
+          "binary": "code_reuse",
+          "repeat": 3,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "stage_one_ran": true,
+          "stage_two_ran": true,
+          "stdout": "copy completed: 88 bytes\nONE\nTWO\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "partial",
+          "binary": "code_reuse",
+          "repeat": 1,
+          "returncode": 43,
+          "signal": null,
+          "target_reached": true,
+          "stage_one_ran": false,
+          "stage_two_ran": true,
+          "stdout": "copy completed: 72 bytes\nTWO\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "partial",
+          "binary": "code_reuse",
+          "repeat": 2,
+          "returncode": 43,
+          "signal": null,
+          "target_reached": true,
+          "stage_one_ran": false,
+          "stage_two_ran": true,
+          "stdout": "copy completed: 72 bytes\nTWO\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "partial",
+          "binary": "code_reuse",
+          "repeat": 3,
+          "returncode": 43,
+          "signal": null,
+          "target_reached": true,
+          "stage_one_ran": false,
+          "stage_two_ran": true,
+          "stdout": "copy completed: 72 bytes\nTWO\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "fixed",
+          "binary": "code_reuse_fixed",
+          "repeat": 1,
+          "returncode": 2,
+          "signal": null,
+          "target_reached": false,
+          "stage_one_ran": false,
+          "stage_two_ran": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "mode": "fixed",
+          "binary": "code_reuse_fixed",
+          "repeat": 2,
+          "returncode": 2,
+          "signal": null,
+          "target_reached": false,
+          "stage_one_ran": false,
+          "stage_two_ran": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "mode": "fixed",
+          "binary": "code_reuse_fixed",
+          "repeat": 3,
+          "returncode": 2,
+          "signal": null,
+          "target_reached": false,
+          "stage_one_ran": false,
+          "stage_two_ran": false,
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        }
+      ]
+    }
+  ]
+}

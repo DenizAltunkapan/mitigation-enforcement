@@ -23,6 +23,7 @@ research project in progress.
 
 | Finding | Evidence |
 |---|---|
+| In one binary under enforced NX, a jump onto the non-executable stack faults (fault PC in the `[stack]` mapping) while a chain of already-executable in-binary functions redirects control flow in order — code reuse succeeds despite NX, not by disabling it; a bounds check prevents it. | [Lab 08](labs/08-code-reuse-chain/RESULTS.md) — 3 cases + an NX control, on x86-64 host |
 | In an anonymous mapping on this host, identical bytes fault under a non-executable mapping and run under an executable one, so execute permission governs execution: NX held. W^X did not — the host allowed a writable-executable mapping. | [Lab 07](labs/07-execution-permission/RESULTS.md) — 3 modes, 9 trials on x86-64 host |
 | A single same-process text-pointer leak makes a saved-return overwrite redirect control flow under PIE+ASLR settings comparable to Lab 05's faulting case; a bounds check still prevents it. | [Lab 06](labs/06-pie-leak-bypass/RESULTS.md) — 3 cases, 9 trials on x86-64 host, 9 distinct leaked bases |
 | The same linear stack overflow is detected after the write by a stack canary, prevented before the write by a bounds check, and faults under PIE+ASLR when a static address is reused. | [Lab 05](labs/05-return-address-overwrite/RESULTS.md) — 4 variants, 54 trials on x86-64 host and Debian 13 VM |
@@ -37,7 +38,7 @@ limits of the results and the remaining work.
 
 ## Labs
 
-Labs 01–03 establish the baseline; Labs 04–07 introduce controlled
+Labs 01–03 establish the baseline; Labs 04–08 introduce controlled
 memory-corruption and mitigation experiments.
 
 | Lab | Topic | Target | Recorded evidence |
@@ -49,9 +50,10 @@ memory-corruption and mitigation experiments.
 | [05](labs/05-return-address-overwrite/README.md) | Return-address overwrite | x86-64 host / VM | [4 variants, 54 trials](labs/05-return-address-overwrite/RESULTS.md) |
 | [06](labs/06-pie-leak-bypass/README.md) | Defeating PIE with a leak | x86-64 host | [3 cases, 9 trials](labs/06-pie-leak-bypass/RESULTS.md) |
 | [07](labs/07-execution-permission/README.md) | Runtime execution permission (W^X) | x86-64 host | [3 modes, 9 trials](labs/07-execution-permission/RESULTS.md) |
+| [08](labs/08-code-reuse-chain/README.md) | Code reuse under a non-exec stack | x86-64 host | [3 cases + NX control](labs/08-code-reuse-chain/RESULTS.md) |
 
 Labs 01–03 share a cross-lab [baseline report](docs/BASELINE-RESULTS.md) and
-[comparison evidence](docs/evidence/). The independent Lab 04, 05, 06 and 07 captures
+[comparison evidence](docs/evidence/). The independent Lab 04, 05, 06, 07 and 08 captures
 have `RESULTS.md` and `evidence/` within their own lab directories.
 
 The [synthesis across labs](docs/SYNTHESIS.md) states the guiding question, what
@@ -60,9 +62,10 @@ cases, the shared limits, and the planned replications.
 
 ## Quickstart
 
-On x86 Linux, install Bash, Python 3.8+, GCC, GDB, GNU Make, Binutils,
-coreutils, QEMU utilities (`qemu-img`) and e2fsprogs (`mke2fs`, `e2fsck`,
-`debugfs`). From the repository root:
+On x86 Linux, install Bash, Python 3.8+, GCC, GDB, GNU Make, Binutils and
+coreutils. QEMU utilities (`qemu-img`) and e2fsprogs (`mke2fs`, `e2fsck`,
+`debugfs`) are optional: only the offline legacy-disk inspection test uses them,
+and it skips itself when they are absent. From the repository root:
 
 ```bash
 ./scripts/validate.sh
@@ -91,6 +94,8 @@ python3 scripts/export-pie-leak.py /tmp/pie-leak-review \
   --output /tmp/pie-leak-review.json
 python3 scripts/capture-wx.py host /tmp/wx-review
 python3 scripts/export-wx.py /tmp/wx-review --output /tmp/wx-review.json
+python3 scripts/capture-code-reuse.py host /tmp/code-reuse-review
+python3 scripts/export-code-reuse.py /tmp/code-reuse-review --output /tmp/code-reuse-review.json
 # Optional Labs 01–03 host capture and verified text export:
 bash scripts/capture-baseline.sh host /tmp/baseline-review
 python3 scripts/export-baseline.py /tmp/baseline-review \
