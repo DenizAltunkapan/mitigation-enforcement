@@ -55,6 +55,7 @@ COLLECTOR_FOR_LAB = {
     "labs/06-pie-leak-bypass": "scripts/capture-pie-leak.py",
     "labs/07-execution-permission": "scripts/capture-wx.py",
     "labs/08-code-reuse-chain": "scripts/capture-code-reuse.py",
+    "labs/09-relro-got": "scripts/capture-relro.py",
 }
 
 
@@ -161,6 +162,16 @@ class ResultsConsistencyTests(unittest.TestCase):
             "labs/08-code-reuse-chain/RESULTS.md",
             {name: {1: ("host", name)}
              for name in ("Compiler", "Assembler / Linker", "C library", "Debugger")},
+        )
+
+    def test_lab09_results_match_evidence(self):
+        # Host-only, no debugger column (the collector needs none).
+        self._check(
+            "Lab 09",
+            "labs/09-relro-got/evidence/2026-11-13.json",
+            "labs/09-relro-got/RESULTS.md",
+            {name: {1: ("host", name)}
+             for name in ("Compiler", "Assembler / Linker", "C library")},
         )
 
     def test_results_trial_counts_match_the_recorded_observations(self):

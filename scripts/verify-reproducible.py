@@ -32,6 +32,7 @@ LABS = {
     "labs/06-pie-leak-bypass": ("capture-pie-leak.py", "export-pie-leak.py"),
     "labs/07-execution-permission": ("capture-wx.py", "export-wx.py"),
     "labs/08-code-reuse-chain": ("capture-code-reuse.py", "export-code-reuse.py"),
+    "labs/09-relro-got": ("capture-relro.py", "export-relro.py"),
 }
 
 # Per-run fields that must not be compared. Everything else in an observation is

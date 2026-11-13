@@ -36,6 +36,9 @@ labs/07-execution-permission/wx_probe
 labs/08-code-reuse-chain/code_reuse
 labs/08-code-reuse-chain/code_reuse_fixed
 
+labs/09-relro-got/got_full
+labs/09-relro-got/got_partial
+
 # Python
 __pycache__/
 *.pyc

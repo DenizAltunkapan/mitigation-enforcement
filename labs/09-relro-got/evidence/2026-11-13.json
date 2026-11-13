@@ -1,0 +1,118 @@
+{
+  "description": "Selected text evidence from verified complete Lab 09 captures. Full binaries and disassembly remain in the original capture directories. Checksums establish consistency, not authenticity.",
+  "captures": [
+    {
+      "name": "l9c",
+      "environment": {
+        "schema_version": 1,
+        "label": "host",
+        "label_is_operator_supplied": true,
+        "captured_at_utc": "2026-11-13T10:26:58.630554+00:00",
+        "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
+        "architecture": "x86_64",
+        "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+        "CC": "gcc",
+        "CFLAGS": "-Wall -Wextra",
+        "LDFLAGS": ""
+      },
+      "versions": {
+        "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "compiler-target": "x86_64-linux-gnu\n",
+        "binutils": "GNU readelf (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n",
+        "libc": "glibc 2.43\n"
+      },
+      "os_release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+      "build_command": [
+        "make",
+        "--always-make",
+        "CC=gcc",
+        "CFLAGS=-Wall -Wextra",
+        "LDFLAGS="
+      ],
+      "build_stdout": "gcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -U_FORTIFY_SOURCE -fcf-protection=none -fno-stack-protector -fno-pie -no-pie -Wl,-z,relro,-z,now -o got_full src/got_write.c\ngcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -U_FORTIFY_SOURCE -fcf-protection=none -fno-stack-protector -fno-pie -no-pie -Wl,-z,relro,-z,lazy -o got_partial src/got_write.c\n",
+      "build_stderr": "",
+      "payload": {
+        "puts_got_slot": {
+          "got_full": "0x403fd0",
+          "got_partial": "0x404018"
+        },
+        "address_source": "local non-PIE build artifacts (objdump -R); not an information disclosure",
+        "action": "write &oracle into the binary's own puts GOT slot, then call puts"
+      },
+      "finding": {
+        "partial_relro_got_is_writable": true,
+        "full_relro_got_is_read_only": true
+      },
+      "artifact_sha256": {
+        "src/got_write.c": "67d9417c9df81a6ed8d80fde69b433e56f6ca1c0f6055ff751ffec9c8b55e304",
+        "Makefile": "22c9dae4c7f21400f31a04f447eafaeb2bfc9bf5e28e262ae51793cb104dedb6",
+        "got_full": "a78168d6e4865932c7533e38f3b9f7588cbc39ad717d9deb5ede770db8bcab8d",
+        "got_partial": "69f426c59b6d0fc2853a2859b53f30b2a74fa5aa0e52c21a976cc1dfff8b75df"
+      },
+      "collector_sha256": "82a459fe57630f542fcd7af5d53774bc27da62a524d5f253eaf90726e42ee555",
+      "full_manifest_sha256": "50ec597fa6068d737186b2276eac8da64ee5a0f1c619eef8bc3f3036db1156d9",
+      "observations": [
+        {
+          "mode": "partial",
+          "binary": "got_partial",
+          "repeat": 1,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "stdout": "TARGET: GOT call redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "partial",
+          "binary": "got_partial",
+          "repeat": 2,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "stdout": "TARGET: GOT call redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "partial",
+          "binary": "got_partial",
+          "repeat": 3,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "stdout": "TARGET: GOT call redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "full",
+          "binary": "got_full",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "mode": "full",
+          "binary": "got_full",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "mode": "full",
+          "binary": "got_full",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    }
+  ]
+}

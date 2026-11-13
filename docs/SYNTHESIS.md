@@ -1,4 +1,4 @@
-# Synthesis across Labs 01–08
+# Synthesis across Labs 01–09
 
 This document ties the labs together under one question and states, for each,
 what was measured, what that observation supports, and what it does not. It is a
@@ -35,6 +35,7 @@ are built to keep those two apart.
 | [06 defeating PIE with a leak](../labs/06-pie-leak-bypass/RESULTS.md) | Primitive extended: remove one precondition | 9 trials, 9 distinct leaked bases: a same-process pointer leak rebases the target so the Lab 05 PIE+ASLR fault becomes redirection; a bounds check still prevents it | The leak is modelled as an explicit disclosure, not derived from a concrete bug |
 | [07 runtime execution permission](../labs/07-execution-permission/RESULTS.md) | Mitigation boundary: measure NX vs. W^X | 9 trials, 3 page protections: identical bytes fault without execute, run with it; a writable-executable mapping is allowed here | One anonymous `mmap`/`mprotect` mapping on one host; not loaded segments, stacks or heaps, nor other kernels |
 | [08 code reuse under NX](../labs/08-code-reuse-chain/RESULTS.md) | Primitive extended: avoid NX instead of disabling it | 9 trials across 3 control-flow cases plus an in-process NX control: a jump onto the non-executable stack faults while an ordered chain of in-binary functions reaches the oracle; a bounds check prevents it | x86-64, white-box static addresses (no PIE leak); a minimal ordered chain, not a libc ROP toolkit; CET disabled |
+| [09 GOT overwrite under RELRO](../labs/09-relro-got/RESULTS.md) | New target and its mitigation: the GOT, not the saved return | 6 trials across 2 cases: overwriting puts's GOT slot redirects the call under partial RELRO but faults under full RELRO | x86-64, white-box static address (no PIE leak); one slot and one call, not a full PLT/GOT attack |
 
 ## How the claims build on each other
 
@@ -59,11 +60,19 @@ are built to keep those two apart.
   enforced — confirmed because the same binary faults when the return is pointed
   at the stack buffer. The move from code injection to code reuse is the lab's
   point; the bounds check, again, is the only thing that prevents it.
+- Lab 09 **changes the target, not just the mitigation**: every earlier primitive
+  hijacks the saved return address, but the GOT is a second control-flow pointer.
+  Full RELRO maps it read-only at run time, turning the overwrite into a fault,
+  while partial RELRO leaves it open. This is a different kind of defense from the
+  others: it does not repair the bug but locks the writable pointer the bug would
+  target.
 
-The consistent thread: in every lab the only change that *prevents* the out-of-
-bounds effect rather than merely interrupting one path is the root-cause repair
-(the bounds check). Canary, PIE/ASLR and NX each interrupt a path under stated
-conditions; none repairs the error.
+The consistent thread: across the overwrite labs the only change that *prevents*
+the out-of-bounds effect rather than merely interrupting one path is the
+root-cause repair (the bounds check). Canary, PIE/ASLR and NX each interrupt a
+path under stated conditions; none repairs the error. Lab 09 adds the
+complementary case — RELRO does not touch the bug but removes the target, by
+making the attacked pointer read-only.
 
 ## Failed and negative cases kept on the record
 
@@ -72,7 +81,7 @@ Honest negatives are part of the evidence, not omissions:
 - **Legacy 32-bit replication is unresolved.** The recovered Debian 7 image boots
   and ran Labs 01–03, but a clean unattended install and its SSH transport are
   [unverified](LEGACY-DIAGNOSIS.md); the original disk lacked a GRUB installation.
-  Labs 04–08 are therefore x86-64 only.
+  Labs 04–09 are therefore x86-64 only.
 - **No NX claim for the legacy CPU.** The default legacy QEMU CPU does not
   advertise NX, so Lab 03 makes no runtime execution-prevention claim there.
 - **Lab 05/06 negative controls fault as predicted.** A length-matched padding
