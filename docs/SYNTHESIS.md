@@ -23,18 +23,18 @@ A mitigation can interrupt a particular path without repairing the error, and an
 observed crash is not by itself evidence of instruction-pointer control. The labs
 are built to keep those two apart.
 
-## What each lab contributes
+## Key results and evidence
 
 | Lab | Role in the chain | Measurement that carries the claim | Scope of the claim |
 |---|---|---|---|
 | [01 process layout](../labs/01-process-memory-layout/README.md) | Baseline: what is fixed vs. randomized | Debian 7 i386 / Debian 13 amd64 comparison with matching inputs: non-PIE text stays fixed, heap/stack/libc move | Observed in these two environments, not a randomization-entropy estimate |
 | [02 stack frames](../labs/02-stack-frames/README.md) | Baseline: where the saved return address sits | VM comparison plus a modern GDB register/frame transcript | Modern transcript recorded; a legacy debugger transcript is open |
 | [03 ELF mitigations](../labs/03-binary-mitigation-baseline/README.md) | Baseline: which protections a build requests | ELF metadata and repeated runs: `GNU_STACK RW`, RELRO/BIND_NOW, NX CPU flag | ELF request and CPU flag only — not runtime enforcement (deferred to Lab 07) |
-| [04 stack canary](../labs/04-stack-canary/README.md) | Mitigation: detection vs. repair | 72 trials, host and VM, `-O0`/`-O2`: the guard aborts *after* the out-of-bounds write; a bounds check rejects it *before* | A contiguous linear overflow; not indexed writes or canary disclosure |
-| [05 return-address overwrite](../labs/05-return-address-overwrite/README.md) | Primitive: redirect control flow, and what stops it | 54 trials across 4 variants: plain redirects to an in-binary oracle; canary aborts; PIE+ASLR faults on a static address; bounds check prevents the write | x86-64; the primitive reaches a known in-binary address, not arbitrary code |
-| [06 defeating PIE with a leak](../labs/06-pie-leak-bypass/README.md) | Primitive extended: remove one precondition | 9 trials, 9 distinct leaked bases: a same-process pointer leak rebases the target so the Lab 05 PIE+ASLR fault becomes redirection; a bounds check still prevents it | The leak is modelled as an explicit disclosure, not derived from a concrete bug |
-| [07 runtime execution permission](../labs/07-execution-permission/README.md) | Mitigation boundary: measure NX vs. W^X | 9 trials, 3 page protections: identical bytes fault without execute, run with it; a writable-executable mapping is allowed here | One anonymous `mmap`/`mprotect` mapping on one host; not loaded segments, stacks or heaps, nor other kernels |
-| [08 code reuse under NX](../labs/08-code-reuse-chain/README.md) | Primitive extended: avoid NX instead of disabling it | 9 trials across 3 control-flow cases plus an in-process NX control: a jump onto the non-executable stack faults while an ordered chain of in-binary functions reaches the oracle; a bounds check prevents it | x86-64, white-box static addresses (no PIE leak); a minimal ordered chain, not a libc ROP toolkit; CET disabled |
+| [04 stack canary](../labs/04-stack-canary/RESULTS.md) | Mitigation: detection vs. repair | 72 trials, host and VM, `-O0`/`-O2`: the guard aborts *after* the out-of-bounds write; a bounds check rejects it *before* | A contiguous linear overflow; not indexed writes or canary disclosure |
+| [05 return-address overwrite](../labs/05-return-address-overwrite/RESULTS.md) | Primitive: redirect control flow, and what stops it | 54 trials across 4 variants: plain redirects to an in-binary oracle; canary aborts; PIE+ASLR faults on a static address; bounds check prevents the write | x86-64; the primitive reaches a known in-binary address, not arbitrary code |
+| [06 defeating PIE with a leak](../labs/06-pie-leak-bypass/RESULTS.md) | Primitive extended: remove one precondition | 9 trials, 9 distinct leaked bases: a same-process pointer leak rebases the target so the Lab 05 PIE+ASLR fault becomes redirection; a bounds check still prevents it | The leak is modelled as an explicit disclosure, not derived from a concrete bug |
+| [07 runtime execution permission](../labs/07-execution-permission/RESULTS.md) | Mitigation boundary: measure NX vs. W^X | 9 trials, 3 page protections: identical bytes fault without execute, run with it; a writable-executable mapping is allowed here | One anonymous `mmap`/`mprotect` mapping on one host; not loaded segments, stacks or heaps, nor other kernels |
+| [08 code reuse under NX](../labs/08-code-reuse-chain/RESULTS.md) | Primitive extended: avoid NX instead of disabling it | 9 trials across 3 control-flow cases plus an in-process NX control: a jump onto the non-executable stack faults while an ordered chain of in-binary functions reaches the oracle; a bounds check prevents it | x86-64, white-box static addresses (no PIE leak); a minimal ordered chain, not a libc ROP toolkit; CET disabled |
 
 ## How the claims build on each other
 

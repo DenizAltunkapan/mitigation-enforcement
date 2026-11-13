@@ -2,121 +2,65 @@
 
 [![Lab validation](https://github.com/DenizAltunkapan/exploit-evolution/actions/workflows/labs.yml/badge.svg)](https://github.com/DenizAltunkapan/exploit-evolution/actions/workflows/labs.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](README.md#quickstart)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](README.md#run-the-checks)
 
-A systems-security lab comparing classical exploitation primitives on legacy
-32-bit Linux and modern x86-64 Linux.
+A systems-security study comparing legacy i386 and modern x86-64 Linux
+baselines, then testing exploitation primitives and mitigations in controlled
+x86-64 binaries. Eight local labs connect process layout and stack frames to
+canaries, PIE/ASLR, execution permission and code reuse.
 
-## Research question
+**Research question:** Under which architectural, build and runtime conditions
+does a memory-safety error become a control-flow primitive, and which fix
+prevents the underlying error?
 
-How do architecture, toolchain defaults and runtime mitigations change the path
-from a memory-safety bug to an exploitation primitive?
+## Findings
 
-The point is not to collect exploits. The labs examine historical assumptions
-and modern mitigations. The memory-corruption experiments distinguish an
-interrupted exploit path from a repair of the underlying bug. All examples are
-synthetic and local. Lab 05 uses an in-binary oracle to measure control-flow
-redirection; no lab targets a real system. This is an independent educational
-research project in progress.
+- A stack canary detects corruption after an out-of-bounds write; a bounds
+  check rejects the write before it occurs. [Lab 04 results](labs/04-stack-canary/RESULTS.md)
+- A same-process pointer leak enables return-address redirection under PIE+ASLR
+  in the tested binary; the bounds check still blocks the path.
+  [Lab 06 results](labs/06-pie-leak-bypass/RESULTS.md)
+- A jump onto a non-executable stack faults, while an ordered chain of existing
+  functions redirects control flow under NX. This is code reuse, not disabled
+  NX. [Lab 08 results](labs/08-code-reuse-chain/RESULTS.md)
 
-## Key results
-
-| Finding | Evidence |
-|---|---|
-| In one binary under enforced NX, a jump onto the non-executable stack faults (fault PC in the `[stack]` mapping) while a chain of already-executable in-binary functions redirects control flow in order — code reuse succeeds despite NX, not by disabling it; a bounds check prevents it. | [Lab 08](labs/08-code-reuse-chain/RESULTS.md) — 3 cases + an NX control, on x86-64 host |
-| In an anonymous mapping on this host, identical bytes fault under a non-executable mapping and run under an executable one, so execute permission governs execution: NX held. W^X did not — the host allowed a writable-executable mapping. | [Lab 07](labs/07-execution-permission/RESULTS.md) — 3 modes, 9 trials on x86-64 host |
-| A single same-process text-pointer leak makes a saved-return overwrite redirect control flow under PIE+ASLR settings comparable to Lab 05's faulting case; a bounds check still prevents it. | [Lab 06](labs/06-pie-leak-bypass/RESULTS.md) — 3 cases, 9 trials on x86-64 host, 9 distinct leaked bases |
-| The same linear stack overflow is detected after the write by a stack canary, prevented before the write by a bounds check, and faults under PIE+ASLR when a static address is reused. | [Lab 05](labs/05-return-address-overwrite/RESULTS.md) — 4 variants, 54 trials on x86-64 host and Debian 13 VM |
-| A stack-canary guard detects corruption but does not prevent the out-of-bounds write; an explicit bounds check does. Holds at `-O0` and `-O2`. | [Lab 04](labs/04-stack-canary/RESULTS.md) — 72 trials, host and Debian VM |
-| Non-PIE text stays at a fixed address while modern default-PIE text moves; heap, stack and libc mappings move in both environments. | [Labs 01–03 baseline](docs/BASELINE-COMPARISON.md) — Debian 7 i386 / Debian 13 amd64, matching inputs, verified manifests |
-
-A mitigation can interrupt a path without repairing the bug, and an observed
-crash does not establish instruction-pointer control. The legacy i386
-replication of Labs 04–05 remains open; see
-[methodology, evidence status and next experiments](docs/RESEARCH.md) for the
-limits of the results and the remaining work.
+These are bounded observations from the recorded environments, not claims about
+arbitrary systems. The [complete key results and evidence table](docs/SYNTHESIS.md#key-results-and-evidence)
+covers all eight labs; the [research record](docs/RESEARCH.md) tracks failed
+cases and open replications.
 
 ## Labs
 
-Labs 01–03 establish the baseline; Labs 04–08 introduce controlled
-memory-corruption and mitigation experiments.
+| Lab | Focus |
+|---|---|
+| [01](labs/01-process-memory-layout/README.md) | Process memory layout on i386 and x86-64 |
+| [02](labs/02-stack-frames/README.md) | Stack frames and saved return addresses |
+| [03](labs/03-binary-mitigation-baseline/README.md) | ELF mitigation baseline |
+| [04](labs/04-stack-canary/README.md) | Canary detection versus bounds checking |
+| [05](labs/05-return-address-overwrite/README.md) | Return-address overwrite under different mitigations |
+| [06](labs/06-pie-leak-bypass/README.md) | PIE/ASLR bypass using a same-process leak |
+| [07](labs/07-execution-permission/README.md) | Runtime NX and W^X measurement |
+| [08](labs/08-code-reuse-chain/README.md) | Code reuse under a non-executable stack |
 
-| Lab | Topic | Target | Recorded evidence |
-|---|---|---|---|
-| [01](labs/01-process-memory-layout/README.md) | Process memory layout | i386 / x86-64 | Verified Debian VM comparison |
-| [02](labs/02-stack-frames/README.md) | Stack frames | i386 / x86-64 | VM comparison and modern GDB transcript |
-| [03](labs/03-binary-mitigation-baseline/README.md) | ELF mitigations | i386 / x86-64 | Verified VM metadata and runs |
-| [04](labs/04-stack-canary/README.md) | Stack canary | x86-64 host / VM | [72 trials](labs/04-stack-canary/RESULTS.md), `-O0` / `-O2` |
-| [05](labs/05-return-address-overwrite/README.md) | Return-address overwrite | x86-64 host / VM | [4 variants, 54 trials](labs/05-return-address-overwrite/RESULTS.md) |
-| [06](labs/06-pie-leak-bypass/README.md) | Defeating PIE with a leak | x86-64 host | [3 cases, 9 trials](labs/06-pie-leak-bypass/RESULTS.md) |
-| [07](labs/07-execution-permission/README.md) | Runtime execution permission (W^X) | x86-64 host | [3 modes, 9 trials](labs/07-execution-permission/RESULTS.md) |
-| [08](labs/08-code-reuse-chain/README.md) | Code reuse under a non-exec stack | x86-64 host | [3 cases + NX control](labs/08-code-reuse-chain/RESULTS.md) |
+Labs 01–03 have a [cross-VM baseline comparison](docs/BASELINE-COMPARISON.md).
+Labs 04–08 keep their results and capture evidence in the respective lab
+directories.
 
-Labs 01–03 share a cross-lab [baseline report](docs/BASELINE-RESULTS.md) and
-[comparison evidence](docs/evidence/). The independent Lab 04, 05, 06, 07 and 08 captures
-have `RESULTS.md` and `evidence/` within their own lab directories.
+## Run the checks
 
-The [synthesis across labs](docs/SYNTHESIS.md) states the guiding question, what
-each lab measures, which observation carries which claim, the negative and failed
-cases, the shared limits, and the planned replications.
-
-## Quickstart
-
-On x86 Linux, install Bash, Python 3.8+, GCC, GDB, GNU Make, Binutils and
-coreutils. QEMU utilities (`qemu-img`) and e2fsprogs (`mke2fs`, `e2fsck`,
-`debugfs`) are optional: only the offline legacy-disk inspection test uses them,
-and it skips itself when they are absent. From the repository root:
+On x86 Linux with Bash, Python 3.8+, GCC, GDB, Make and Binutils:
 
 ```bash
 ./scripts/validate.sh
 ```
 
-This verifies builds, tooling and evidence integrity locally. No VM startup,
-ISO download, root access or network access is needed. The C examples
-intentionally include undefined behavior; use a disposable VM for manual
-experiments. A host run confirms the local tooling and does not substitute for
-the recorded VM measurements.
+This checks the local builds, tooling and evidence integrity without starting
+VMs or downloading images. The [local review commands](docs/REVIEW-LOCALLY.md)
+cover optional host captures and exports; [docs/SETUP.md](docs/SETUP.md) covers
+VM setup and baseline capture.
 
-## Review locally
+All experiments use synthetic, local programs. They do not target real systems.
+The C examples deliberately exercise undefined behavior; use disposable VMs for
+manual experiments. A host run does not replace the recorded VM measurements.
 
-With the Quickstart prerequisites installed, run these optional host captures
-from the repository root, using fresh output paths:
-
-```bash
-python3 scripts/capture-stack-canary.py host /tmp/canary-review
-python3 scripts/export-stack-canary.py /tmp/canary-review \
-  --output /tmp/canary-review.json
-python3 scripts/capture-return-overwrite.py host /tmp/overwrite-review
-python3 scripts/export-return-overwrite.py /tmp/overwrite-review \
-  --output /tmp/overwrite-review.json
-python3 scripts/capture-pie-leak.py host /tmp/pie-leak-review
-python3 scripts/export-pie-leak.py /tmp/pie-leak-review \
-  --output /tmp/pie-leak-review.json
-python3 scripts/capture-wx.py host /tmp/wx-review
-python3 scripts/export-wx.py /tmp/wx-review --output /tmp/wx-review.json
-python3 scripts/capture-code-reuse.py host /tmp/code-reuse-review
-python3 scripts/export-code-reuse.py /tmp/code-reuse-review --output /tmp/code-reuse-review.json
-# Optional Labs 01–03 host capture and verified text export:
-bash scripts/capture-baseline.sh host /tmp/baseline-review
-python3 scripts/export-baseline.py /tmp/baseline-review \
-  --output /tmp/baseline-review.json
-```
-
-A host label is a local smoke test; it does not replace VM results.
-
-## VM setup and baseline capture
-
-The Debian 13 (modern x86-64) and Debian 7 (legacy i386) VM setup, disposable
-snapshot sessions, and the baseline capture and export workflow are documented
-in [docs/SETUP.md](docs/SETUP.md).
-
-## Non-goals
-
-- Not a weaponized exploit collection.
-- Not a chapter-by-chapter reproduction of any book.
-- No copyrighted source code, disk images or third-party binaries are committed.
-- No scanning or attacking real systems.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+MIT licensed; see [LICENSE](LICENSE).

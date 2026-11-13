@@ -90,7 +90,7 @@ isolate the effect of any one of those variables.
 
 ## Reproduction and evidence integrity
 
-[The root README](../README.md#quickstart) provides the local entry point.
+[The root README](../README.md#run-the-checks) provides the local entry point.
 The baseline collector covers Labs 01–03; dedicated Python collectors cover
 Labs 04 and 05. All build copies outside the source tree and refuse existing
 output directories. Captures include their collector source.
@@ -103,6 +103,17 @@ binaries. The baseline exporter additionally requires matching inputs when
 combining captures. Selected JSON omits full binaries and disassembly, so it is suitable
 for repository review but cannot replace a full capture. Hashes detect changes
 relative to a manifest; they do not authenticate who ran an experiment.
+
+Two automated checks keep the committed evidence honest against later edits.
+`tests/test_results_consistency.py` reads only the committed JSON, Markdown and
+source: it ties every version, trial count, operating system and saved-return
+offset stated in a RESULTS.md back to the recorded evidence, and every recorded
+collector and source hash back to the file on disk. `scripts/verify-reproducible.py`,
+run in CI, goes further for the host captures: it re-runs each committed collector
+and confirms the fresh outcomes — every observation's return code, signal and
+outcome flags, and the finding — match the committed evidence, ignoring only the
+inherently per-run fields (timestamps, raw output and ASLR-randomized addresses).
+So a collector cannot drift from the evidence it is supposed to produce.
 
 VM downloads and installed packages are not pinned. Exact recorded versions
 support interpretation, but do not promise bit-identical future installations.

@@ -1,7 +1,7 @@
 # VM setup and baseline capture
 
 This guide covers the virtual machines and the baseline capture workflow. For
-local verification without a VM, see the [Quickstart](../README.md#quickstart)
+local verification without a VM, see [Run the checks](../README.md#run-the-checks)
 in the root README. For methodology and evidence status, see
 [RESEARCH.md](RESEARCH.md).
 

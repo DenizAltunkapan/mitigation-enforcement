@@ -1,12 +1,19 @@
-"""Guards committed RESULTS.md prose against drift from the recorded evidence.
+"""Guards committed RESULTS.md prose and evidence provenance against drift.
 
-Labs 04-06 state toolchain versions in prose. The verified numbers live in each
-capture's recorded `versions` strings, one field per tool. These checks assert
-that every version written in a RESULTS.md environment table matches the field
-of the matching capture, so the prose can never silently diverge from what was
-measured.
+Several kinds of silent drift are checked, reading only committed JSON, Markdown
+and source files — no build tools:
 
-The checks are strict on purpose:
+1. RESULTS.md toolchain versions (Labs 04-08) against each capture's recorded
+   `versions` strings, one field per tool, so the prose cannot diverge from what
+   was measured.
+2. The trial count, operating system and saved-return offset stated in each
+   RESULTS.md against the recorded observations, os-release and payload, so those
+   measured numbers in the prose cannot go stale when the evidence is regenerated.
+3. Each lab's recorded `collector_sha256` and committed `artifact_sha256` entries
+   against the collector script and source/Makefile on disk, so evidence cannot
+   claim to come from a script or source that has since changed.
+
+The version checks are strict on purpose:
 
 - Each table row is tied to one evidence field (compiler, debugger, ...), so a
   binutils number cannot be satisfied by the compiler's version and vice versa.
@@ -19,8 +26,9 @@ The checks are strict on purpose:
 
 Expected values are read from the evidence, not hard-coded, so regenerating a
 capture cannot leave a stale assertion that still passes. No build tools are
-required; this reads only committed JSON and Markdown.
+required; this reads only committed JSON, Markdown and source files.
 """
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -37,6 +45,16 @@ FIELD_FOR_ROW = {
     "Debugger": "gdb-version",
     "Assembler / Linker": "binutils",
     "C library": "libc",
+}
+# Labs whose portable evidence records a collector hash, mapped to the committed
+# collector that produced it. A new such lab must be added here, enforced by
+# CollectorProvenanceTests.test_every_lab_with_recorded_evidence_is_mapped.
+COLLECTOR_FOR_LAB = {
+    "labs/04-stack-canary": "scripts/capture-stack-canary.py",
+    "labs/05-return-address-overwrite": "scripts/capture-return-overwrite.py",
+    "labs/06-pie-leak-bypass": "scripts/capture-pie-leak.py",
+    "labs/07-execution-permission": "scripts/capture-wx.py",
+    "labs/08-code-reuse-chain": "scripts/capture-code-reuse.py",
 }
 
 
@@ -145,6 +163,84 @@ class ResultsConsistencyTests(unittest.TestCase):
              for name in ("Compiler", "Assembler / Linker", "C library", "Debugger")},
         )
 
+    def test_results_trial_counts_match_the_recorded_observations(self):
+        # Each RESULTS.md states how many trials were run. That number is the
+        # total observations recorded in the evidence, so the prose must name it
+        # next to "trials" or "observations". This catches a count that drifts
+        # when the evidence is regenerated with a different number of runs.
+        for lab in COLLECTOR_FOR_LAB:
+            evidence = sorted((ROOT / lab / "evidence").glob("*.json"))
+            self.assertTrue(evidence, lab + " has no committed evidence")
+            total = sum(
+                len(capture["observations"])
+                for path in evidence
+                for capture in json.loads(path.read_text())["captures"]
+            )
+            results = (ROOT / lab / "RESULTS.md").read_text()
+            pattern = re.compile(r"\b%d\b[^.\n]*?\b(?:trials|observations)\b" % total)
+            self.assertRegex(
+                results, pattern,
+                "%s/RESULTS.md does not state the recorded total of %d trials; "
+                "update the prose or regenerate the evidence" % (lab, total),
+            )
+
+    def test_results_name_the_recorded_operating_system(self):
+        # Where a capture records os-release, the RESULTS environment table must
+        # name that distribution and version, so a host/VM change cannot leave the
+        # prose claiming the old OS. Labs whose export omits os-release are skipped.
+        distribution = re.compile(r"Ubuntu \d+\.\d+|Debian GNU/Linux \d+")
+        checked = 0
+        for lab in COLLECTOR_FOR_LAB:
+            results = (ROOT / lab / "RESULTS.md").read_text()
+            for path in sorted((ROOT / lab / "evidence").glob("*.json")):
+                for capture in json.loads(path.read_text())["captures"]:
+                    os_release = capture.get("os_release")
+                    if not os_release:
+                        continue
+                    pretty = next(
+                        (line.split("=", 1)[1].strip().strip('"')
+                         for line in os_release.splitlines()
+                         if line.startswith("PRETTY_NAME")),
+                        None,
+                    )
+                    self.assertIsNotNone(pretty, path.name + " has no PRETTY_NAME")
+                    match = distribution.match(pretty)
+                    self.assertIsNotNone(match, "unrecognized os-release: " + pretty)
+                    self.assertIn(
+                        match.group(0), results,
+                        "%s/RESULTS.md does not name the recorded OS %r"
+                        % (lab, match.group(0)),
+                    )
+                    checked += 1
+        self.assertGreater(checked, 0, "no os-release was checked")
+
+    def test_results_state_the_recorded_saved_return_offset(self):
+        # The saved-return offset is the central measured constant of the
+        # overwrite labs. Where a capture records it, RESULTS.md must state that
+        # number next to the word "offset", so the prose cannot keep an old value
+        # after the layout (and the evidence) changes. Labs without the field,
+        # such as Lab 07, are skipped.
+        checked = 0
+        for lab in COLLECTOR_FOR_LAB:
+            results = (ROOT / lab / "RESULTS.md").read_text()
+            for path in sorted((ROOT / lab / "evidence").glob("*.json")):
+                for capture in json.loads(path.read_text())["captures"]:
+                    payload = capture.get("payload", {})
+                    offset = payload.get("saved_return_offset") or payload.get("padding_bytes")
+                    if offset is None:
+                        continue
+                    pattern = re.compile(
+                        r"offset[^.\n]*?\b%d\b|\b%d\b[^.\n]*?offset" % (offset, offset)
+                    )
+                    self.assertRegex(
+                        results, pattern,
+                        "%s/RESULTS.md does not state the recorded saved-return "
+                        "offset of %d; update the prose or regenerate the evidence"
+                        % (lab, offset),
+                    )
+                    checked += 1
+        self.assertGreater(checked, 0, "no saved-return offset was checked")
+
 
 class CellCheckGuaranteesTests(unittest.TestCase):
     """Pins the strictness of the cell check against drift in the check itself,
@@ -179,6 +275,70 @@ class CellCheckGuaranteesTests(unittest.TestCase):
     def test_rejects_a_drifted_number(self):
         with self.assertRaises(AssertionError):
             self.check("C library", "glibc 2.99")
+
+
+# Each lab's portable evidence records the SHA-256 of the collector that produced
+# it and of its committed source files. If either is changed without regenerating
+# the evidence, the recorded hash goes stale while every other check still passes.
+# These cases tie the recorded hashes back to the committed files on disk.
+class CollectorProvenanceTests(unittest.TestCase):
+    def test_every_lab_with_recorded_evidence_is_mapped(self):
+        # A new lab that records a collector hash must be added here, so the
+        # provenance check can never silently skip it.
+        for evidence_dir in sorted(ROOT.glob("labs/*/evidence")):
+            files = list(evidence_dir.glob("*.json"))
+            if not files:
+                continue
+            records_hash = any(
+                "collector_sha256" in capture
+                for path in files
+                for capture in json.loads(path.read_text()).get("captures", [])
+            )
+            if records_hash:
+                lab = evidence_dir.parent.relative_to(ROOT).as_posix()
+                self.assertIn(lab, COLLECTOR_FOR_LAB,
+                              lab + " records a collector hash but is not mapped here")
+
+    def test_recorded_collector_hash_matches_the_committed_script(self):
+        for lab, script in COLLECTOR_FOR_LAB.items():
+            collector = ROOT / script
+            self.assertTrue(collector.exists(), script + " is missing")
+            on_disk = hashlib.sha256(collector.read_bytes()).hexdigest()
+            evidence = sorted((ROOT / lab / "evidence").glob("*.json"))
+            self.assertTrue(evidence, lab + " has no committed evidence")
+            for path in evidence:
+                for capture in json.loads(path.read_text())["captures"]:
+                    self.assertEqual(
+                        capture["collector_sha256"], on_disk,
+                        "%s: recorded collector hash does not match %s; "
+                        "regenerate the evidence after changing the collector"
+                        % (path.relative_to(ROOT), script),
+                    )
+
+    def test_recorded_source_hashes_match_the_committed_lab_files(self):
+        # The evidence hashes the lab's committed source and Makefile. Only those
+        # are checked: the generated binaries are git-ignored and rebuild to a
+        # different hash, so a locally present one must not be compared. Editing a
+        # committed source without regenerating the evidence is therefore caught.
+        checked = 0
+        for lab in COLLECTOR_FOR_LAB:
+            for path in sorted((ROOT / lab / "evidence").glob("*.json")):
+                for capture in json.loads(path.read_text())["captures"]:
+                    for name, digest in capture.get("artifact_sha256", {}).items():
+                        if not (name.startswith("src/") or name == "Makefile"):
+                            continue  # a git-ignored build product
+                        artifact = ROOT / lab / name
+                        self.assertTrue(artifact.exists(),
+                                        "%s: committed artifact %s is missing"
+                                        % (lab, name))
+                        self.assertEqual(
+                            hashlib.sha256(artifact.read_bytes()).hexdigest(), digest,
+                            "%s: recorded hash of %s does not match the committed "
+                            "file; regenerate the evidence after changing it"
+                            % (path.relative_to(ROOT), name),
+                        )
+                        checked += 1
+        self.assertGreater(checked, 0, "no committed artifacts were checked")
 
 
 if __name__ == "__main__":
