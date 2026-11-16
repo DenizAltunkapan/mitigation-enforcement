@@ -6,8 +6,8 @@
 
 A systems-security study comparing legacy i386 and modern x86-64 Linux
 baselines, then testing exploitation primitives and mitigations in controlled
-x86-64 binaries. Eight local labs connect process layout and stack frames to
-canaries, PIE/ASLR, execution permission and code reuse.
+x86-64 binaries. Ten local labs connect process layout and stack frames to
+canaries, PIE/ASLR, execution permission, code reuse, RELRO and format strings.
 
 **Research question:** Under which architectural, build and runtime conditions
 does a memory-safety error become a control-flow primitive, and which fix
@@ -26,7 +26,7 @@ prevents the underlying error?
 
 These are bounded observations from the recorded environments, not claims about
 arbitrary systems. The [complete key results and evidence table](docs/SYNTHESIS.md#key-results-and-evidence)
-covers all eight labs; the [research record](docs/RESEARCH.md) tracks failed
+covers all ten labs; the [research record](docs/RESEARCH.md) tracks failed
 cases and open replications.
 
 ## Labs
@@ -42,9 +42,10 @@ cases and open replications.
 | [07](labs/07-execution-permission/README.md) | Runtime NX and W^X measurement |
 | [08](labs/08-code-reuse-chain/README.md) | Code reuse under a non-executable stack |
 | [09](labs/09-relro-got/README.md) | GOT overwrite under partial versus full RELRO |
+| [10](labs/10-format-string/README.md) | Format-string disclosure, write primitive and FORTIFY |
 
 Labs 01–03 have a [cross-VM baseline comparison](docs/BASELINE-COMPARISON.md).
-Labs 04–09 keep their results and capture evidence in the respective lab
+Labs 04–10 keep their results and capture evidence in the respective lab
 directories.
 
 ## Run the checks

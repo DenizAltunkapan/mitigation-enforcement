@@ -1,0 +1,215 @@
+{
+  "description": "Selected text evidence from verified complete Lab 10 captures. Full binaries remain in the original capture directories. Checksums establish consistency, not authenticity.",
+  "captures": [
+    {
+      "name": "l10-ev",
+      "environment": {
+        "schema_version": 1,
+        "label": "host",
+        "label_is_operator_supplied": true,
+        "captured_at_utc": "2026-11-16T15:20:33.100593+00:00",
+        "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
+        "architecture": "x86_64",
+        "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+        "CC": "gcc",
+        "CFLAGS": "-Wall -Wextra",
+        "LDFLAGS": ""
+      },
+      "versions": {
+        "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "compiler-target": "x86_64-linux-gnu\n",
+        "binutils": "GNU readelf (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n",
+        "libc": "glibc 2.43\n"
+      },
+      "os_release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+      "build_command": [
+        "make",
+        "--always-make",
+        "CC=gcc",
+        "CFLAGS=-Wall -Wextra",
+        "LDFLAGS="
+      ],
+      "build_stdout": "gcc -Wall -Wextra  -O2 -g -fno-omit-frame-pointer -fcf-protection=none -fno-stack-protector -fno-pie -no-pie -Wno-format-security -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -o format_plain src/format_string.c\ngcc -Wall -Wextra  -O2 -g -fno-omit-frame-pointer -fcf-protection=none -fno-stack-protector -fno-pie -no-pie -Wno-format-security -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -o format_fortified src/format_string.c\ngcc -Wall -Wextra  -O2 -g -fno-omit-frame-pointer -fcf-protection=none -fno-stack-protector -fno-pie -no-pie -Wno-format-security -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -DFIXED_FORMAT -o format_fixed src/format_string.c\n",
+      "build_stderr": "",
+      "payload": {
+        "leak_format": ".%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p",
+        "stack_marker": "0x4c45414b4d41524b",
+        "write_format": "AAAA%n",
+        "note": "the program supplies a pointer to a local test variable; controlling an arbitrary destination without that pointer is out of scope"
+      },
+      "finding": {
+        "format_string_discloses_stack_memory": true,
+        "write_primitive_reaches_local_target": true,
+        "fortify_rejects_the_n_write": true,
+        "fixed_format_prints_input_literally": true
+      },
+      "artifact_sha256": {
+        "src/format_string.c": "bf236372b4aa6ebcbe727e58f89c85c55fb32beb9ca3c0b7d1e36f73b6993f05",
+        "Makefile": "8889d1a0b068078ef1b3388586e124a25e72f8f1d43dd724d9c664d36df96573",
+        "format_plain": "c3bdf94f1288b60b02612acd63cb416f784e3de66e3fdf48a9c070aebd95340f",
+        "format_fortified": "85b5bc609d9cdb493f204908ed118deb35bc4957d825feaf6de10b51109a3415",
+        "format_fixed": "3ca0dc55a66f5dce683e1722cd3384289292e29d6a140321d3424da38d762477"
+      },
+      "collector_sha256": "111a88661cbedfb8e7cfdd0b0a0d2ebb2f1acc56093745b59ba2642c86687e06",
+      "full_manifest_sha256": "7f1a1eed6b52b37af3636ef893c1c90adf34773813f27093edb9f08bccf550cc",
+      "observations": [
+        {
+          "mode": "leak",
+          "binary": "format_plain",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "marker_leaked": true,
+          "target_written": false,
+          "safe_input_literal": false,
+          "fortify_detected": false,
+          "stdout": ".0x7ffe947f5384.0x7f798b814750.0x7f798b810ee0.(nil).0x7f798b8f1740.(nil).0x4c45414b4d41524b.(nil).(nil).0x7ffe947f54e8.0x2.0x7ffe947f5460.0x7f798b62a601.0x7ffe947f54a0.0x7ffe947f54e8.0x28b91a000.0x401070.0x7ffe947f5420.0x7f798b93cd46.(nil).0xe9ac642afc6f2e39.0x7ffe947f54e8.0x2.0x7f798b957000\n",
+          "stderr": ""
+        },
+        {
+          "mode": "leak",
+          "binary": "format_plain",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "marker_leaked": true,
+          "target_written": false,
+          "safe_input_literal": false,
+          "fortify_detected": false,
+          "stdout": ".0x7fff8e0251c4.0x7dba8c614750.0x7dba8c610ee0.(nil).0x7dba8c72e740.(nil).0x4c45414b4d41524b.(nil).(nil).0x7fff8e025328.0x2.0x7fff8e0252a0.0x7dba8c42a601.0x7fff8e0252e0.0x7fff8e025328.0x28c757000.0x401070.0x7fff8e025260.0x7dba8c779d46.(nil).0x7a092c11b0fd0a82.0x7fff8e025328.0x2.0x7dba8c794000\n",
+          "stderr": ""
+        },
+        {
+          "mode": "leak",
+          "binary": "format_plain",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "marker_leaked": true,
+          "target_written": false,
+          "safe_input_literal": false,
+          "fortify_detected": false,
+          "stdout": ".0x7ffe2b7f5024.0x789b0b614750.0x789b0b610ee0.(nil).0x789b0b79f740.(nil).0x4c45414b4d41524b.(nil).(nil).0x7ffe2b7f5188.0x2.0x7ffe2b7f5100.0x789b0b42a601.0x7ffe2b7f5140.0x7ffe2b7f5188.0x20b7c8000.0x401070.0x7ffe2b7f50c0.0x789b0b7ead46.(nil).0x7089b4e1d904b011.0x7ffe2b7f5188.0x2.0x789b0b805000\n",
+          "stderr": ""
+        },
+        {
+          "mode": "write",
+          "binary": "format_plain",
+          "repeat": 1,
+          "returncode": 42,
+          "signal": null,
+          "marker_leaked": false,
+          "target_written": true,
+          "safe_input_literal": false,
+          "fortify_detected": false,
+          "stdout": "AAAA\nTARGET: format write changed the test variable\n",
+          "stderr": ""
+        },
+        {
+          "mode": "write",
+          "binary": "format_plain",
+          "repeat": 2,
+          "returncode": 42,
+          "signal": null,
+          "marker_leaked": false,
+          "target_written": true,
+          "safe_input_literal": false,
+          "fortify_detected": false,
+          "stdout": "AAAA\nTARGET: format write changed the test variable\n",
+          "stderr": ""
+        },
+        {
+          "mode": "write",
+          "binary": "format_plain",
+          "repeat": 3,
+          "returncode": 42,
+          "signal": null,
+          "marker_leaked": false,
+          "target_written": true,
+          "safe_input_literal": false,
+          "fortify_detected": false,
+          "stdout": "AAAA\nTARGET: format write changed the test variable\n",
+          "stderr": ""
+        },
+        {
+          "mode": "fortify",
+          "binary": "format_fortified",
+          "repeat": 1,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "marker_leaked": false,
+          "target_written": false,
+          "safe_input_literal": false,
+          "fortify_detected": true,
+          "stdout": "",
+          "stderr": "*** %n in writable segments detected ***\n"
+        },
+        {
+          "mode": "fortify",
+          "binary": "format_fortified",
+          "repeat": 2,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "marker_leaked": false,
+          "target_written": false,
+          "safe_input_literal": false,
+          "fortify_detected": true,
+          "stdout": "",
+          "stderr": "*** %n in writable segments detected ***\n"
+        },
+        {
+          "mode": "fortify",
+          "binary": "format_fortified",
+          "repeat": 3,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "marker_leaked": false,
+          "target_written": false,
+          "safe_input_literal": false,
+          "fortify_detected": true,
+          "stdout": "",
+          "stderr": "*** %n in writable segments detected ***\n"
+        },
+        {
+          "mode": "fixed",
+          "binary": "format_fixed",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "marker_leaked": false,
+          "target_written": false,
+          "safe_input_literal": true,
+          "fortify_detected": false,
+          "stdout": "AAAA%n\n",
+          "stderr": ""
+        },
+        {
+          "mode": "fixed",
+          "binary": "format_fixed",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "marker_leaked": false,
+          "target_written": false,
+          "safe_input_literal": true,
+          "fortify_detected": false,
+          "stdout": "AAAA%n\n",
+          "stderr": ""
+        },
+        {
+          "mode": "fixed",
+          "binary": "format_fixed",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "marker_leaked": false,
+          "target_written": false,
+          "safe_input_literal": true,
+          "fortify_detected": false,
+          "stdout": "AAAA%n\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ]
+}

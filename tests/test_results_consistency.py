@@ -56,6 +56,7 @@ COLLECTOR_FOR_LAB = {
     "labs/07-execution-permission": "scripts/capture-wx.py",
     "labs/08-code-reuse-chain": "scripts/capture-code-reuse.py",
     "labs/09-relro-got": "scripts/capture-relro.py",
+    "labs/10-format-string": "scripts/capture-format-string.py",
 }
 
 
@@ -170,6 +171,16 @@ class ResultsConsistencyTests(unittest.TestCase):
             "Lab 09",
             "labs/09-relro-got/evidence/2026-11-13.json",
             "labs/09-relro-got/RESULTS.md",
+            {name: {1: ("host", name)}
+             for name in ("Compiler", "Assembler / Linker", "C library")},
+        )
+
+    def test_lab10_results_match_evidence(self):
+        # Host-only, no debugger column (the collector needs none).
+        self._check(
+            "Lab 10",
+            "labs/10-format-string/evidence/2026-11-16.json",
+            "labs/10-format-string/RESULTS.md",
             {name: {1: ("host", name)}
              for name in ("Compiler", "Assembler / Linker", "C library")},
         )

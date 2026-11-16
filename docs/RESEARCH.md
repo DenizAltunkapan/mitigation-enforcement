@@ -30,6 +30,7 @@ arbitrary code execution.
 | 07: runtime execution permission | [Host capture](../labs/07-execution-permission/RESULTS.md) with portable JSON evidence across 3 page-protection modes (9 trials), confirming NX enforcement and an unenforced W^X policy | Debian 13 VM replication; hosts with an LSM or hardened kernel may reject the writable-executable mapping |
 | 08: code reuse under NX | [Host capture](../labs/08-code-reuse-chain/RESULTS.md) with portable JSON evidence across 3 control-flow cases (9 trials) and an in-process NX control: a jump onto the non-executable stack faults in the [stack] mapping while an ordered chain of in-binary functions redirects control flow; a bounds check prevents it | Debian 13 VM replication; CET/shadow-stack and libc-gadget variants are out of scope; white-box static addresses (no PIE leak) |
 | 09: GOT overwrite under RELRO | [Host capture](../labs/09-relro-got/RESULTS.md) with portable JSON evidence across 2 cases (6 trials): overwriting puts's GOT slot redirects the call under partial RELRO (status 42) but faults under full RELRO (SIGSEGV) | Debian 13 VM replication; one slot and one call, not a full PLT/GOT attack; white-box static address (no PIE leak) |
+| 10: format-string vulnerability | [Host capture](../labs/10-format-string/RESULTS.md) with portable JSON evidence across 4 cases (12 trials): a `%p` walk discloses a planted stack marker, `%n` changes a program-supplied local variable (status 42), FORTIFY aborts the same input (SIGABRT), and a constant format prints it literally | Debian 13 VM replication; the disclosure is not the PIE-base leak of Lab 06, and the attacker does not select an arbitrary write address |
 
 The Lab 01–03 guides now use the [verified VM comparison](BASELINE-COMPARISON.md).
 It pairs the recovered Debian 7 capture from 26 October with the Debian 13
@@ -143,6 +144,10 @@ run fresh captures independently using the documented commands.
 6. Lab 08 now demonstrates code reuse under NX with white-box static addresses.
    Replicate it in the VM, and consider a variant with CET/shadow-stack enabled
    to record where the ordered chain is instead stopped.
+7. Lab 09 now measures a GOT overwrite under partial versus full RELRO on the
+   host. Replicate it in the Debian 13 VM, so the RELRO result is not host-only.
+8. Replicate Lab 10 in the Debian 13 VM; verify that the same supplied-pointer
+   `%n` contrast holds with the VM's compiler and glibc.
 
 ## Scope
 

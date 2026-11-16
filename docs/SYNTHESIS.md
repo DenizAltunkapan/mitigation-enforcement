@@ -1,4 +1,4 @@
-# Synthesis across Labs 01–09
+# Synthesis across Labs 01–10
 
 This document ties the labs together under one question and states, for each,
 what was measured, what that observation supports, and what it does not. It is a
@@ -36,6 +36,7 @@ are built to keep those two apart.
 | [07 runtime execution permission](../labs/07-execution-permission/RESULTS.md) | Mitigation boundary: measure NX vs. W^X | 9 trials, 3 page protections: identical bytes fault without execute, run with it; a writable-executable mapping is allowed here | One anonymous `mmap`/`mprotect` mapping on one host; not loaded segments, stacks or heaps, nor other kernels |
 | [08 code reuse under NX](../labs/08-code-reuse-chain/RESULTS.md) | Primitive extended: avoid NX instead of disabling it | 9 trials across 3 control-flow cases plus an in-process NX control: a jump onto the non-executable stack faults while an ordered chain of in-binary functions reaches the oracle; a bounds check prevents it | x86-64, white-box static addresses (no PIE leak); a minimal ordered chain, not a libc ROP toolkit; CET disabled |
 | [09 GOT overwrite under RELRO](../labs/09-relro-got/RESULTS.md) | New target and its mitigation: the GOT, not the saved return | 6 trials across 2 cases: overwriting puts's GOT slot redirects the call under partial RELRO but faults under full RELRO | x86-64, white-box static address (no PIE leak); one slot and one call, not a full PLT/GOT attack |
+| [10 format-string vulnerability](../labs/10-format-string/RESULTS.md) | New bug class: a disclosure and write without an overflow | 12 trials across 4 cases: a `%p` walk discloses a planted stack marker, `%n` changes a supplied local variable, FORTIFY aborts the same input, and a constant format prints it literally | x86-64; the marker is not a PIE-base leak and the attacker does not select an arbitrary write address |
 
 ## How the claims build on each other
 
@@ -81,7 +82,7 @@ Honest negatives are part of the evidence, not omissions:
 - **Legacy 32-bit replication is unresolved.** The recovered Debian 7 image boots
   and ran Labs 01–03, but a clean unattended install and its SSH transport are
   [unverified](LEGACY-DIAGNOSIS.md); the original disk lacked a GRUB installation.
-  Labs 04–09 are therefore x86-64 only.
+  Labs 04–10 are therefore x86-64 only.
 - **No NX claim for the legacy CPU.** The default legacy QEMU CPU does not
   advertise NX, so Lab 03 makes no runtime execution-prevention claim there.
 - **Lab 05/06 negative controls fault as predicted.** A length-matched padding
@@ -110,8 +111,8 @@ Honest negatives are part of the evidence, not omissions:
 
 Kept separate from the claims above so nothing here is read as a result:
 
-1. Replicate Labs 06, 07 and 08 in the Debian 13 VM, so the PIE-leak, W^X and
-   code-reuse findings are not host-only.
+1. Replicate Labs 06–10 in the Debian 13 VM, so the PIE-leak, W^X,
+   code-reuse, RELRO and format-string findings are not host-only.
 2. Replicate Lab 07 on a hardened or LSM-restricted host to record where a
    writable-executable mapping is instead rejected.
 3. A Lab 08 variant with CET/shadow-stack enabled, to record where the ordered

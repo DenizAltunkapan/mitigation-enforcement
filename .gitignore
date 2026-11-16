@@ -39,6 +39,10 @@ labs/08-code-reuse-chain/code_reuse_fixed
 labs/09-relro-got/got_full
 labs/09-relro-got/got_partial
 
+labs/10-format-string/format_plain
+labs/10-format-string/format_fortified
+labs/10-format-string/format_fixed
+
 # Python
 __pycache__/
 *.pyc
