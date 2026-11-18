@@ -1,22 +1,35 @@
-# Lab 07 Results — 8 November 2026
+# Lab 07 Results — 18 November 2026
 
-The runtime execution-permission experiment ran on an Ubuntu x86-64 review host.
-Each capture probes three page protections three times each (9 trials). The
-operator label (`host`) identifies the measurement run, not an automatic
-attestation. A Debian 13 VM replication is planned and not yet recorded.
+The runtime execution-permission experiment was captured in two distinct software
+environments: an Ubuntu x86-64 review host and a Debian 13 x86-64 VM. Each
+environment probes three page protections three times each (9 trials per
+environment, **18 trials** total). The operator label (`host` / `modern`)
+identifies the measurement run, not an automatic attestation.
 
 ## Environment and provenance
 
-| Property | Host review environment |
-|---|---|
-| OS / Distribution | Ubuntu 26.04.1 LTS (x86-64) |
-| Compiler | GCC 15.2.0 (Ubuntu 15.2.0-16ubuntu1) |
-| Assembler / Linker | GNU Binutils 2.46 |
-| C library | glibc 2.43 |
-| CPU advertises NX | yes |
+| Property | Host review environment | Modern VM |
+|---|---|---|
+| OS / Distribution | Ubuntu 26.04.1 LTS (x86-64) | Debian GNU/Linux 13 (trixie) (x86-64) |
+| Kernel | Linux 7.0.0-43-generic | Linux 6.12.105+deb13-amd64 |
+| Compiler | GCC 15.2.0 (Ubuntu 15.2.0-16ubuntu1) | GCC 14.2.0 (Debian 14.2.0-19) |
+| Assembler / Linker | GNU Binutils 2.46 | GNU Binutils 2.44 |
+| C library | glibc 2.43 | glibc 2.41 |
+| CPU advertises NX | yes | yes |
 
-The rows are reproduced from the committed [portable evidence](evidence/2026-11-08.json),
+The rows are reproduced from the committed [portable evidence](evidence/2026-11-18.json),
 which also contains the `oracle` disassembly used to confirm the probed bytes.
+The two environments differ in compiler, linker, C library and kernel, so the
+result holds across two distinct toolchains, not one.
+
+> Provenance note: both the host and the modern-VM captures in this file were
+> recorded on 2026-11-18 under the environments pinned in
+> [`research/environments.lock.json`](../../research/environments.lock.json).
+> They were produced concurrently with the [pre-registration](../../research/plan.yaml),
+> not provably after it, so they are **exploratory/pilot** captures, not a
+> confirmatory dataset (see the pre-registration for the confirmatory protocol).
+> Earlier host-only captures from this lab's first measurement were superseded
+> by this dated, two-environment recapture.
 
 ## Observed outcomes
 
@@ -65,10 +78,10 @@ to other kernels (see the boundaries below).
 
 ## Evidence and reproduction
 
-[Portable text evidence](evidence/2026-11-08.json) contains all nine
-observations, each mode's stdout and stderr, signed return codes, the oracle
-disassembly, tool versions, the build command, the finding, and source and binary
-hashes with the full capture manifest hash. Regenerate a capture and the portable
+[Portable text evidence](evidence/2026-11-18.json) contains all 18 observations
+across both environments, each mode's stdout and stderr, signed return codes, the
+oracle disassembly, tool versions, the build command, the finding, and source and
+binary hashes with the full capture manifest hash. Regenerate the host capture and the portable
 evidence with:
 
 ```bash

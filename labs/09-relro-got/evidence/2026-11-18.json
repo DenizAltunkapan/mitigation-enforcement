@@ -2,12 +2,12 @@
   "description": "Selected text evidence from verified complete Lab 09 captures. Full binaries and disassembly remain in the original capture directories. Checksums establish consistency, not authenticity.",
   "captures": [
     {
-      "name": "l9c3",
+      "name": "hostv2-relro",
       "environment": {
         "schema_version": 1,
         "label": "host",
         "label_is_operator_supplied": true,
-        "captured_at_utc": "2026-11-18T08:58:43.208584+00:00",
+        "captured_at_utc": "2026-11-18T18:48:25.016689+00:00",
         "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
         "architecture": "x86_64",
         "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
@@ -46,11 +46,124 @@
       "artifact_sha256": {
         "src/got_write.c": "858183da635e9d0798a1724cc427d0038d4ef8275c4bef5fb9f019be44316df2",
         "Makefile": "22c9dae4c7f21400f31a04f447eafaeb2bfc9bf5e28e262ae51793cb104dedb6",
-        "got_full": "2672b7e8b465d397c0483f9999be0635ed7432a8b9f11f6c166d853abb7eeb08",
-        "got_partial": "078220474a0c784dc975e36bf8e818b6b502bf657a2bff93d3e5effb94986326"
+        "got_full": "c73cbe8b42246c27e9e7fe3985d3bb4ed4929496f4615215c6e07197e5991f57",
+        "got_partial": "797aa5e02c05661f99ca674d6ac59623bca36e0ec4fa0f3be9ebd05eeb4672c5"
       },
       "collector_sha256": "82a459fe57630f542fcd7af5d53774bc27da62a524d5f253eaf90726e42ee555",
-      "full_manifest_sha256": "4b40b5f62698db39e48cc1aa2a63a4a9700aa4a25c0720ecdc790bc4557c6574",
+      "full_manifest_sha256": "490c694b69dd785adcc651a11ce7701e2fe57a2443c0a09a6262fe99b2b09333",
+      "observations": [
+        {
+          "mode": "partial",
+          "binary": "got_partial",
+          "repeat": 1,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "stdout": "TARGET: GOT call redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "partial",
+          "binary": "got_partial",
+          "repeat": 2,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "stdout": "TARGET: GOT call redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "partial",
+          "binary": "got_partial",
+          "repeat": 3,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "stdout": "TARGET: GOT call redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "full",
+          "binary": "got_full",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "mode": "full",
+          "binary": "got_full",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "mode": "full",
+          "binary": "got_full",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "name": "cap-relro",
+      "environment": {
+        "schema_version": 1,
+        "label": "modern",
+        "label_is_operator_supplied": true,
+        "captured_at_utc": "2026-11-18T18:48:01.520780+00:00",
+        "platform": "Linux-6.12.105+deb13-amd64-x86_64-with-glibc2.41",
+        "architecture": "x86_64",
+        "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+        "CC": "gcc",
+        "CFLAGS": "-Wall -Wextra",
+        "LDFLAGS": ""
+      },
+      "versions": {
+        "compiler": "gcc (Debian 14.2.0-19) 14.2.0\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "compiler-target": "x86_64-linux-gnu\n",
+        "binutils": "GNU readelf (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n",
+        "libc": "glibc 2.41\n"
+      },
+      "os_release": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.6\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\n",
+      "build_command": [
+        "make",
+        "--always-make",
+        "CC=gcc",
+        "CFLAGS=-Wall -Wextra",
+        "LDFLAGS="
+      ],
+      "build_stdout": "gcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -U_FORTIFY_SOURCE -fcf-protection=none -fno-stack-protector -fno-pie -no-pie -Wl,-z,relro,-z,now -o got_full src/got_write.c\ngcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -U_FORTIFY_SOURCE -fcf-protection=none -fno-stack-protector -fno-pie -no-pie -Wl,-z,relro,-z,lazy -o got_partial src/got_write.c\n",
+      "build_stderr": "",
+      "payload": {
+        "puts_got_slot": {
+          "got_full": "0x403fc8",
+          "got_partial": "0x404010"
+        },
+        "address_source": "local non-PIE build artifacts (objdump -R); not an information disclosure",
+        "action": "write &oracle into the binary's own puts GOT slot, then call puts"
+      },
+      "finding": {
+        "partial_relro_got_is_writable": true,
+        "full_relro_got_is_read_only": true
+      },
+      "artifact_sha256": {
+        "src/got_write.c": "858183da635e9d0798a1724cc427d0038d4ef8275c4bef5fb9f019be44316df2",
+        "Makefile": "22c9dae4c7f21400f31a04f447eafaeb2bfc9bf5e28e262ae51793cb104dedb6",
+        "got_full": "4e7de000b5787d401ee9e8618dc8fc3b42507c7bbc9500309be3c48af2412ac0",
+        "got_partial": "12de7eed7fe87fc806243c4ff6728bf730b0bc7e22ddd2796aa713dfb03ee3a8"
+      },
+      "collector_sha256": "82a459fe57630f542fcd7af5d53774bc27da62a524d5f253eaf90726e42ee555",
+      "full_manifest_sha256": "25629f970d9e89a3c26d5c01fce10223ab9fe87c96b060393842368ae2ae9387",
       "observations": [
         {
           "mode": "partial",

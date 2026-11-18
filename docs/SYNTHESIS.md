@@ -32,11 +32,11 @@ are built to keep those two apart.
 | [03 ELF mitigations](../labs/03-binary-mitigation-baseline/README.md) | Baseline: which protections a build requests | ELF metadata and repeated runs: `GNU_STACK RW`, RELRO/BIND_NOW, NX CPU flag | ELF request and CPU flag only — not runtime enforcement (deferred to Lab 07) |
 | [04 stack canary](../labs/04-stack-canary/RESULTS.md) | Mitigation: detection vs. repair | 72 trials, host and VM, `-O0`/`-O2`: the guard aborts *after* the out-of-bounds write; a bounds check rejects it *before* | A contiguous linear overflow; not indexed writes or canary disclosure |
 | [05 return-address overwrite](../labs/05-return-address-overwrite/RESULTS.md) | Primitive: redirect control flow, and what stops it | 54 trials across 4 variants: plain redirects to an in-binary oracle; canary aborts; PIE+ASLR faults on a static address; bounds check prevents the write | x86-64; the primitive reaches a known in-binary address, not arbitrary code |
-| [06 defeating PIE with a leak](../labs/06-pie-leak-bypass/RESULTS.md) | Primitive extended: remove one precondition | 9 trials, 9 distinct leaked bases: a same-process pointer leak rebases the target so the Lab 05 PIE+ASLR fault becomes redirection; a bounds check still prevents it | The leak is modelled as an explicit disclosure, not derived from a concrete bug |
-| [07 runtime execution permission](../labs/07-execution-permission/RESULTS.md) | Mitigation boundary: measure NX vs. W^X | 9 trials, 3 page protections: identical bytes fault without execute, run with it; a writable-executable mapping is allowed here | One anonymous `mmap`/`mprotect` mapping on one host; not loaded segments, stacks or heaps, nor other kernels |
-| [08 code reuse under NX](../labs/08-code-reuse-chain/RESULTS.md) | Primitive extended: avoid NX instead of disabling it | 9 trials across 3 control-flow cases plus an in-process NX control: a jump onto the non-executable stack faults while an ordered chain of in-binary functions reaches the oracle; a bounds check prevents it | x86-64, white-box static addresses (no PIE leak); a minimal ordered chain, not a libc ROP toolkit; CET disabled |
-| [09 GOT overwrite under RELRO](../labs/09-relro-got/RESULTS.md) | New target and its mitigation: the GOT, not the saved return | 6 trials across 2 cases: overwriting puts's GOT slot redirects the call under partial RELRO but faults under full RELRO | x86-64, white-box static address (no PIE leak); one slot and one call, not a full PLT/GOT attack |
-| [10 format-string vulnerability](../labs/10-format-string/RESULTS.md) | New bug class: a disclosure and write without an overflow | 12 trials across 4 cases: a `%p` walk discloses a planted stack marker, `%n` changes a supplied local variable, FORTIFY aborts the same input, and a constant format prints it literally | x86-64; the marker is not a PIE-base leak and the attacker does not select an arbitrary write address |
+| [06 defeating PIE with a leak](../labs/06-pie-leak-bypass/RESULTS.md) | Primitive extended: remove one precondition | 18 trials across host + Debian 13 VM (9 distinct leaked bases per environment): a same-process pointer leak rebases the target so the Lab 05 PIE+ASLR fault becomes redirection; a bounds check still prevents it | The leak is modelled as an explicit disclosure, not derived from a concrete bug |
+| [07 runtime execution permission](../labs/07-execution-permission/RESULTS.md) | Mitigation boundary: measure NX vs. W^X | 18 trials across host + Debian 13 VM, 3 page protections: identical bytes fault without execute, run with it; a writable-executable mapping is allowed in both | One anonymous `mmap`/`mprotect` mapping; not loaded segments, stacks or heaps; a hardened/LSM host is untested |
+| [08 code reuse under NX](../labs/08-code-reuse-chain/RESULTS.md) | Primitive extended: avoid NX instead of disabling it | 18 process trials across host + Debian 13 VM, 3 control-flow cases plus an in-process NX control: a jump onto the non-executable stack faults while an ordered chain of in-binary functions reaches the oracle; a bounds check prevents it | x86-64, white-box static addresses (no PIE leak); a minimal ordered chain, not a libc ROP toolkit; CET disabled |
+| [09 GOT overwrite under RELRO](../labs/09-relro-got/RESULTS.md) | New target and its mitigation: the GOT, not the saved return | 12 trials across host + Debian 13 VM, 2 cases: overwriting puts's GOT slot redirects the call under partial RELRO but faults under full RELRO | x86-64, white-box static address (no PIE leak); one slot and one call, not a full PLT/GOT attack |
+| [10 format-string vulnerability](../labs/10-format-string/RESULTS.md) | New bug class: a disclosure and write without an overflow | 24 trials across host + Debian 13 VM, 4 cases: a `%p` walk discloses a planted stack marker, `%n` changes a supplied local variable, FORTIFY aborts the same input, and a constant format prints it literally | x86-64; the marker is not a PIE-base leak and the attacker does not select an arbitrary write address |
 
 ## How the claims build on each other
 
@@ -115,9 +115,13 @@ Honest negatives are part of the evidence, not omissions:
    arbitrary or attacker-supplied code execution, and not an attack on a real
    system. Where a destination is needed the program supplies it; selecting an
    arbitrary write address is out of scope.
-2. **Single host / single pairing.** Host results are one machine's; the VM
-   comparison is one Debian 7 ↔ Debian 13 pairing. Cross-system differences
-   (kernel, libc, CPU) are recorded but not individually isolated.
+2. **Few environments.** Labs 06–10 were recorded on two distinct software
+   environments (an Ubuntu 26.04 host and a Debian 13 VM, differing in compiler,
+   linker, libc and kernel, both x86-64); the Labs 01–03 baseline is one
+   Debian 7 ↔ Debian 13 pairing. Agreement across two toolchains is stronger than
+   one, but the VM may share the host's physical machine, cross-system differences
+   (kernel, libc, CPU) are recorded rather than individually isolated, and this is
+   still a small number of environments.
 3. **Unpinned toolchains.** Package versions are recorded for interpretation but
    not pinned, so future installs are not guaranteed bit-identical.
 4. **Checksums establish consistency, not authenticity.** Manifest hashes detect
@@ -127,14 +131,16 @@ Honest negatives are part of the evidence, not omissions:
 
 Kept separate from the claims above so nothing here is read as a result:
 
-1. Replicate Labs 06–10 in the Debian 13 VM, so the PIE-leak, W^X,
-   code-reuse, RELRO and format-string findings are not host-only.
-2. Replicate Lab 07 on a hardened or LSM-restricted host to record where a
-   writable-executable mapping is instead rejected.
-3. A Lab 08 variant with CET/shadow-stack enabled, to record where the ordered
+1. Replicate Lab 07 on a hardened or LSM-restricted host to record where a
+   writable-executable mapping is instead rejected (both recorded environments
+   allow it).
+2. A Lab 08 variant with CET/shadow-stack enabled, to record where the ordered
    chain is instead stopped by control-flow integrity.
-4. Validate a clean legacy installation independently of the recovered image, as
+3. Validate a clean legacy installation independently of the recovered image, as
    a precondition for any historical 32-bit replication.
+
+(Labs 06–10 have now been replicated in the Debian 13 VM; each carries host and
+modern captures with matching findings, so they are no longer host-only.)
 
 This project is an independent educational study. It documents a way of working —
 falsifiable questions, recorded evidence, explicit negatives and bounded claims —

@@ -99,7 +99,7 @@ python3 scripts/export-code-reuse.py /tmp/code-reuse-host --output /tmp/code-reu
 
 The exporter verifies the full manifest and exact artifact coverage and refuses
 to overwrite an existing JSON file. The committed [portable evidence](evidence/)
-records a host capture including the finding.
+records a host capture and a Debian 13 VM capture, including the finding.
 
 ## Attacker assumptions and limits
 

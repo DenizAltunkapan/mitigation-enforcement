@@ -122,7 +122,7 @@ python3 scripts/export-pie-leak.py /tmp/pie-leak-host \
 
 The exporter verifies the full manifest and exact artifact coverage, requires the
 leaked base to have varied, and refuses to overwrite an existing JSON file. The
-committed [portable evidence](evidence/) records a host capture.
+committed [portable evidence](evidence/) records a host capture and a Debian 13 VM capture.
 
 ## Attacker assumptions and limits
 

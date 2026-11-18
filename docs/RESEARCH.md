@@ -26,11 +26,11 @@ arbitrary code execution.
 | 03: ELF mitigations | Verified VM comparison, repeated runs and ELF metadata | Runtime execution-permission enforcement is now measured in Lab 07; no NX claim for the default legacy CPU |
 | 04: stack canary | 72 recorded trials across host/Debian VM and `-O0`/`-O2`, with selected text evidence | Historical 32-bit replication after validating the recovered boot path |
 | 05: return-address overwrite | [Verified host / Debian 13 VM comparison](../labs/05-return-address-overwrite/RESULTS.md) and portable JSON evidence across 4 binary variants (54 recorded trials) | Historical 32-bit i386 replication using an architecture-adapted test setup |
-| 06: defeating PIE with a leak | [Host capture](../labs/06-pie-leak-bypass/RESULTS.md) with portable JSON evidence across 3 cases (9 trials, 9 distinct leaked bases) | Debian 13 VM replication; the leak is assumed, not derived from a specific bug class |
-| 07: runtime execution permission | [Host capture](../labs/07-execution-permission/RESULTS.md) with portable JSON evidence across 3 page-protection modes (9 trials), confirming NX enforcement and an unenforced W^X policy | Debian 13 VM replication; hosts with an LSM or hardened kernel may reject the writable-executable mapping |
-| 08: code reuse under NX | [Host capture](../labs/08-code-reuse-chain/RESULTS.md) with portable JSON evidence across 3 control-flow cases (9 trials) and an in-process NX control: a jump onto the non-executable stack faults in the [stack] mapping while an ordered chain of in-binary functions redirects control flow; a bounds check prevents it | Debian 13 VM replication; CET/shadow-stack and libc-gadget variants are out of scope; white-box static addresses (no PIE leak) |
-| 09: GOT overwrite under RELRO | [Host capture](../labs/09-relro-got/RESULTS.md) with portable JSON evidence across 2 cases (6 trials): overwriting puts's GOT slot redirects the call under partial RELRO (status 42) but faults under full RELRO (SIGSEGV) | Debian 13 VM replication; one slot and one call, not a full PLT/GOT attack; white-box static address (no PIE leak) |
-| 10: format-string vulnerability | [Host capture](../labs/10-format-string/RESULTS.md) with portable JSON evidence across 4 cases (12 trials): a `%p` walk discloses a planted stack marker, `%n` changes a program-supplied local variable (status 42), FORTIFY aborts the same input (SIGABRT), and a constant format prints it literally | Debian 13 VM replication; the disclosure is not the PIE-base leak of Lab 06, and the attacker does not select an arbitrary write address |
+| 06: defeating PIE with a leak | [Host + Debian 13 VM capture](../labs/06-pie-leak-bypass/RESULTS.md) with portable JSON evidence across 3 cases in each environment (18 trials, 9 distinct leaked bases per environment) | The leak is assumed, not derived from a specific bug class; historical 32-bit i386 replication |
+| 07: runtime execution permission | [Host + Debian 13 VM capture](../labs/07-execution-permission/RESULTS.md) with portable JSON evidence across 3 page-protection modes in each environment (18 trials), confirming NX enforcement and an unenforced W^X policy in both | Hosts with an LSM or hardened kernel may reject the writable-executable mapping |
+| 08: code reuse under NX | [Host + Debian 13 VM capture](../labs/08-code-reuse-chain/RESULTS.md) with portable JSON evidence across 3 control-flow cases in each environment (18 process trials) and an in-process NX control: a jump onto the non-executable stack faults in the [stack] mapping while an ordered chain of in-binary functions redirects control flow; a bounds check prevents it | CET/shadow-stack and libc-gadget variants are out of scope; white-box static addresses (no PIE leak) |
+| 09: GOT overwrite under RELRO | [Host + Debian 13 VM capture](../labs/09-relro-got/RESULTS.md) with portable JSON evidence across 2 cases in each environment (12 trials): overwriting puts's GOT slot redirects the call under partial RELRO (status 42) but faults under full RELRO (SIGSEGV) | One slot and one call, not a full PLT/GOT attack; white-box static address (no PIE leak) |
+| 10: format-string vulnerability | [Host + Debian 13 VM capture](../labs/10-format-string/RESULTS.md) with portable JSON evidence across 4 cases in each environment (24 trials): a `%p` walk discloses a planted stack marker, `%n` changes a program-supplied local variable (status 42), FORTIFY aborts the same input (SIGABRT), and a constant format prints it literally | The disclosure is not the PIE-base leak of Lab 06, and the attacker does not select an arbitrary write address |
 
 The Lab 01–03 guides now use the [verified VM comparison](BASELINE-COMPARISON.md).
 It pairs the recovered Debian 7 capture from 26 October with the Debian 13
@@ -47,18 +47,19 @@ Lab 06's [results](../labs/06-pie-leak-bypass/RESULTS.md) use a separate program
 under PIE build settings comparable to Lab 05's `overwrite_pie`, not a rerun of
 Lab 05's binary: a same-process pointer leak makes the overwrite redirect
 control flow where ASLR alone made it crash, while an equivalent bounds check
-still prevents it. The leak is modelled as an explicit disclosure; deriving it
-from a concrete bug class and replicating in the VM remain open.
+still prevents it. The contrast was recorded in both the host and the Debian 13
+VM. The leak is modelled as an explicit disclosure; deriving it from a concrete
+bug class remains open.
 
 Lab 07's [results](../labs/07-execution-permission/RESULTS.md) supply the runtime
 execution-permission test Lab 03 left open. Copying one in-binary oracle into an
 anonymous mapping and calling it under three page protections shows that, for
-this mapping on this host, the page's execute permission decides whether the
-identical bytes run (fault under `rw`, success under `rx`), and that this host
-enforces NX but not W^X: it allowed a writable-executable mapping. The result is
+this mapping, the page's execute permission decides whether the identical bytes
+run (fault under `rw`, success under `rx`), and that both recorded environments
+enforce NX but not W^X: each allowed a writable-executable mapping. The result is
 scoped to this anonymous-mapping probe, not to loaded segments, stacks or heaps. NX (a CPU feature) and W^X (a software policy) are
-recorded as distinct claims; a hardened host may reject the writable-executable
-mapping, which a VM replication would show.
+recorded as distinct claims; a hardened or LSM-restricted host may instead reject
+the writable-executable mapping — that case is not yet recorded.
 
 Lab 08's [results](../labs/08-code-reuse-chain/RESULTS.md) continue from Lab 07:
 once stack shellcode is blocked, control is redirected through code that is
@@ -146,6 +147,9 @@ run fresh captures independently using the documented commands.
 
 ## Next experiments, in order
 
+Labs 06–10 have now been replicated in the Debian 13 VM; each carries host and
+modern captures with matching findings. The remaining open work is:
+
 1. Validate a clean legacy installation independently of the recovered image. The completed
    [offline diagnosis](LEGACY-DIAGNOSIS.md) found a filesystem that passed the
    read-only check, with kernel/initramfs present but no GRUB installation.
@@ -157,18 +161,11 @@ run fresh captures independently using the documented commands.
    replacing the guest runtime or mislabelling host output.
 3. Pin VM image identifiers/checksums and record package manifests, then perform
    a clean-machine reproduction before extending the number of labs.
-4. Replicate Lab 06 in the Debian 13 VM and record a second capture, so the
-   PIE-leak result is not host-only.
-5. Lab 07 now measures runtime execution permission (NX enforced, W^X not) on
-   the host. Replicate it on a hardened or LSM-restricted host, and in the VM, to
-   record where a writable-executable mapping is instead rejected.
-6. Lab 08 now demonstrates code reuse under NX with white-box static addresses.
-   Replicate it in the VM, and consider a variant with CET/shadow-stack enabled
-   to record where the ordered chain is instead stopped.
-7. Lab 09 now measures a GOT overwrite under partial versus full RELRO on the
-   host. Replicate it in the Debian 13 VM, so the RELRO result is not host-only.
-8. Replicate Lab 10 in the Debian 13 VM; verify that the same supplied-pointer
-   `%n` contrast holds with the VM's compiler and glibc.
+4. Lab 07: replicate on a hardened or LSM-restricted host to record where a
+   writable-executable mapping is instead rejected (the two recorded environments
+   both allow it).
+5. Lab 08: consider a variant with CET/shadow-stack enabled to record where the
+   ordered chain is instead stopped by control-flow integrity.
 
 ## Scope
 

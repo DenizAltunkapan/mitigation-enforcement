@@ -136,52 +136,52 @@ class ResultsConsistencyTests(unittest.TestCase):
         )
 
     def test_lab06_results_match_evidence(self):
-        # Host-only: one environment column (cell 1).
+        # Two columns: host is cell 1, modern VM is cell 2.
         self._check(
             "Lab 06",
-            "labs/06-pie-leak-bypass/evidence/2026-11-07.json",
+            "labs/06-pie-leak-bypass/evidence/2026-11-18.json",
             "labs/06-pie-leak-bypass/RESULTS.md",
-            {name: {1: ("host", name)}
+            {name: {1: ("host", name), 2: ("modern", name)}
              for name in ("Compiler", "Assembler / Linker", "C library", "Debugger")},
         )
 
     def test_lab07_results_match_evidence(self):
-        # Host-only, no debugger column (the probe needs none).
+        # Two columns: host is cell 1, modern VM is cell 2; no debugger column.
         self._check(
             "Lab 07",
-            "labs/07-execution-permission/evidence/2026-11-08.json",
+            "labs/07-execution-permission/evidence/2026-11-18.json",
             "labs/07-execution-permission/RESULTS.md",
-            {name: {1: ("host", name)}
+            {name: {1: ("host", name), 2: ("modern", name)}
              for name in ("Compiler", "Assembler / Linker", "C library")},
         )
 
     def test_lab08_results_match_evidence(self):
-        # Host-only.
+        # Two columns: host is cell 1, modern VM is cell 2.
         self._check(
             "Lab 08",
-            "labs/08-code-reuse-chain/evidence/2026-11-09.json",
+            "labs/08-code-reuse-chain/evidence/2026-11-18.json",
             "labs/08-code-reuse-chain/RESULTS.md",
-            {name: {1: ("host", name)}
+            {name: {1: ("host", name), 2: ("modern", name)}
              for name in ("Compiler", "Assembler / Linker", "C library", "Debugger")},
         )
 
     def test_lab09_results_match_evidence(self):
-        # Host-only, no debugger column (the collector needs none).
+        # Two columns: host is cell 1, modern VM is cell 2; no debugger column.
         self._check(
             "Lab 09",
             "labs/09-relro-got/evidence/2026-11-18.json",
             "labs/09-relro-got/RESULTS.md",
-            {name: {1: ("host", name)}
+            {name: {1: ("host", name), 2: ("modern", name)}
              for name in ("Compiler", "Assembler / Linker", "C library")},
         )
 
     def test_lab10_results_match_evidence(self):
-        # Host-only, no debugger column (the collector needs none).
+        # Two columns: host is cell 1, modern VM is cell 2; no debugger column.
         self._check(
             "Lab 10",
-            "labs/10-format-string/evidence/2026-11-16.json",
+            "labs/10-format-string/evidence/2026-11-18.json",
             "labs/10-format-string/RESULTS.md",
-            {name: {1: ("host", name)}
+            {name: {1: ("host", name), 2: ("modern", name)}
              for name in ("Compiler", "Assembler / Linker", "C library")},
         )
 

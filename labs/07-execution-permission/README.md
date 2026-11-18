@@ -82,7 +82,7 @@ python3 scripts/export-wx.py /tmp/wx-host --output /tmp/wx.json
 
 The exporter verifies the full manifest and exact artifact coverage and refuses
 to overwrite an existing JSON file. The committed [portable evidence](evidence/)
-records a host capture including the oracle disassembly and the finding.
+records a host capture and a Debian 13 VM capture, including the oracle disassembly and the finding.
 
 ## Limits
 

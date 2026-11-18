@@ -1,0 +1,443 @@
+{
+  "description": "Selected text evidence from verified complete Lab 06 captures. Full binaries and disassembly remain in the original capture directories. Checksums establish consistency, not authenticity.",
+  "captures": [
+    {
+      "name": "hostv2-pie-leak",
+      "environment": {
+        "schema_version": 1,
+        "label": "host",
+        "label_is_operator_supplied": true,
+        "captured_at_utc": "2026-11-18T18:48:16.053746+00:00",
+        "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
+        "architecture": "x86_64",
+        "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+        "CC": "gcc",
+        "CFLAGS": "-Wall -Wextra",
+        "LDFLAGS": "",
+        "aslr_before": "2",
+        "aslr_after": "2"
+      },
+      "versions": {
+        "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "compiler-target": "x86_64-linux-gnu\n",
+        "binutils": "GNU readelf (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n",
+        "gdb-version": "GNU gdb (Ubuntu 17.1-2ubuntu1) 17.1\nCopyright (C) 2025 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n",
+        "libc": "glibc 2.43\n"
+      },
+      "os_release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+      "build_command": [
+        "make",
+        "--always-make",
+        "CC=gcc",
+        "CFLAGS=-Wall -Wextra",
+        "LDFLAGS="
+      ],
+      "build_stdout": "gcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls -U_FORTIFY_SOURCE -fcf-protection=none -fno-stack-protector -fPIE -pie -Wl,-z,relro,-z,now,-z,noexecstack -o pie_bypass src/pie_leak.c\ngcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls -U_FORTIFY_SOURCE -fcf-protection=none -fno-stack-protector -fPIE -pie -Wl,-z,relro,-z,now,-z,noexecstack -DFIXED -o pie_fixed src/pie_leak.c\n",
+      "build_stderr": "",
+      "payload": {
+        "saved_return_offset": 40,
+        "payload_bytes": 56,
+        "reference_symbol_link": "0x11c9",
+        "redirect_target_link": "0x11d0",
+        "target_minus_reference": "0x7",
+        "alignment_ret_link": "0x1449",
+        "address_source": "link-time offsets from the local PIE build artifacts, rebased with the runtime base from a same-process leak; the link-time delta is not a disclosure, only the runtime base is",
+        "layout": "A * saved-return offset | little-endian alignment_ret | little-endian redirect_target"
+      },
+      "stale_sources": [
+        {
+          "repeat": 1,
+          "leak_stdout": "LEAK 0x63d2bb24d1c9\n",
+          "leak_stderr": "",
+          "returncode": 0
+        },
+        {
+          "repeat": 2,
+          "leak_stdout": "LEAK 0x6408f249b1c9\n",
+          "leak_stderr": "",
+          "returncode": 0
+        },
+        {
+          "repeat": 3,
+          "leak_stdout": "LEAK 0x55d806df81c9\n",
+          "leak_stderr": "",
+          "returncode": 0
+        }
+      ],
+      "stale_fault": {
+        "fault_pc": "0x60102365f449",
+        "stale_base": "0x60102365e000",
+        "session_base": "0x5a8a81c84000",
+        "text_size": "0x1575",
+        "fault_in_stale_text_range": true,
+        "fault_in_session_text_range": false
+      },
+      "stale_fault_gdb": "\nThis GDB supports auto-downloading debuginfo from the following URLs:\n  <https://debuginfod.ubuntu.com>\nEnable debuginfod for this session? (y or [n]) [answered N; input not from terminal]\nDebuginfod has been disabled.\nTo make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.\n[Thread debugging using libthread_db enabled]\nUsing host libthread_db library \"/usr/lib/x86_64-linux-gnu/libthread_db.so.1\".\nLEAK 0x5a8a81c851c9\ncopy completed: 56 bytes, first byte 65\n\nProgram received signal SIGSEGV, Segmentation fault.\n0x000060102365f449 in ?? ()\nLAB06_FAULT_PC=0x60102365f449\nLAB06_SESSION_REF=0x5a8a81c851c9\n",
+      "distinct_leaked_bases": 9,
+      "artifact_sha256": {
+        "src/pie_leak.c": "884c13a402f5d4068157b6316472f182d6cfcfd725fa15af0e9ced4c1c349022",
+        "Makefile": "c3a3bffa51299e76a90b5f73e73ff53dc4a353253148e71a8211792c1a150569",
+        "pie_bypass": "583619391ba18db5746b7f179d24f1846666c1a52df1f2a52a677d831f6c1428",
+        "pie_fixed": "bf85aaffbb74c2e5acef9a782e78a05069521745dba118ba809ddd7279cfae8e"
+      },
+      "collector_sha256": "af7bc65253ac449771188bfefc2ae8753da8147a77d393cb2aaeb3e8f4d5f1b4",
+      "full_manifest_sha256": "ed8c8fd6ee441f02dae7e0a938ab3a0fe9eaac4144c4892f8987ef77896c15a5",
+      "observations": [
+        {
+          "mode": "bypass",
+          "binary": "pie_bypass",
+          "repeat": 1,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x5a20d96b41c9",
+          "attacked_base": "0x5a20d96b3000",
+          "stale_base": false,
+          "leak": "LEAK 0x5a20d96b41c9\n",
+          "stdout": "copy completed: 56 bytes, first byte 65\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "bypass",
+          "binary": "pie_bypass",
+          "repeat": 2,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x5cd61999f1c9",
+          "attacked_base": "0x5cd61999e000",
+          "stale_base": false,
+          "leak": "LEAK 0x5cd61999f1c9\n",
+          "stdout": "copy completed: 56 bytes, first byte 65\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "bypass",
+          "binary": "pie_bypass",
+          "repeat": 3,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x63e2a06a41c9",
+          "attacked_base": "0x63e2a06a3000",
+          "stale_base": false,
+          "leak": "LEAK 0x63e2a06a41c9\n",
+          "stdout": "copy completed: 56 bytes, first byte 65\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "stale",
+          "binary": "pie_bypass",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x57da24f551c9",
+          "attacked_base": "0x63d2bb24c000",
+          "stale_base": true,
+          "leak": "LEAK 0x57da24f551c9\n",
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "mode": "stale",
+          "binary": "pie_bypass",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x6144b8a521c9",
+          "attacked_base": "0x6408f249a000",
+          "stale_base": true,
+          "leak": "LEAK 0x6144b8a521c9\n",
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "mode": "stale",
+          "binary": "pie_bypass",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x5af7948731c9",
+          "attacked_base": "0x55d806df7000",
+          "stale_base": true,
+          "leak": "LEAK 0x5af7948731c9\n",
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "mode": "fixed",
+          "binary": "pie_fixed",
+          "repeat": 1,
+          "returncode": 2,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x5ab7bc9111c9",
+          "attacked_base": "0x5ab7bc910000",
+          "stale_base": false,
+          "leak": "LEAK 0x5ab7bc9111c9\n",
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "mode": "fixed",
+          "binary": "pie_fixed",
+          "repeat": 2,
+          "returncode": 2,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x63636db571c9",
+          "attacked_base": "0x63636db56000",
+          "stale_base": false,
+          "leak": "LEAK 0x63636db571c9\n",
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "mode": "fixed",
+          "binary": "pie_fixed",
+          "repeat": 3,
+          "returncode": 2,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x5bb6fba0b1c9",
+          "attacked_base": "0x5bb6fba0a000",
+          "stale_base": false,
+          "leak": "LEAK 0x5bb6fba0b1c9\n",
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        }
+      ]
+    },
+    {
+      "name": "cap-pie-leak",
+      "environment": {
+        "schema_version": 1,
+        "label": "modern",
+        "label_is_operator_supplied": true,
+        "captured_at_utc": "2026-11-18T18:48:00.096279+00:00",
+        "platform": "Linux-6.12.105+deb13-amd64-x86_64-with-glibc2.41",
+        "architecture": "x86_64",
+        "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+        "CC": "gcc",
+        "CFLAGS": "-Wall -Wextra",
+        "LDFLAGS": "",
+        "aslr_before": "2",
+        "aslr_after": "2"
+      },
+      "versions": {
+        "compiler": "gcc (Debian 14.2.0-19) 14.2.0\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "compiler-target": "x86_64-linux-gnu\n",
+        "binutils": "GNU readelf (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n",
+        "gdb-version": "GNU gdb (Debian 16.3-1) 16.3\nCopyright (C) 2024 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n",
+        "libc": "glibc 2.41\n"
+      },
+      "os_release": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.6\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\n",
+      "build_command": [
+        "make",
+        "--always-make",
+        "CC=gcc",
+        "CFLAGS=-Wall -Wextra",
+        "LDFLAGS="
+      ],
+      "build_stdout": "gcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls -U_FORTIFY_SOURCE -fcf-protection=none -fno-stack-protector -fPIE -pie -Wl,-z,relro,-z,now,-z,noexecstack -o pie_bypass src/pie_leak.c\ngcc -Wall -Wextra  -O0 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls -U_FORTIFY_SOURCE -fcf-protection=none -fno-stack-protector -fPIE -pie -Wl,-z,relro,-z,now,-z,noexecstack -DFIXED -o pie_fixed src/pie_leak.c\n",
+      "build_stderr": "",
+      "payload": {
+        "saved_return_offset": 40,
+        "payload_bytes": 56,
+        "reference_symbol_link": "0x11c9",
+        "redirect_target_link": "0x11d0",
+        "target_minus_reference": "0x7",
+        "alignment_ret_link": "0x144c",
+        "address_source": "link-time offsets from the local PIE build artifacts, rebased with the runtime base from a same-process leak; the link-time delta is not a disclosure, only the runtime base is",
+        "layout": "A * saved-return offset | little-endian alignment_ret | little-endian redirect_target"
+      },
+      "stale_sources": [
+        {
+          "repeat": 1,
+          "leak_stdout": "LEAK 0x560f24a191c9\n",
+          "leak_stderr": "",
+          "returncode": 0
+        },
+        {
+          "repeat": 2,
+          "leak_stdout": "LEAK 0x55e4d65ae1c9\n",
+          "leak_stderr": "",
+          "returncode": 0
+        },
+        {
+          "repeat": 3,
+          "leak_stdout": "LEAK 0x55d61e8371c9\n",
+          "leak_stderr": "",
+          "returncode": 0
+        }
+      ],
+      "stale_fault": {
+        "fault_pc": "0x55a48018444c",
+        "stale_base": "0x55a480183000",
+        "session_base": "0x55ec06db9000",
+        "text_size": "0x157e",
+        "fault_in_stale_text_range": true,
+        "fault_in_session_text_range": false
+      },
+      "stale_fault_gdb": "[Thread debugging using libthread_db enabled]\nUsing host libthread_db library \"/lib/x86_64-linux-gnu/libthread_db.so.1\".\nLEAK 0x55ec06dba1c9\ncopy completed: 56 bytes, first byte 65\n\nProgram received signal SIGSEGV, Segmentation fault.\n0x000055a48018444c in ?? ()\nLAB06_FAULT_PC=0x55a48018444c\nLAB06_SESSION_REF=0x55ec06dba1c9\n",
+      "distinct_leaked_bases": 9,
+      "artifact_sha256": {
+        "src/pie_leak.c": "884c13a402f5d4068157b6316472f182d6cfcfd725fa15af0e9ced4c1c349022",
+        "Makefile": "c3a3bffa51299e76a90b5f73e73ff53dc4a353253148e71a8211792c1a150569",
+        "pie_bypass": "ac6273f4d0b6ff8bdb436f4c24a2d93d8a4b91de0beb5498b1536d260e438f45",
+        "pie_fixed": "9da318a838b84577edc5b571aa49a3c7d50b6f7efde1163d254e9988ea1a77bb"
+      },
+      "collector_sha256": "af7bc65253ac449771188bfefc2ae8753da8147a77d393cb2aaeb3e8f4d5f1b4",
+      "full_manifest_sha256": "cd6fe3fc329cdb01a6799e3a78bd1c2ca3fe310904050604e8ee382d1721a242",
+      "observations": [
+        {
+          "mode": "bypass",
+          "binary": "pie_bypass",
+          "repeat": 1,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x55bac85091c9",
+          "attacked_base": "0x55bac8508000",
+          "stale_base": false,
+          "leak": "LEAK 0x55bac85091c9\n",
+          "stdout": "copy completed: 56 bytes, first byte 65\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "bypass",
+          "binary": "pie_bypass",
+          "repeat": 2,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x55ff6e39c1c9",
+          "attacked_base": "0x55ff6e39b000",
+          "stale_base": false,
+          "leak": "LEAK 0x55ff6e39c1c9\n",
+          "stdout": "copy completed: 56 bytes, first byte 65\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "bypass",
+          "binary": "pie_bypass",
+          "repeat": 3,
+          "returncode": 42,
+          "signal": null,
+          "target_reached": true,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x559a29c4f1c9",
+          "attacked_base": "0x559a29c4e000",
+          "stale_base": false,
+          "leak": "LEAK 0x559a29c4f1c9\n",
+          "stdout": "copy completed: 56 bytes, first byte 65\nTARGET: control flow redirected\n",
+          "stderr": ""
+        },
+        {
+          "mode": "stale",
+          "binary": "pie_bypass",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x5626f90ae1c9",
+          "attacked_base": "0x560f24a18000",
+          "stale_base": true,
+          "leak": "LEAK 0x5626f90ae1c9\n",
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "mode": "stale",
+          "binary": "pie_bypass",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x56127df701c9",
+          "attacked_base": "0x55e4d65ad000",
+          "stale_base": true,
+          "leak": "LEAK 0x56127df701c9\n",
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "mode": "stale",
+          "binary": "pie_bypass",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "target_reached": false,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x5614683141c9",
+          "attacked_base": "0x55d61e836000",
+          "stale_base": true,
+          "leak": "LEAK 0x5614683141c9\n",
+          "stdout": "copy completed: 56 bytes, first byte 65\n",
+          "stderr": ""
+        },
+        {
+          "mode": "fixed",
+          "binary": "pie_fixed",
+          "repeat": 1,
+          "returncode": 2,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x55cd5e33f1c9",
+          "attacked_base": "0x55cd5e33e000",
+          "stale_base": false,
+          "leak": "LEAK 0x55cd5e33f1c9\n",
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "mode": "fixed",
+          "binary": "pie_fixed",
+          "repeat": 2,
+          "returncode": 2,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x55f019cfe1c9",
+          "attacked_base": "0x55f019cfd000",
+          "stale_base": false,
+          "leak": "LEAK 0x55f019cfe1c9\n",
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        },
+        {
+          "mode": "fixed",
+          "binary": "pie_fixed",
+          "repeat": 3,
+          "returncode": 2,
+          "signal": null,
+          "target_reached": false,
+          "returned_from_overflow": false,
+          "leaked_reference": "0x55d8a1cd41c9",
+          "attacked_base": "0x55d8a1cd3000",
+          "stale_base": false,
+          "leak": "LEAK 0x55d8a1cd41c9\n",
+          "stdout": "",
+          "stderr": "rejected: input exceeds buffer capacity\n"
+        }
+      ]
+    }
+  ]
+}
