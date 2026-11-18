@@ -28,8 +28,9 @@ attacker-controlled, while the test program supplies the pointer.
    after `AAAA%n`, the variable contains `4` and the program exits `42`.
 3. **Mitigation (FORTIFY):** built with `_FORTIFY_SOURCE=2`, `printf` becomes
    `__printf_chk`, and glibc rejects a `%n` whose format string is in writable
-   memory, printing `*** %n in writable segments detected ***` and aborting
-   (`SIGABRT`) before any write is attempted.
+   memory, printing a `%n in writable segment(s) detected` diagnostic (the exact
+   wording is glibc-version dependent) and aborting (`SIGABRT`) before any write
+   is attempted.
 4. **Repair (fixed format):** `printf("%s", argv[1])` treats the same input as
    data. The `%n` characters print literally and the test variable stays zero.
 

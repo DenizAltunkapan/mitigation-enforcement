@@ -2,12 +2,12 @@
   "description": "Selected text evidence from verified complete Lab 10 captures. Full binaries remain in the original capture directories. Checksums establish consistency, not authenticity.",
   "captures": [
     {
-      "name": "l10-ev",
+      "name": "l10new",
       "environment": {
         "schema_version": 1,
         "label": "host",
         "label_is_operator_supplied": true,
-        "captured_at_utc": "2026-11-16T15:20:33.100593+00:00",
+        "captured_at_utc": "2026-11-18T17:14:20.119541+00:00",
         "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
         "architecture": "x86_64",
         "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
@@ -46,12 +46,12 @@
       "artifact_sha256": {
         "src/format_string.c": "bf236372b4aa6ebcbe727e58f89c85c55fb32beb9ca3c0b7d1e36f73b6993f05",
         "Makefile": "8889d1a0b068078ef1b3388586e124a25e72f8f1d43dd724d9c664d36df96573",
-        "format_plain": "c3bdf94f1288b60b02612acd63cb416f784e3de66e3fdf48a9c070aebd95340f",
-        "format_fortified": "85b5bc609d9cdb493f204908ed118deb35bc4957d825feaf6de10b51109a3415",
-        "format_fixed": "3ca0dc55a66f5dce683e1722cd3384289292e29d6a140321d3424da38d762477"
+        "format_plain": "090ed60bf0f245cf2e61d0230645efa3d9d6ea319f0d1d64b8dd7b450516371e",
+        "format_fortified": "ae0eb72a1afc8a1b001793f005b266298955c6b6a8dc942f04313b4c7f3f9d16",
+        "format_fixed": "edb339c89937636d2125ee1cfcff034775854d28626e7a135e396d6ea26a1be7"
       },
-      "collector_sha256": "111a88661cbedfb8e7cfdd0b0a0d2ebb2f1acc56093745b59ba2642c86687e06",
-      "full_manifest_sha256": "7f1a1eed6b52b37af3636ef893c1c90adf34773813f27093edb9f08bccf550cc",
+      "collector_sha256": "2438d797e8b46165f1041b6bfe17913b13d31b4501844cae97049e9070dee697",
+      "full_manifest_sha256": "91e099e389542e2d66f123cf40859c3320f9167720cb66415295cd7b02613f9f",
       "observations": [
         {
           "mode": "leak",
@@ -63,7 +63,7 @@
           "target_written": false,
           "safe_input_literal": false,
           "fortify_detected": false,
-          "stdout": ".0x7ffe947f5384.0x7f798b814750.0x7f798b810ee0.(nil).0x7f798b8f1740.(nil).0x4c45414b4d41524b.(nil).(nil).0x7ffe947f54e8.0x2.0x7ffe947f5460.0x7f798b62a601.0x7ffe947f54a0.0x7ffe947f54e8.0x28b91a000.0x401070.0x7ffe947f5420.0x7f798b93cd46.(nil).0xe9ac642afc6f2e39.0x7ffe947f54e8.0x2.0x7f798b957000\n",
+          "stdout": ".0x7fff20313704.0x7a1ce9014750.0x7a1ce9010ee0.(nil).0x7a1ce90d5740.(nil).0x4c45414b4d41524b.(nil).(nil).0x7fff20313868.0x2.0x7fff203137e0.0x7a1ce8e2a601.0x7fff20313820.0x7fff20313868.0x2e90fe000.0x401070.0x7fff203137a0.0x7a1ce9120d46.(nil).0x9512793f539a1594.0x7fff20313868.0x2.0x7a1ce913b000\n",
           "stderr": ""
         },
         {
@@ -76,7 +76,7 @@
           "target_written": false,
           "safe_input_literal": false,
           "fortify_detected": false,
-          "stdout": ".0x7fff8e0251c4.0x7dba8c614750.0x7dba8c610ee0.(nil).0x7dba8c72e740.(nil).0x4c45414b4d41524b.(nil).(nil).0x7fff8e025328.0x2.0x7fff8e0252a0.0x7dba8c42a601.0x7fff8e0252e0.0x7fff8e025328.0x28c757000.0x401070.0x7fff8e025260.0x7dba8c779d46.(nil).0x7a092c11b0fd0a82.0x7fff8e025328.0x2.0x7dba8c794000\n",
+          "stdout": ".0x7ffc7e6c4a54.0x73cd1aa14750.0x73cd1aa10ee0.(nil).0x73cd1ab46740.(nil).0x4c45414b4d41524b.(nil).(nil).0x7ffc7e6c4bb8.0x2.0x7ffc7e6c4b30.0x73cd1a82a601.0x7ffc7e6c4b70.0x7ffc7e6c4bb8.0x21ab6f000.0x401070.0x7ffc7e6c4af0.0x73cd1ab91d46.(nil).0x9aa5db6203345021.0x7ffc7e6c4bb8.0x2.0x73cd1abac000\n",
           "stderr": ""
         },
         {
@@ -89,7 +89,7 @@
           "target_written": false,
           "safe_input_literal": false,
           "fortify_detected": false,
-          "stdout": ".0x7ffe2b7f5024.0x789b0b614750.0x789b0b610ee0.(nil).0x789b0b79f740.(nil).0x4c45414b4d41524b.(nil).(nil).0x7ffe2b7f5188.0x2.0x7ffe2b7f5100.0x789b0b42a601.0x7ffe2b7f5140.0x7ffe2b7f5188.0x20b7c8000.0x401070.0x7ffe2b7f50c0.0x789b0b7ead46.(nil).0x7089b4e1d904b011.0x7ffe2b7f5188.0x2.0x789b0b805000\n",
+          "stdout": ".0x7ffd6483b954.0x783e4d614750.0x783e4d610ee0.(nil).0x783e4d7f2740.(nil).0x4c45414b4d41524b.(nil).(nil).0x7ffd6483bab8.0x2.0x7ffd6483ba30.0x783e4d42a601.0x7ffd6483ba70.0x7ffd6483bab8.0x24d81b000.0x401070.0x7ffd6483b9f0.0x783e4d83dd46.(nil).0xe03e80fc7f50dc60.0x7ffd6483bab8.0x2.0x783e4d858000\n",
           "stderr": ""
         },
         {

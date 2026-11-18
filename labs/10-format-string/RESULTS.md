@@ -22,7 +22,7 @@ The rows are reproduced from the committed [portable evidence](evidence/2026-11-
 |---|---|---|---|
 | `leak` | plain, `-O2` | `%p` walk | the planted numeric marker appears, status 0 |
 | `write` | plain, `-O2` | `AAAA%n` | test variable becomes `4`, status `42` |
-| `fortify` | `_FORTIFY_SOURCE=2`, `-O2` | `AAAA%n` | `SIGABRT` (`-6`), `%n in writable segments detected` |
+| `fortify` | `_FORTIFY_SOURCE=2`, `-O2` | `AAAA%n` | `SIGABRT` (`-6`), `%n in writable segments detected` (wording is glibc-version dependent) |
 | `fixed` | constant format, `-O2` | `AAAA%n` | input printed literally, status `0` |
 
 Each case was identical across its three repeats. The fortified binary imports

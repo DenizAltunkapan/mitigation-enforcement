@@ -25,7 +25,10 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 MARKER = b"4c45414b4d41524b"  # STACK_MARKER "LEAKMARK", as %p prints it
 LEAK_WALK = ".%p" * 24
-FORTIFY_MESSAGE = b"%n in writable segments detected"
+# glibc's FORTIFY abort message for a %n in a writable format. The exact wording
+# is version-dependent ("segment" in glibc 2.39, "segments" in 2.43), so match the
+# stable part rather than one release's phrasing.
+FORTIFY_MESSAGE = re.compile(rb"%n in writable segment[s]? detected")
 WRITE_MARKER = b"TARGET: format write changed the test variable\n"
 
 
@@ -116,7 +119,7 @@ def capture(label, output):
                    "marker_leaked": MARKER in result.stdout,
                    "target_written": WRITE_MARKER in result.stdout,
                    "safe_input_literal": result.stdout == b"AAAA%n\n",
-                   "fortify_detected": FORTIFY_MESSAGE in result.stderr}
+                   "fortify_detected": FORTIFY_MESSAGE.search(result.stderr) is not None}
             observations.append(row)
             (output / "observations.json").write_text(json.dumps(observations, indent=2) + "\n")
             if mode == "leak":
