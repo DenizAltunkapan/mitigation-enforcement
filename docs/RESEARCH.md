@@ -71,6 +71,27 @@ addresses are read from the local build artifacts (no PIE leak, unlike Lab 06),
 and the bounds-check build prevents the overwrite, the same repair that held in
 Labs 04–06.
 
+Lab 09's [results](../labs/09-relro-got/RESULTS.md) move the target off the stack.
+The earlier control-flow primitives (Labs 05, 06 and 08) all hijack the saved
+return address; the GOT is a second control-flow pointer the loader writes. Writing the address of an in-binary oracle
+into `puts`'s GOT slot redirects the call under partial RELRO (`-z lazy`, status 42),
+while the identical write faults under full RELRO (`-z now`, SIGSEGV) because the
+loader has mapped the GOT read-only at startup. The two builds differ only in that
+link flag; the static slot address is read from each build's own artifacts (no PIE
+leak). This measures a mitigation of a different kind: full RELRO does not repair
+the bug, it removes the writable target the bug would use.
+
+Lab 10's [results](../labs/10-format-string/RESULTS.md) change the bug class. A
+format string under caller control is both a read and a write primitive without a
+linear buffer overflow: a `%p` walk discloses a planted stack marker (not the
+PIE-base pointer leak of Lab 06), and a `%n` conversion with a program-supplied
+pointer changes a local test variable (status 42). `_FORTIFY_SOURCE=2` makes glibc
+reject `%n` from a writable format and abort (SIGABRT) before the write lands,
+while a constant `"%s"` format removes the conversion entirely and prints the input
+literally. FORTIFY stops this one write path much as RELRO locks one target; the
+constant format is the root-cause repair, the counterpart of the bounds check in
+the overflow labs.
+
 ## Experiment protocol
 
 1. State a falsifiable question, expected observation and rejection criterion.
@@ -94,10 +115,10 @@ isolate the effect of any one of those variables.
 
 [The root README](../README.md#run-the-checks) provides the local entry point.
 The baseline collector covers Labs 01–03; dedicated Python collectors cover
-Labs 04 and 05. All build copies outside the source tree and refuse existing
+Labs 04–10, one per lab. All build copies outside the source tree and refuse existing
 output directories. Captures include their collector source.
 
-Full capture manifests permit integrity checks. The baseline, Lab 04 and Lab 05 exporters
+Full capture manifests permit integrity checks. The baseline and the Labs 04–10 exporters
 verify every manifest entry and exact artifact coverage before creating portable
 JSON snapshots. They reject incomplete captures, modified files, extra artifacts,
 duplicate entries and symlinks. They read data only and never execute captured

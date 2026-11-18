@@ -24,6 +24,14 @@ python3 scripts/capture-code-reuse.py host /tmp/code-reuse-review
 python3 scripts/export-code-reuse.py /tmp/code-reuse-review \
   --output /tmp/code-reuse-review.json
 
+python3 scripts/capture-relro.py host /tmp/relro-review
+python3 scripts/export-relro.py /tmp/relro-review \
+  --output /tmp/relro-review.json
+
+python3 scripts/capture-format-string.py host /tmp/format-string-review
+python3 scripts/export-format-string.py /tmp/format-string-review \
+  --output /tmp/format-string-review.json
+
 # Optional Labs 01–03 host capture and verified text export:
 bash scripts/capture-baseline.sh host /tmp/baseline-review
 python3 scripts/export-baseline.py /tmp/baseline-review \

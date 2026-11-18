@@ -49,7 +49,7 @@ plain one calls `printf`.
 
 ## Build and capture
 
-Build the two variants locally:
+Build the three variants locally:
 
 ```bash
 make -C labs/10-format-string

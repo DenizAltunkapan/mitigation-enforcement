@@ -1,7 +1,7 @@
 # Lab 09 - GOT Overwrite Under Partial vs Full RELRO
 
-Research question: Labs 05–08 all redirect control flow through the saved return
-address. The GOT (Global Offset Table) is a different control-flow target — every
+Research question: the control-flow labs 05, 06 and 08 all redirect through the
+saved return address. The GOT (Global Offset Table) is a different control-flow target — every
 imported library function is called through a writable pointer. Does RELRO
 decide, at run time, whether that pointer can be overwritten: is the GOT writable
 under partial RELRO and read-only under full RELRO?
@@ -11,8 +11,8 @@ an ordinary user on a review host or in a disposable VM. The GOT write has
 undefined behavior in C; its outcome is an empirical observation for a specific
 compiler, linker and binary configuration.
 
-Every binary in this repository (Labs 05–08) already links with full RELRO. This
-lab measures what that flag actually prevents.
+The binaries in Labs 05–08 already link with full RELRO. This lab measures what
+that flag actually prevents.
 
 ## Concepts
 

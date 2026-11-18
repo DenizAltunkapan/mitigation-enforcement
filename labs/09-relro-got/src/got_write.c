@@ -1,8 +1,8 @@
 /*
  * Lab 09 - GOT overwrite under partial vs full RELRO, local white-box.
  *
- * Labs 05-08 all redirect control flow through the saved return address. The
- * GOT (Global Offset Table) is a different control-flow target: each imported
+ * The control-flow labs 05, 06 and 08 all redirect through the saved return
+ * address. The GOT (Global Offset Table) is a different control-flow target: each imported
  * library function is called through a writable pointer that the dynamic linker
  * fills in. Overwriting a GOT entry redirects the next call to that function.
  *
@@ -12,7 +12,7 @@
  *   - Full RELRO (-z relro -z now): the linker resolves every symbol at startup
  *     and then maps the GOT read-only. A GOT overwrite faults.
  *
- * All of Argowei's own binaries, and Labs 05-08, build with full RELRO; this lab
+ * The binaries in Labs 05-08 build with full RELRO; this lab
  * measures what that actually prevents. The program writes the address of an
  * in-binary oracle into a chosen GOT slot and then makes the corresponding
  * library call. The oracle performs no shell, file, socket or external action;

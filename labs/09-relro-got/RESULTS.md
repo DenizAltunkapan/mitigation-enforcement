@@ -1,4 +1,4 @@
-# Lab 09 Results — 13 November 2026
+# Lab 09 Results — 18 November 2026
 
 The RELRO GOT-overwrite experiment ran on an Ubuntu x86-64 review host. Each
 capture probes two cases three times each (6 trials). The operator label (`host`)
@@ -14,7 +14,7 @@ replication is planned and not yet recorded.
 | Assembler / Linker | GNU Binutils 2.46 |
 | C library | glibc 2.43 |
 
-The rows are reproduced from the committed [portable evidence](evidence/2026-11-13.json).
+The rows are reproduced from the committed [portable evidence](evidence/2026-11-18.json).
 
 ## Observed outcomes
 
@@ -37,9 +37,9 @@ differently); both addresses are recorded in the evidence.
 The two builds differ only in the RELRO linker option, so the contrast isolates
 RELRO as the deciding factor. Reaching the oracle under partial RELRO is
 control-flow redirection through the GOT — a target distinct from the saved
-return address of Labs 05–08. Full RELRO, the configuration every binary in this
-repository already uses, maps the GOT read-only and turns the overwrite into a
-fault.
+return address used by the control-flow labs 05, 06 and 08. Full RELRO, the
+configuration the binaries in Labs 05–08 already use, maps the GOT read-only and
+turns the overwrite into a fault.
 
 ## Methodological boundaries
 
@@ -57,7 +57,7 @@ fault.
 
 ## Evidence and reproduction
 
-[Portable text evidence](evidence/2026-11-13.json) contains all six observations,
+[Portable text evidence](evidence/2026-11-18.json) contains all six observations,
 each case's stdout and stderr, signed return codes, the GOT-slot addresses, the
 finding, tool versions, the build command, and source and binary hashes with the
 full capture manifest hash. Regenerate a capture and the portable evidence with:

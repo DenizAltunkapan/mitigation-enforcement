@@ -61,19 +61,32 @@ are built to keep those two apart.
   enforced — confirmed because the same binary faults when the return is pointed
   at the stack buffer. The move from code injection to code reuse is the lab's
   point; the bounds check, again, is the only thing that prevents it.
-- Lab 09 **changes the target, not just the mitigation**: every earlier primitive
-  hijacks the saved return address, but the GOT is a second control-flow pointer.
+- Lab 09 **changes the target, not just the mitigation**: the earlier control-flow
+  primitives (Labs 05, 06 and 08) hijack the saved return address, but the GOT is a
+  second control-flow pointer.
   Full RELRO maps it read-only at run time, turning the overwrite into a fault,
   while partial RELRO leaves it open. This is a different kind of defense from the
   others: it does not repair the bug but locks the writable pointer the bug would
   target.
+- Lab 10 **changes the bug class**: the overflow labs (04–06, 08) all drive a
+  linear buffer overflow, but a caller-controlled format string is a disclosure
+  and a write with no overflow at all. A `%p` walk discloses a planted stack marker
+  and a `%n` conversion changes a local variable. Here two repairs act at different
+  points:
+  `_FORTIFY_SOURCE=2` makes glibc reject `%n` from a writable format and abort
+  before the write, stopping this one path much as RELRO locks one target, while a
+  constant `"%s"` format removes the conversion entirely — the root-cause repair,
+  the counterpart of the bounds check in the overflow labs.
 
-The consistent thread: across the overwrite labs the only change that *prevents*
-the out-of-bounds effect rather than merely interrupting one path is the
-root-cause repair (the bounds check). Canary, PIE/ASLR and NX each interrupt a
-path under stated conditions; none repairs the error. Lab 09 adds the
-complementary case — RELRO does not touch the bug but removes the target, by
-making the attacked pointer read-only.
+The consistent thread: across the labs that test a repair (04–06, 08, 10) the only
+change that *prevents* the effect structurally rather than merely interrupting one
+path is the root-cause repair — the bounds check in the overflow labs, the constant
+format in Lab 10. Labs 01–03 and 07 measure no such repair. Canary,
+PIE/ASLR and NX each interrupt a path under stated conditions without repairing
+the error. Full RELRO and FORTIFY sit between: they do not touch the bug, but
+unlike the earlier mitigations they stop the write itself — RELRO by removing the
+writable target, FORTIFY by rejecting the `%n` argument — each still bounded to one
+target or one conversion.
 
 ## Failed and negative cases kept on the record
 
@@ -95,10 +108,13 @@ Honest negatives are part of the evidence, not omissions:
 
 ## Limits that apply across the labs
 
-1. **In-binary oracle, not code execution.** Labs 05–07 reach or run an existing
-   in-binary function. That demonstrates instruction-pointer control to a known
-   address or execution under a page permission — not arbitrary or
-   attacker-supplied code execution, and not an attack on a real system.
+1. **In-binary oracle or local target, not code execution.** Labs 05–09 reach or
+   run an existing in-binary function, and Lab 10 changes a program-supplied local
+   variable. That demonstrates instruction-pointer control to a known address,
+   execution under a page permission, or a write to a supplied pointer — not
+   arbitrary or attacker-supplied code execution, and not an attack on a real
+   system. Where a destination is needed the program supplies it; selecting an
+   arbitrary write address is out of scope.
 2. **Single host / single pairing.** Host results are one machine's; the VM
    comparison is one Debian 7 ↔ Debian 13 pairing. Cross-system differences
    (kernel, libc, CPU) are recorded but not individually isolated.

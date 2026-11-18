@@ -3,7 +3,7 @@
 Several kinds of silent drift are checked, reading only committed JSON, Markdown
 and source files — no build tools:
 
-1. RESULTS.md toolchain versions (Labs 04-08) against each capture's recorded
+1. RESULTS.md toolchain versions (Labs 04-10) against each capture's recorded
    `versions` strings, one field per tool, so the prose cannot diverge from what
    was measured.
 2. The trial count, operating system and saved-return offset stated in each
@@ -169,7 +169,7 @@ class ResultsConsistencyTests(unittest.TestCase):
         # Host-only, no debugger column (the collector needs none).
         self._check(
             "Lab 09",
-            "labs/09-relro-got/evidence/2026-11-13.json",
+            "labs/09-relro-got/evidence/2026-11-18.json",
             "labs/09-relro-got/RESULTS.md",
             {name: {1: ("host", name)}
              for name in ("Compiler", "Assembler / Linker", "C library")},
