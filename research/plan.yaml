@@ -1,0 +1,94 @@
+# Exploit Evolution — research pre-registration (Phase 0)
+#
+# Status: pre-registration. This file fixes the research questions, factors,
+# outcome taxonomy and exclusion rules BEFORE confirmatory captures are recorded,
+# so that later results cannot be reinterpreted to fit. It is the machine-readable
+# companion to paper/plan.md; the prose there is authoritative where they differ.
+#
+# This file describes intent. It does not itself run anything.
+
+schema_version: 1
+registered_at: "2026-11-18"
+
+thesis: >
+  Measure the gap between a mitigation being declared (build flag, ELF marker)
+  and actually enforced for a specific operation at runtime, with reproducible
+  evidence, and explain the deviations. Complementary to the SoK "Fragility"
+  conceptual model (USENIX Security 2026): that work models where assumptions can
+  break; this project measures whether they break on concrete binaries and
+  environments.
+
+# The activation/coverage chain each measurement instruments (see paper/plan.md).
+activation_chain:
+  - requested    # build flag asks for the mitigation
+  - emitted      # instrumentation / ELF metadata is present
+  - supported    # the platform provides the feature
+  - activated    # runtime enablement is confirmed
+  - covered      # the operation under test is in a protected region
+  - effective    # the specific guarantee holds for this case
+
+research_questions:
+  RQ1_activation_and_coverage: >
+    What evidence is required to move from "protection requested" to "this
+    operation is protected"? Each link of the activation chain must be observed
+    separately; the required evidence is mechanism-specific.
+  RQ2_causes_and_composition: >
+    When declared and observed protection differ, which cause explains it:
+    missing activation, incomplete instrumentation, an intended coverage
+    boundary, the ordering of checks, or a measurement artifact? In a combination
+    of mitigations, which one produced the observed outcome?
+  RQ3_transferability_and_value: >
+    Do the explanations hold in a second pinned environment, and what do the
+    extra observations buy over a simpler metadata-only check (e.g.
+    hardening-check)?
+
+# Factors deliberately varied. A confirmatory capture states its cell in this
+# space; combinations not listed here are out of scope for the pre-registered run.
+factors:
+  environment: [host, modern]          # pinned in environments.lock.json
+  optimization: ["-O0", "-O2"]          # where a lab's mitigation depends on it
+  mitigation_profile: [none, requested] # plus mechanism-specific levels per lab
+  input_class: [valid, boundary, invalid]
+
+# Outcome taxonomy (replaces binary pass/fail in research mode). Every trial is
+# classified into exactly one. "Blocked early" is a valid protection result;
+# "program never started" is not a protection result at all.
+outcome_taxonomy:
+  - blocked_before_operation   # the invalid operation was prevented
+  - detected_after_operation   # the operation happened, then was detected/aborted
+  - controlled_local_effect    # a supplied-pointer / in-binary effect occurred
+  - unattributed_fault         # a fault not attributable to a specific guarantee
+  - unsupported                # platform/hardware does not provide the feature
+  - invalid_control            # controls/preconditions make the trial uninterpretable
+  - unreachable                # the input/check path was not reached
+  - environment_failure        # build/runtime failed for environmental reasons
+  - not_executed               # the trial did not run
+
+# Four independent states recorded per capture/observation (see paper/plan.md).
+# A fully recorded counter-finding stays exportable:
+#   capture_complete=true, hypothesis_supported=false.
+state_model:
+  capture_complete: "all required data was recorded, independent of outcome"
+  control_validity: "controls and preconditions make the trial interpretable"
+  hypothesis_supported: "the result supports the pre-registered hypothesis"
+  regression_gate_passed: "previously fixed behaviour reproduced (CI gate only)"
+
+# Exclusion rules fixed in advance, so dropping a trial is principled, not ad hoc.
+exclusions:
+  - "ASLR disabled when the lab's claim depends on randomization (e.g. Lab 06)."
+  - "A platform that does not advertise the required CPU feature -> unsupported."
+  - "A control that proves the bug did not actually trigger -> invalid_control."
+  - "Inapplicable factor combinations are reported with a reason, never silently dropped."
+
+# Scope of the first confirmatory run (focused; see paper/plan.md Section 0).
+scope_v1:
+  labs: ["06", "07", "08", "09", "10"]          # VM replication under pinning
+  new_labs: ["11", "14", "13", "20"]            # built after replication is pinned
+  external_corpus: false                         # deferred to v2 (QuickSafe subset)
+  note: >
+    The host+VM captures recorded on 2026-11-18 were produced CONCURRENTLY with
+    this pre-registration, not provably after it, so they are EXPLORATORY/PILOT,
+    not a confirmatory dataset. A true confirmatory run commits and publishes this
+    pre-registration and the environment lock FIRST, then re-captures Labs 06-10
+    under the pinned environments. Git commit order alone does not establish
+    temporal pre-registration; this note records the honest status.
