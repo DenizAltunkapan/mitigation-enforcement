@@ -15,10 +15,19 @@ a ready classification library (outcomes.py) to record these fields directly.
     python3 scripts/research/classify_outcomes.py --json     # machine-readable
     python3 scripts/research/classify_outcomes.py --lab 09   # one lab
 
-The committed evidence already encodes passing results, so for the recorded
-captures hypothesis_supported is expected to be True everywhere; the value of this
-tool is that it makes a FUTURE counter-finding legible as data rather than a lost
-capture, and it checks the taxonomy mapping is total and unambiguous.
+The committed PILOT captures (recorded concurrently with pre-registration, not
+provably after it — see research/plan.yaml scope_v1) happen to pass, so for them
+hypothesis_supported is True. That is NOT assumed: the classifier credits a
+mitigation only when its mechanism-specific stop signature is present (an abort for
+a canary/FORTIFY detection, a fault or clean rejection for a block, or a positive
+flag such as safe_input_literal), never for mere absence of effect. A capture in
+which a mitigation silently failed to fire would surface here as a counter-finding
+(hypothesis_supported=False) that is still a complete capture. The value of the
+tool is that this makes such a finding legible as data rather than a lost capture,
+and it checks the taxonomy mapping is total and unambiguous. Note the scope limit:
+the legacy collectors still gate their COMPLETE marker on the expected result, so a
+live counter-finding is preserved by this research layer, not yet by the collectors
+themselves (new labs record the four states directly; see paper/plan.md Section 8).
 """
 import argparse
 import json
@@ -61,14 +70,29 @@ def _expect_by(key, mapping):
 
 LAB_POLICIES = {
     "04-stack-canary": LabPolicy(
-        # safe returns from the copy normally (a control, no hypothesis); overflow
-        # is detected by the canary AFTER the out-of-bounds write (SIGABRT).
-        effect_flags=[],  # no attack "effect" flag; the copy path is the control
-        repair_outcome=DETECT,
-        expectation=lambda o: None if o.get("mode") == "safe" else DETECT,
+        # The "effect" here is the copy running to completion (returned_from_copy):
+        # for the safe control that is the expected baseline; for an overflow it is
+        # what the mitigation must prevent. The three binaries then differ on the
+        # overflow: the unprotected one crashes with an unattributed SIGSEGV (the
+        # demonstration that, without a guard, the overflow is simply memory-unsafe
+        # — NOT a protection result); the canary aborts AFTER the write (SIGABRT,
+        # detection); the bounds-checked fix rejects cleanly before the write (block).
+        effect_flags=["returned_from_copy"],
+        repair_outcome=lambda o: {
+            "stack_canary": DETECT,        # canary aborts after the write
+            "stack_fixed": BLOCK,          # bounds check rejects before the write
+        }.get(o.get("binary"), "unattributed_fault"),  # unprotected: no guard to credit
+        expectation=_expect_by("binary", {
+            "stack_unprotected": "unattributed_fault",  # no guard: the overflow faults
+            "stack_canary": DETECT,                      # canary aborts after the write
+            "stack_fixed": BLOCK,                        # bounds check rejects first
+        }),
     ),
     "05-return-address-overwrite": LabPolicy(
-        effect_flags=["target_reached"],
+        # The attack effect is reaching the oracle; the safe control's completed copy
+        # (returned_from_copy) also counts as a produced local effect, so the control
+        # reads as controlled_local_effect rather than unreachable.
+        effect_flags=["target_reached", "returned_from_copy"],
         # The stop kind depends on the binary variant: the canary detects after the
         # write; PIE+ASLR and the bounds-check fix block before reaching the target.
         repair_outcome=lambda o: DETECT if o.get("binary") == "overwrite_canary" else BLOCK,
@@ -87,6 +111,9 @@ LAB_POLICIES = {
     "07-execution-permission": LabPolicy(
         effect_flags=["marker_printed"],  # the copied oracle ran
         repair_outcome=BLOCK,  # NX faults before the bytes execute
+        # A block is confirmed by the SIGSEGV on the non-executable page, or by an
+        # explicit mprotect refusal; "no marker" alone is not credited.
+        block_signal=lambda o: bool(o.get("mprotect_rejected")),
         expectation=_expect({"rw": BLOCK, "rx": EFFECT, "rwx": EFFECT}),
     ),
     "08-code-reuse-chain": LabPolicy(
@@ -101,8 +128,12 @@ LAB_POLICIES = {
     ),
     "10-format-string": LabPolicy(
         effect_flags=["marker_leaked", "target_written"],
-        repair_outcome=BLOCK,  # FORTIFY aborts before the %n write; constant format rejects
-        expectation=_expect({"leak": EFFECT, "write": EFFECT, "fortify": BLOCK, "fixed": BLOCK}),
+        # FORTIFY aborts AFTER detecting the %n write (SIGABRT) -> detection; the
+        # constant-format fix rejects before any write and exits cleanly (rc 0) with
+        # safe_input_literal set -> a block confirmed by that flag, not by a fault.
+        repair_outcome=lambda o: DETECT if o.get("mode") == "fortify" else BLOCK,
+        block_signal=lambda o: bool(o.get("safe_input_literal")),
+        expectation=_expect({"leak": EFFECT, "write": EFFECT, "fortify": DETECT, "fixed": BLOCK}),
     ),
 }
 
@@ -124,9 +155,13 @@ def classify_lab(lab, policy):
     for capture in data["captures"]:
         observations = capture["observations"]
         annotated = annotate(observations, policy)
-        # The committed evidence is, by construction, a complete capture whose
-        # controls held (it carries COMPLETE and passed its collector). We record
-        # those as True here; a future live run would compute them directly.
+        # capture_complete is True by construction for committed evidence (it carries
+        # the COMPLETE marker: all data was recorded). control_validity and
+        # hypothesis_supported are NOT assumed — they are derived from the classified
+        # observations (control_valid=True here only means "the caller does not veto
+        # it"; controls_held still inspects the control modes). A future counter-
+        # finding in the committed evidence would surface here as these states going
+        # False without any change to this call.
         states = capture_states(
             observations, policy, control_valid=True, capture_complete=True,
         )
@@ -181,7 +216,8 @@ def main():
             print("  %-11s n=%-2d [%s]  %s" % (env_label, cap["n"], flags, counts))
             if not states["hypothesis_supported"]:
                 all_supported = False
-    print("\nAll committed captures support their pre-registered hypothesis."
+    print("\nAll committed PILOT captures support their pre-registered hypothesis "
+          "(exploratory, not a confirmatory dataset; see research/plan.yaml)."
           if all_supported else
           "\nAt least one capture is a recorded counter-finding (hypothesis_supported=False).")
     return 0

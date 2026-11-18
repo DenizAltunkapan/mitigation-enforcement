@@ -38,31 +38,68 @@ STATE_FIELDS = (
 )
 
 
+# Stop signatures: predicates that confirm a mechanism actually acted, so that a
+# "no effect" trial is only attributed to a mitigation when its positive signal is
+# present. Absence of effect alone is NOT a protection result (that was the review's
+# central objection: a canary binary exiting 0 with no effect is a counter-finding,
+# not a silent "detected"). Each takes an observation and returns True/False.
+def aborted(o):
+    """A detection/abort fault: the write happened, then a guard killed the process
+    (stack canary SIGABRT, FORTIFY __printf_chk abort)."""
+    return o.get("signal") == "SIGABRT" or o.get("returncode") == -6
+
+
+def faulted(o):
+    """A hardware/loader fault before the operation completed (NX/PIE/RELRO SIGSEGV,
+    or any terminating signal that is not the detect-abort path)."""
+    return o.get("signal") is not None and not aborted(o)
+
+
+def clean_reject(o):
+    """A non-fault, non-zero exit: a pre-operation rejection by a source-level check
+    (a bounds check that returns an error code), with no effect and no crash."""
+    return o.get("signal") is None and (o.get("returncode") or 0) != 0
+
+
+# A stop_signature maps repair_outcome -> predicate. For a detection outcome the
+# abort must be seen; for a block the stop must be a fault, a clean rejection, or a
+# lab-specific positive flag (declared per policy via extra_block_ok).
+STOP_SIGNATURE = {
+    "detected_after_operation": aborted,
+    "blocked_before_operation": lambda o: faulted(o) or clean_reject(o),
+}
+
+
 class LabPolicy:
     """How one lab maps a raw observation to an outcome and a hypothesis check.
 
     A lab names:
       effect_flags:    observation keys that, when true, mean the tested memory or
                        control-flow effect occurred (e.g. "target_reached").
-      repair_outcome:  the outcome to assign when the effect did NOT occur, i.e. a
-                       mitigation or repair acted. Either "blocked_before_operation"
-                       (prevented before the write: a bounds check, a read-only
-                       GOT, a non-executable page, a constant format) or
-                       "detected_after_operation" (the write happened, then a guard
-                       aborted: a stack canary).
+      repair_outcome:  the outcome to assign when the effect did NOT occur AND the
+                       mechanism's stop signature is present. Either
+                       "blocked_before_operation" (prevented before the write: a
+                       bounds check, a read-only GOT, a non-executable page, a
+                       constant format) or "detected_after_operation" (the write
+                       happened, then a guard aborted: a stack canary, FORTIFY).
       expectation(obs): returns the pre-registered expected outcome for that trial's
                         mode, so hypothesis_supported is the observed==expected test.
-      fault_is_mitigation: True when a fault IS how this lab's stop manifests
-                       (RELRO/NX/PIE faults, a canary aborts). False when the lab's
-                       no-effect stop should be a clean rejection, so a fault is not
-                       the mitigation acting.
-      unexpected_fault: when True, a fault that is not the mitigation
-                       (fault_is_mitigation False) is recorded as unattributed_fault
-                       rather than silently folded into repair_outcome.
+      block_signal(obs): optional extra predicate that, when it returns True, confirms
+                       a block for a lab that has a direct positive flag for it
+                       (e.g. Lab 10 safe_input_literal, Lab 07 mprotect_rejected). It
+                       is OR-ed with the generic fault/clean-reject signature.
+      unexpected_fault: when True, a terminating signal that is NOT the declared stop
+                       signature is recorded as unattributed_fault instead of being
+                       folded into repair_outcome.
+
+    The essential guarantee: a "no effect" trial whose stop signature is ABSENT is
+    never silently attributed to the mitigation. It becomes unattributed_fault (if it
+    faulted) or unreachable (if it exited cleanly with returncode 0 and no effect) —
+    both of which break the pre-registered hypothesis, so a counter-finding survives.
     """
 
     def __init__(self, effect_flags, repair_outcome, expectation,
-                 *, fault_is_mitigation=True, unexpected_fault=False):
+                 *, block_signal=None, unexpected_fault=True):
         # repair_outcome is either a fixed outcome string or a callable
         # (observation) -> outcome, for labs whose stop kind depends on the binary
         # variant (e.g. Lab 05: a canary detects after the write, PIE blocks before).
@@ -71,7 +108,7 @@ class LabPolicy:
         self.effect_flags = tuple(effect_flags)
         self._repair_outcome = repair_outcome
         self.expectation = expectation
-        self.fault_is_mitigation = fault_is_mitigation
+        self.block_signal = block_signal
         self.unexpected_fault = unexpected_fault
 
     def repair_outcome_for(self, observation):
@@ -79,6 +116,16 @@ class LabPolicy:
             else self._repair_outcome
         assert value in OUTCOMES
         return value
+
+    def stop_confirmed(self, observation):
+        """True iff the declared repair_outcome's stop signature is present for this
+        observation (its positive signal, not merely 'no effect')."""
+        outcome = self.repair_outcome_for(observation)
+        if outcome == "blocked_before_operation" and self.block_signal \
+                and self.block_signal(observation):
+            return True
+        signature = STOP_SIGNATURE.get(outcome)
+        return bool(signature and signature(observation))
 
 
 def _effect_occurred(observation, policy):
@@ -88,20 +135,24 @@ def _effect_occurred(observation, policy):
 def classify(observation, policy):
     """Map one observation to exactly one outcome category.
 
-    Generic across labs: it reads the common fields (returncode, signal) and the
-    lab's declared effect flags. It never inspects raw stdout/stderr, so it is
-    stable across toolchains (the Lab 10 glibc wording difference, for instance,
-    does not change the classification).
+    Generic across labs: it reads the common fields (returncode, signal), the lab's
+    declared effect flags, and the lab's declared stop signature. It never inspects
+    raw stdout/stderr, so it is stable across toolchains (the Lab 10 glibc wording
+    difference, for instance, does not change the classification).
 
-    The logic has three branches:
-      - the trial did not run                         -> not_executed
-      - the tested effect occurred                    -> controlled_local_effect
-      - the effect did NOT occur: the mitigation or
-        repair acted, so the lab's declared
-        repair_outcome applies (either a clean
-        pre-write rejection or a post-write abort);
-        policy.unexpected_fault flags a fault that
-        the lab does not attribute to its mitigation  -> repair_outcome | unattributed_fault
+    Branches:
+      - the trial did not run                           -> not_executed
+      - the tested effect occurred                      -> controlled_local_effect
+      - no effect, and the mechanism's stop signature
+        is present (the POSITIVE signal, not just the
+        absence of effect)                              -> repair_outcome
+      - no effect, a terminating signal, but NOT the
+        declared stop signature                         -> unattributed_fault
+      - no effect, clean exit 0, no attributable stop   -> unreachable
+
+    The last two branches are what make a counter-finding survive: a mitigation that
+    was expected to stop the operation but produced neither its stop signature nor
+    the effect is classified against the hypothesis, never silently as "it worked".
     """
     rc = observation.get("returncode")
     if rc is None:
@@ -110,14 +161,16 @@ def classify(observation, policy):
         # The tested effect was produced (oracle reached, local variable written).
         # A controlled local effect, not code execution.
         return "controlled_local_effect"
-    # No effect: the mitigation/repair acted. The lab declares what that means for
-    # its design — a pre-write block, or a post-write detection/abort — and both
-    # are reached whether the stop is a clean exit or a fault. A lab may also mark
-    # a fault it cannot attribute to its mitigation as unattributed.
-    faulted = observation.get("signal") is not None
-    if faulted and policy.unexpected_fault and not policy.fault_is_mitigation:
+    # No effect was observed. Attribute the stop to the mitigation ONLY when its
+    # declared positive signature is present.
+    if policy.stop_confirmed(observation):
+        return policy.repair_outcome_for(observation)
+    # No effect, but the declared stop signature is absent. Do not credit the
+    # mitigation. A terminating signal we cannot attribute is an unattributed fault;
+    # a clean exit with no effect means the tested path was never reached.
+    if observation.get("signal") is not None and policy.unexpected_fault:
         return "unattributed_fault"
-    return policy.repair_outcome_for(observation)
+    return "unreachable"
 
 
 def hypothesis_supported(observation, policy):
@@ -129,20 +182,55 @@ def hypothesis_supported(observation, policy):
     return classify(observation, policy) == expected
 
 
+def controls_held(observations, policy):
+    """Whether the capture's CONTROLS behaved as controls, independent of whether the
+    mitigation hypothesis held. A control mode (one with no attack expectation) must
+    either reproduce its baseline effect or be a clean non-crashing run; a control
+    that itself faulted means the harness, not the mitigation, stopped the trial, and
+    the attack trials beside it are then uninterpretable. This is the regression
+    precondition (plan.yaml: controls make the trial interpretable), computed
+    separately from hypothesis_supported so the two states are not the same test."""
+    control_rows = [o for o in observations if policy.expectation(o) is None]
+    if not control_rows:
+        return True  # no declared controls in this capture; nothing to invalidate
+    for o in control_rows:
+        outcome = classify(o, policy)
+        # A control must not have crashed in an unattributed way, and must not be
+        # a mitigation "repair" (a control is supposed to run, not be stopped).
+        if outcome in ("unattributed_fault", "environment_failure", "not_executed"):
+            return False
+    return True
+
+
 def capture_states(observations, policy, *, control_valid, capture_complete):
     """Compute the four states for a whole capture.
 
-    control_valid and capture_complete are supplied by the caller (the collector
-    knows whether its preconditions held and whether all data was recorded). The
-    other two are derived from the classified observations.
+    capture_complete is supplied by the caller (the collector knows whether all data
+    was recorded, independent of outcome). The other three are derived from the
+    classified observations. control_valid is an optional caller override: when the
+    collector already knows preconditions failed it passes False; otherwise the
+    control modes in the capture are inspected directly (controls_held), so
+    control_validity is not an unconditional True.
+
+    The four states are deliberately independent:
+      - capture_complete:      all data recorded (caller).
+      - control_validity:      the controls behaved as controls (derived) AND the
+                               caller did not veto it.
+      - hypothesis_supported:  every attack/mitigation trial matched its expectation.
+      - regression_gate_passed: the capture is usable as a CI regression gate, i.e.
+                               controls valid AND hypothesis held. A counter-finding
+                               (hypothesis False) is still capture_complete; it simply
+                               must not pass the regression gate.
     """
     supported = [hypothesis_supported(o, policy) for o in observations]
     known = [s for s in supported if s is not None]
+    controls_valid = bool(control_valid) and controls_held(observations, policy)
+    hypothesis_ok = bool(known) and all(known)
     return {
         "capture_complete": bool(capture_complete),
-        "control_validity": bool(control_valid),
-        "hypothesis_supported": bool(known) and all(known),
-        "regression_gate_passed": bool(known) and all(known) and bool(control_valid),
+        "control_validity": controls_valid,
+        "hypothesis_supported": hypothesis_ok,
+        "regression_gate_passed": hypothesis_ok and controls_valid,
     }
 
 

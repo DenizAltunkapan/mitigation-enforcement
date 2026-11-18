@@ -46,13 +46,14 @@ class ClassifyTests(unittest.TestCase):
             "controlled_local_effect",
         )
 
-    def test_fault_without_effect_is_block_for_fault_mitigation(self):
+    def test_fault_without_effect_is_block_when_signature_matches(self):
+        # A block's stop signature is a fault (or a clean reject). SIGSEGV qualifies.
         self.assertEqual(
             classify(obs(returncode=-11, signal="SIGSEGV", reached=False), self.block),
             "blocked_before_operation",
         )
 
-    def test_clean_exit_without_effect_is_block(self):
+    def test_clean_reject_without_effect_is_block(self):
         # A bounds-check rejection: exits non-zero, no fault, no effect.
         self.assertEqual(
             classify(obs(returncode=2, signal=None, reached=False), self.block),
@@ -65,11 +66,47 @@ class ClassifyTests(unittest.TestCase):
             "detected_after_operation",
         )
 
-    def test_unattributed_fault_when_configured(self):
+    def test_block_requires_its_signature_not_mere_absence_of_effect(self):
+        # The central review point: a block-expecting mitigation that exits cleanly
+        # with returncode 0 and no effect produced NEITHER its stop signature nor the
+        # effect. It must NOT be credited as blocked; it is a counter-finding.
+        self.assertEqual(
+            classify(obs(returncode=0, signal=None, reached=False), self.block),
+            "unreachable",
+        )
+
+    def test_detect_requires_abort_not_clean_exit(self):
+        # A canary that did not abort (clean exit, no effect) is not a detection.
+        self.assertEqual(
+            classify(obs(returncode=0, signal=None, reached=False), self.detect),
+            "unreachable",
+        )
+        # A SIGSEGV is a fault, not the canary's abort signature -> unattributed.
+        self.assertEqual(
+            classify(obs(returncode=-11, signal="SIGSEGV", reached=False), self.detect),
+            "unattributed_fault",
+        )
+
+    def test_block_signal_flag_confirms_a_clean_block(self):
+        # Lab 10 'fixed' style: rc 0, no effect, but a positive flag proves the block
+        # (the input was treated as a literal format), so it is a block, not unreached.
         policy = LabPolicy(
             effect_flags=["reached"], repair_outcome="blocked_before_operation",
             expectation=lambda o: None,
-            fault_is_mitigation=False, unexpected_fault=True,
+            block_signal=lambda o: bool(o.get("safe_literal")),
+        )
+        self.assertEqual(
+            classify(obs(returncode=0, signal=None, reached=False, safe_literal=True), policy),
+            "blocked_before_operation",
+        )
+
+    def test_fault_not_matching_signature_is_unattributed(self):
+        # A fault where the lab expects a clean rejection (no fault signature) and the
+        # fault is not the declared stop -> unattributed_fault, never a silent block.
+        policy = LabPolicy(
+            effect_flags=["reached"],
+            repair_outcome="unattributed_fault",  # this binary has no mitigation to credit
+            expectation=lambda o: None,
         )
         self.assertEqual(
             classify(obs(returncode=-11, signal="SIGSEGV", reached=False), policy),
@@ -98,6 +135,8 @@ class ClassifyTests(unittest.TestCase):
             obs(returncode=None), obs(returncode=42, reached=True),
             obs(returncode=-11, signal="SIGSEGV", reached=False),
             obs(returncode=2, signal=None, reached=False),
+            obs(returncode=0, signal=None, reached=False),   # clean, no effect
+            obs(returncode=-6, signal="SIGABRT", reached=False),
         ):
             self.assertIn(classify(observation, self.block), OUTCOMES)
 
@@ -168,6 +207,39 @@ class ClassifierIntegrationTests(unittest.TestCase):
                     "%s/%s: committed evidence should support its hypothesis"
                     % (lab["lab"], capture["environment"]),
                 )
+
+    def test_silent_mitigation_failure_in_real_evidence_is_a_counter_finding(self):
+        # End-to-end over the REAL evidence file, through the real policy: take Lab
+        # 09's committed full-RELRO observation (a block, SIGSEGV, target not reached)
+        # and mutate it to the reviewer's case — the mitigation silently did NOT fire:
+        # clean exit 0, GOT call not redirected, no fault. The classifier must record
+        # this as a counter-finding (hypothesis_supported False) that is still a
+        # complete capture, NOT silently credit the mitigation. This exercises the
+        # actual evidence shape and the actual LAB_POLICIES, not a synthetic object.
+        import outcomes  # noqa
+        from classify_outcomes import LAB_POLICIES, evidence_path
+        policy = LAB_POLICIES["09-relro-got"]
+        data = json.loads(evidence_path("09-relro-got").read_text())
+        observations = [dict(o) for o in data["captures"][0]["observations"]]
+        full_rows = [o for o in observations if o.get("binary") == "got_full"]
+        self.assertTrue(full_rows, "expected a full-RELRO observation in real evidence")
+        # As recorded, the real row is a genuine block and supports the hypothesis.
+        self.assertEqual(classify(full_rows[0], policy), "blocked_before_operation")
+        self.assertTrue(capture_states(
+            full_rows, policy, control_valid=True, capture_complete=True,
+        )["hypothesis_supported"])
+        # Now simulate the silent failure on every full-RELRO row.
+        for row in full_rows:
+            row["returncode"], row["signal"], row["target_reached"] = 0, None, False
+        self.assertEqual(classify(full_rows[0], policy), "unreachable")
+        states = capture_states(
+            full_rows, policy, control_valid=True, capture_complete=True,
+        )
+        self.assertTrue(states["capture_complete"],
+                        "a silent-failure capture is still complete data")
+        self.assertFalse(states["hypothesis_supported"],
+                         "a mitigation that did not fire must not support its hypothesis")
+        self.assertFalse(states["regression_gate_passed"])
 
 
 if __name__ == "__main__":
