@@ -68,11 +68,13 @@ baseline control that returns normally). Three repeats per cell, 24 trials.
 - **Uninstrumented reference:** `cet_none` is the same program without the CET
   request, so any difference from `cet_full` is attributable to CET alone.
 
-## Observed outcome (this host)
+## Observed outcome (host; CET-capable)
 
-Measured on x86-64 with `user_shstk` supported but **not active by default**
-(see [RESULTS.md](RESULTS.md) for the full environment; this is a single-host
-pilot, modern-VM replication is still open). The same `cet_full` binary:
+Measured on x86-64 with `user_shstk` supported but **not active by default**. The
+table below is the host; the lab was also captured in a Debian 13 QEMU/KVM guest
+whose CPU advertises no CET, where the chain breaks earlier (at *emitted*) and no
+profile can enforce — see [RESULTS.md](RESULTS.md) for both environments and the
+transferability comparison. The same `cet_full` binary on the host:
 
 | profile | runtime | attack (overflow) | classification |
 |---|---|---|---|

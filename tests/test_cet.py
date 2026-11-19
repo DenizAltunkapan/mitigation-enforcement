@@ -120,6 +120,27 @@ class CetShadowStackTests(unittest.TestCase):
                 active("cet_none", "shstk") is False,
             )
 
+            # Metadata-only oracle: the inference rule a note-only checker applies,
+            # compared to runtime truth. Each cell is self-consistent, and a cell is
+            # a false positive IFF the oracle says "protected" but the runtime did
+            # not stop the attack. On a CET-capable host the cet_full/default cell is
+            # exactly such a false positive (note present, but inactive at runtime).
+            oracle = json.loads((output / "metadata_oracle.json").read_text())
+            counted_fps = 0
+            for cell in oracle["cells"]:
+                is_fp = (cell["metadata_only_verdict"] == "protected"
+                         and cell["runtime_truth"] == "not protected")
+                self.assertEqual(cell["false_positive"], is_fp,
+                                 "oracle false_positive flag inconsistent: %r" % cell)
+                counted_fps += int(is_fp)
+            self.assertEqual(oracle["false_positive_count"], counted_fps)
+            if active("cet_full", "default") is False and reaches("cet_full", "default"):
+                # A CET-capable host: the note-only rule MUST be wrong for at least
+                # the cet_full/default cell — the paper's central claim, measured.
+                self.assertGreaterEqual(oracle["false_positive_count"], 1)
+                self.assertEqual(finding["metadata_only_false_positives"],
+                                 oracle["false_positive_count"])
+
             # The four states are recorded, and a clean capture supports its
             # hypothesis (the policy's expectation adapts to the activation state).
             states = json.loads((output / "states.json").read_text())
@@ -221,6 +242,47 @@ class CetShadowStackTests(unittest.TestCase):
             mutated = [c for c in payload["classified"] if c["profile"] == "cet_full"
                        and c["runtime"] == "shstk" and c["mode"] == "attack"]
             self.assertTrue(mutated and all(c["hypothesis_supported"] is False for c in mutated))
+
+
+class CommittedEvidenceConsistencyTests(unittest.TestCase):
+    """Bind the numbers written in RESULTS.md to the committed evidence, so the prose
+    cannot drift from the data (mirrors tests/test_results_consistency.py for the
+    fields that are Lab-11-specific). No build tools needed, so this runs in CI."""
+
+    EVIDENCE = ROOT / "labs/11-cet-shadow-stack/evidence/2026-11-19.json"
+    RESULTS = ROOT / "labs/11-cet-shadow-stack/RESULTS.md"
+
+    def setUp(self):
+        self.captures = json.loads(self.EVIDENCE.read_text())["captures"]
+        self.results = self.RESULTS.read_text()
+
+    def test_metadata_oracle_false_positive_count_matches_results_prose(self):
+        # RESULTS.md states "1 of 4 cells is a false positive" for the host. That
+        # number must equal the host capture's recorded oracle count, so the central
+        # claim cannot be overstated or go stale when the evidence is regenerated.
+        host = next(c for c in self.captures if c["environment"]["label"] == "host")
+        fp = host["metadata_oracle"]["false_positive_count"]
+        total = len(host["metadata_oracle"]["cells"])
+        self.assertRegex(
+            self.results, r"\b%d of %d cells is a false positive" % (fp, total),
+            "RESULTS.md host false-positive prose does not match the evidence "
+            "(%d of %d); update the prose or regenerate the evidence" % (fp, total))
+
+    def test_results_name_both_recorded_environments(self):
+        # The two-environment claim must name both captured environments' OS.
+        labels = {c["environment"]["label"] for c in self.captures}
+        self.assertEqual(labels, {"host", "modern"})
+        self.assertIn("Ubuntu", self.results)
+        self.assertIn("Debian", self.results)
+
+    def test_chain_break_links_match_the_evidence(self):
+        # The transferability claim names where the chain breaks per environment.
+        for capture in self.captures:
+            breaks_at = capture["finding"]["chain_breaks_at"]
+            self.assertIn(
+                breaks_at, self.results,
+                "RESULTS.md does not mention the recorded chain-break link %r for %s"
+                % (breaks_at, capture["environment"]["label"]))
 
 
 if __name__ == "__main__":

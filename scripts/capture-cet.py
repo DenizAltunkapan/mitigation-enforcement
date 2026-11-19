@@ -71,9 +71,22 @@ EFFECT = "controlled_local_effect"
 BLOCK = "blocked_before_operation"
 
 
+def _environment_can_enforce(observation):
+    """Whether a shadow stack is even possible for this trial's environment, read
+    per observation (so one classifier run can mix a CET-capable host capture and a
+    CET-incapable VM capture): the binary must carry the CET note AND the CPU must
+    advertise user_shstk. Each observation records both facts."""
+    return bool(observation.get("cet_note_present") and observation.get("cpu_user_shstk"))
+
+
 def _expectation(observation):
     if observation.get("mode") == "safe":
         return None  # baseline control, no attack hypothesis
+    if not _environment_can_enforce(observation):
+        # No CET note emittable, or no CPU support: no profile can enforce, so the
+        # attack is expected to reach hijack() everywhere, like the uninstrumented
+        # reference. The chain breaks at emitted/supported, not activated.
+        return EFFECT
     return BLOCK if observation.get("shstk_active") else EFFECT
 
 
@@ -192,13 +205,24 @@ def capture(label, output):
         own = re.findall(r"<(?:hijack|victim|main)>:(.*?)(?=\n[0-9a-f]+ <|\Z)", disas.stdout.decode(), re.S)
         endbr_own = sum(chunk.count("endbr64") for chunk in own)
         emitted[binary] = {"cet_note_present": has_note, "endbr64_in_own_code": endbr_own}
-        if binary == "cet_full":
-            require(has_note, "cet_full lost its CET note")
-        else:
+        if binary == "cet_none":
             require(not has_note, "cet_none unexpectedly carries a CET note")
+    # NOTE: we do NOT require cet_full to carry the note. On some environments
+    # (e.g. a QEMU guest whose CPU model does not advertise CET, or an older
+    # toolchain), -fcf-protection=full emits no CET property at all. That is not a
+    # collector error: it is the activation chain breaking at the *emitted* link,
+    # a legitimate transferability (RQ3) result recorded as a complete capture.
 
     # --- Link 3: supported, from the CPU flags. ---
     features = main_features(Path("/proc/cpuinfo").read_text())
+
+    # Whether THIS environment can even provide a shadow stack: the CET note must be
+    # emittable AND the CPU must advertise user_shstk. When it cannot, no profile can
+    # enforce, every attack reaches hijack(), and the expectation (per observation,
+    # via _environment_can_enforce) is EFFECT everywhere — an 'unsupported'-flavoured
+    # chain break (emitted/supported), not a counter-finding.
+    shstk_environment_capable = bool(
+        emitted["cet_full"]["cet_note_present"] and features["user_shstk"])
 
     # --- Links 4-6: activated, covered, effective, measured PER PROCESS. ---
     # Each tested binary reports its OWN shadow-stack status (activated) and, on a
@@ -298,9 +322,69 @@ def capture(label, output):
                 if r["profile"] == profile and r["runtime"] == runtime and r["mode"] == "attack"]
         return bool(rows) and all(r["segv_cperr"] is True for r in rows)
 
+    # Metadata-only oracle vs. runtime truth. This is the direct, reproducible
+    # rebuttal of "CET note present => this operation is shadow-stack protected",
+    # the inference checksec / hardening-check make from the ELF alone. We implement
+    # that exact inference rule (note present AND CPU support => report "protected")
+    # and compare its verdict, per (profile, runtime, mode=attack), to what actually
+    # happened at runtime (was the hijack stopped by a SEGV_CPERR fault?). A cell
+    # where the oracle says "protected" but the operation was NOT stopped is a FALSE
+    # POSITIVE: the metadata-only claim was wrong for a running process. No external
+    # tool is invoked, so the result does not depend on a specific tool version; the
+    # inference rule itself is what is under test (the honest guard in the README).
+    def metadata_only_says_protected(profile):
+        # What a note-only checker concludes: the binary advertises CET and the CPU
+        # supports it. It cannot see per-process activation, so it stops here.
+        return emitted[profile]["cet_note_present"] and features["user_shstk"]
+
+    def runtime_actually_protected(profile, runtime):
+        # Ground truth: the attack did NOT reach hijack AND the stop was a control-
+        # protection fault (shadow-stack catch), proven per process.
+        return (not reaches(profile, runtime)) and blocked_by_cperr(profile, runtime)
+
+    oracle_cells = []
+    oracle_false_positives = 0
+    for profile in PROFILES:
+        for runtime in RUNTIMES:
+            claimed = bool(metadata_only_says_protected(profile))
+            actual = bool(runtime_actually_protected(profile, runtime))
+            false_positive = claimed and not actual
+            oracle_false_positives += int(false_positive)
+            oracle_cells.append({
+                "profile": profile, "runtime": runtime,
+                "metadata_only_verdict": "protected" if claimed else "not protected",
+                "runtime_truth": "protected" if actual else "not protected",
+                "false_positive": false_positive,
+            })
+    (output / "metadata_oracle.json").write_text(json.dumps({
+        "inference_rule": "CET GNU-property note present AND CPU advertises user_shstk => report protected",
+        "note": "implements the metadata-only inference of checksec/hardening-check; no external tool invoked",
+        "cells": oracle_cells,
+        "false_positive_count": oracle_false_positives,
+        "false_positive_rate": oracle_false_positives / len(oracle_cells),
+    }, indent=2) + "\n")
+
+    # Where the activation chain first breaks in THIS environment (RQ3). The chain
+    # is requested -> emitted -> supported -> activated -> effective; the first
+    # missing link is the environment's limiting factor.
+    if not emitted["cet_full"]["cet_note_present"]:
+        chain_breaks_at = "emitted"            # toolchain/target emits no CET note
+    elif not features["user_shstk"]:
+        chain_breaks_at = "supported"          # CPU does not advertise user_shstk
+    elif activated["cet_full"]["default"] is False:
+        chain_breaks_at = "activated"          # emitted+supported, but inactive at runtime
+    else:
+        chain_breaks_at = "effective"          # activated and enforcing
+
     (output / "finding.json").write_text(json.dumps({
         "cet_full_note_present": emitted["cet_full"]["cet_note_present"],
         "cpu_supports_shstk": features["user_shstk"],
+        # Whether this environment can provide a shadow stack at all, and where the
+        # chain breaks if not. On a CET-capable host this is True and the break is
+        # "activated"; on a QEMU guest without CET it is False and the break is
+        # "emitted"/"supported" — the transferability (RQ3) result.
+        "shstk_environment_capable": shstk_environment_capable,
+        "chain_breaks_at": chain_breaks_at,
         # Per-process activation, from the tested binaries themselves.
         "cet_full_shstk_active_default": activated["cet_full"]["default"],
         "cet_full_shstk_active_tunable": activated["cet_full"]["shstk"],
@@ -310,17 +394,21 @@ def capture(label, output):
         "cet_none_default_reaches_hijack": reaches("cet_none", "default"),
         # The block, proven by a control-protection fault, not a bare SIGSEGV.
         "cet_full_shstk_blocked_by_control_protection_fault": blocked_by_cperr("cet_full", "shstk"),
-        # Finding A: the metadata-only inference is wrong — a CET-note binary with
-        # the shadow stack inactive is exploited exactly like the reference.
+        # Metadata-only oracle: how many (profile, runtime) cells a note-only checker
+        # would call "protected" while the operation was actually not stopped.
+        "metadata_only_false_positives": oracle_false_positives,
+        # Finding A (CET-capable environments only): the metadata-only inference is
+        # wrong — a CET-note binary with the shadow stack inactive is exploited
+        # exactly like the reference.
         "metadata_only_inference_would_be_wrong":
             emitted["cet_full"]["cet_note_present"]
             and activated["cet_full"]["default"] is False
             and reaches("cet_full", "default"),
-        # Finding B: the tunable cannot activate the shadow stack for a binary
-        # without the CET note — activation depends on emission, measured per
-        # process (the earlier "activation without emission" phrasing was wrong).
+        # Finding B (CET-capable environments only): the tunable cannot activate the
+        # shadow stack for a binary without the CET note — activation depends on
+        # emission, measured per process.
         "tunable_does_not_activate_shstk_without_cet_note":
-            activated["cet_none"]["shstk"] is False,
+            shstk_environment_capable and activated["cet_none"]["shstk"] is False,
         "control_validity": control_valid,
         "hypothesis_supported": states["hypothesis_supported"],
     }, indent=2) + "\n")

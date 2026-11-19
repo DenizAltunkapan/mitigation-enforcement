@@ -128,6 +128,7 @@ def export_capture(root):
         "build_command": json.loads((root / "build.command.json").read_text()),
         "build_stdout": (root / "build.stdout.txt").read_text(),
         "activation_chain": json.loads((root / "activation_chain.json").read_text()),
+        "metadata_oracle": json.loads((root / "metadata_oracle.json").read_text()),
         "states": json.loads((root / "states.json").read_text()),
         "classified": json.loads((root / "classified.json").read_text()),
         "finding": json.loads((root / "finding.json").read_text()),

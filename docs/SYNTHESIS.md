@@ -37,7 +37,7 @@ are built to keep those two apart.
 | [08 code reuse under NX](../labs/08-code-reuse-chain/RESULTS.md) | Primitive extended: avoid NX instead of disabling it | 18 process trials across host + Debian 13 VM, 3 control-flow cases plus an in-process NX control: a jump onto the non-executable stack faults while an ordered chain of in-binary functions reaches the oracle; a bounds check prevents it | x86-64, white-box static addresses (no PIE leak); a minimal ordered chain, not a libc ROP toolkit; CET disabled |
 | [09 GOT overwrite under RELRO](../labs/09-relro-got/RESULTS.md) | New target and its mitigation: the GOT, not the saved return | 12 trials across host + Debian 13 VM, 2 cases: overwriting puts's GOT slot redirects the call under partial RELRO but faults under full RELRO | x86-64, white-box static address (no PIE leak); one slot and one call, not a full PLT/GOT attack |
 | [10 format-string vulnerability](../labs/10-format-string/RESULTS.md) | New bug class: a disclosure and write without an overflow | 24 trials across host + Debian 13 VM, 4 cases: a `%p` walk discloses a planted stack marker, `%n` changes a supplied local variable, FORTIFY aborts the same input, and a constant format prints it literally | x86-64; the marker is not a PIE-base leak and the attacker does not select an arbitrary write address |
-| [11 CET shadow stack](../labs/11-cet-shadow-stack/RESULTS.md) | Anchor: requested vs. observed enforcement | 24 trials, host pilot: the *same* CET-note binary reaches an in-binary hijack when its process's shadow stack is inactive (behaving exactly like the uninstrumented reference) and is caught by a `SEGV_CPERR` control-protection fault once activated; the `SHSTK` tunable does not activate the shadow stack for a binary without the CET note (activation depends on emission, measured per process) | x86-64 host with `user_shstk` supported but inactive by default; shadow-stack half of CET only (no IBT); exploratory pilot, VM replication open |
+| [11 CET shadow stack](../labs/11-cet-shadow-stack/RESULTS.md) | Anchor: requested vs. observed enforcement | 48 trials, two environments: the same CET-note binary is exploited when its process's shadow stack is inactive and caught by a `SEGV_CPERR` fault once active; the activation chain breaks at a different link per environment (activated on the host, emitted in the no-CET VM), and a metadata-only inference is wrong exactly where CET is requested but unenforced | x86-64; host `user_shstk` supported but inactive by default, VM advertises no CET; shadow-stack half of CET only (no IBT); exploratory pilot |
 
 ## How the claims build on each other
 
@@ -78,6 +78,17 @@ are built to keep those two apart.
   before the write, stopping this one path much as RELRO locks one target, while a
   constant `"%s"` format removes the conversion entirely — the root-cause repair,
   the counterpart of the bounds check in the overflow labs.
+- Lab 11 **adds a new axis**: Labs 01–10 ask whether a mitigation, once built in,
+  stops an operation; Lab 11 asks which *link of the activation chain* (requested →
+  emitted → supported → activated → effective) is actually satisfied, and so turns
+  the project's declared-vs-observed theme into a direct measurement. It is the one
+  lab where a declaration (an ELF CET note) and its enforcement come apart: the same
+  declared-protected binary is exploitable or protected depending only on a
+  per-process runtime state, and a metadata-only check is wrong exactly where the
+  mitigation is requested and emitted but not enforced (see
+  [Lab 11 results](../labs/11-cet-shadow-stack/RESULTS.md) for the per-cell data).
+  Where Labs 04–10 locate a mitigation on the prevent/detect/limit spectrum, Lab 11
+  shows that even placing it there presumes enforcement that must itself be observed.
 
 The consistent thread: across the labs that test a repair (04–06, 08, 10) the only
 change that *prevents* the effect structurally rather than merely interrupting one
