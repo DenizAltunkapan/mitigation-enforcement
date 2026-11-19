@@ -58,6 +58,7 @@ COLLECTOR_FOR_LAB = {
     "labs/09-relro-got": "scripts/capture-relro.py",
     "labs/10-format-string": "scripts/capture-format-string.py",
     "labs/11-cet-shadow-stack": "scripts/capture-cet.py",
+    "labs/12-fortify-coverage": "scripts/capture-fortify-coverage.py",
 }
 
 
@@ -184,6 +185,16 @@ class ResultsConsistencyTests(unittest.TestCase):
             "labs/10-format-string/RESULTS.md",
             {name: {1: ("host", name), 2: ("modern", name)}
              for name in ("Compiler", "Assembler / Linker", "C library")},
+        )
+
+    def test_lab12_results_match_evidence(self):
+        # Host-only: one environment column (cell 1); Compiler and C library rows.
+        self._check(
+            "Lab 12",
+            "labs/12-fortify-coverage/evidence/2026-11-19.json",
+            "labs/12-fortify-coverage/RESULTS.md",
+            {name: {1: ("host", name)}
+             for name in ("Compiler", "C library")},
         )
 
     def test_results_trial_counts_match_the_recorded_observations(self):

@@ -138,23 +138,26 @@ LAB_POLICIES = {
 }
 
 
-def _lab11_policy():
-    """Lab 11 records the four states natively, so its policy lives in the
-    collector (scripts/capture-cet.py) as the single source of truth. Import it
-    here rather than restating it, so the unified report cannot drift from the
+def _collector_policy(collector_filename):
+    """Labs 11 and 12 record the four states natively, so their policy lives in the
+    collector as the single source of truth. Import LAB_POLICY from the collector
+    rather than restating it, so the unified report cannot drift from the
     capture-time classification."""
     import importlib.util
     spec = importlib.util.spec_from_file_location(
-        "capture_cet", ROOT / "scripts" / "capture-cet.py")
+        collector_filename.replace("-", "_").replace(".py", ""),
+        ROOT / "scripts" / collector_filename)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module.LAB_POLICY
 
 
-try:
-    LAB_POLICIES["11-cet-shadow-stack"] = _lab11_policy()
-except (OSError, ImportError, AttributeError):
-    pass  # Lab 11 not present; the classifier still runs over the other labs.
+for _lab, _collector in (("11-cet-shadow-stack", "capture-cet.py"),
+                         ("12-fortify-coverage", "capture-fortify-coverage.py")):
+    try:
+        LAB_POLICIES[_lab] = _collector_policy(_collector)
+    except (OSError, ImportError, AttributeError):
+        pass  # Lab not present; the classifier still runs over the other labs.
 
 
 def lab_dir(lab):

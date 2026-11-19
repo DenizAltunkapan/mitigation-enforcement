@@ -1,0 +1,1271 @@
+{
+  "description": "Selected text evidence from complete Lab 12 captures (FORTIFY coverage: when is a buffer copy actually checked?). Binaries and disassembly remain in the capture directories. The coverage matrix and four research states are carried through unchanged; a coverage counter-finding exports like any complete capture. Checksums establish consistency, not authenticity.",
+  "captures": [
+    {
+      "name": "ft12-host",
+      "environment": {
+        "schema_version": 1,
+        "label": "host",
+        "label_is_operator_supplied": true,
+        "captured_at_utc": "2026-11-19T12:57:17.842185+00:00",
+        "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
+        "architecture": "x86_64",
+        "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+        "CC": "gcc",
+        "CFLAGS": "-Wall -Wextra",
+        "LDFLAGS": ""
+      },
+      "versions": {
+        "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "compiler-target": "x86_64-linux-gnu\n",
+        "binutils": "GNU readelf (GNU Binutils for Ubuntu) 2.46\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n",
+        "libc": "glibc 2.43\n"
+      },
+      "os_release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+      "build_command": [
+        "make",
+        "--always-make",
+        "CC=gcc",
+        "CFLAGS=-Wall -Wextra",
+        "LDFLAGS="
+      ],
+      "build_stdout": "gcc -O2 -g -fno-stack-protector -Wall -Wextra -U_FORTIFY_SOURCE  -Isrc -o fortify_off src/fortify_copy.c src/sink.c\ngcc -O2 -g -fno-stack-protector -Wall -Wextra -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2  -Isrc -o fortify_l2 src/fortify_copy.c src/sink.c\ngcc -O2 -g -fno-stack-protector -Wall -Wextra -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3  -Isrc -o fortify_l3 src/fortify_copy.c src/sink.c\n",
+      "coverage": {
+        "dest_size": 32,
+        "cells": [
+          {
+            "level": "off",
+            "variant": "static",
+            "emitted_chk": false,
+            "effective": false,
+            "emitted_but_not_effective": false
+          },
+          {
+            "level": "off",
+            "variant": "runtime",
+            "emitted_chk": false,
+            "effective": false,
+            "emitted_but_not_effective": false
+          },
+          {
+            "level": "off",
+            "variant": "crosstu",
+            "emitted_chk": false,
+            "effective": false,
+            "emitted_but_not_effective": false
+          },
+          {
+            "level": "l2",
+            "variant": "static",
+            "emitted_chk": true,
+            "effective": true,
+            "emitted_but_not_effective": false
+          },
+          {
+            "level": "l2",
+            "variant": "runtime",
+            "emitted_chk": false,
+            "effective": false,
+            "emitted_but_not_effective": false
+          },
+          {
+            "level": "l2",
+            "variant": "crosstu",
+            "emitted_chk": false,
+            "effective": false,
+            "emitted_but_not_effective": false
+          },
+          {
+            "level": "l3",
+            "variant": "static",
+            "emitted_chk": true,
+            "effective": true,
+            "emitted_but_not_effective": false
+          },
+          {
+            "level": "l3",
+            "variant": "runtime",
+            "emitted_chk": true,
+            "effective": true,
+            "emitted_but_not_effective": false
+          },
+          {
+            "level": "l3",
+            "variant": "crosstu",
+            "emitted_chk": false,
+            "effective": false,
+            "emitted_but_not_effective": false
+          }
+        ],
+        "emitted_but_not_effective_count": 0
+      },
+      "states": {
+        "capture_complete": true,
+        "control_validity": true,
+        "hypothesis_supported": true,
+        "regression_gate_passed": true
+      },
+      "classified": [
+        {
+          "level": "off",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 1,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "off",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 2,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "off",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 3,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "off",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 1,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "off",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 2,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "off",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 3,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "off",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 1,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "off",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 2,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "off",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 3,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "off",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 1,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "off",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 2,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "off",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 3,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "off",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 1,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "off",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 2,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "off",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 3,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "off",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 1,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "off",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 2,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "off",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 3,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l2",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 1,
+          "outcome": "blocked_before_operation",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l2",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 2,
+          "outcome": "blocked_before_operation",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l2",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 3,
+          "outcome": "blocked_before_operation",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l2",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 1,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l2",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 2,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l2",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 3,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l2",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 1,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l2",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 2,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l2",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 3,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l2",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 1,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l2",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 2,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l2",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 3,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l2",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 1,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l2",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 2,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l2",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 3,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l2",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 1,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l2",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 2,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l2",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 3,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l3",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 1,
+          "outcome": "blocked_before_operation",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l3",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 2,
+          "outcome": "blocked_before_operation",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l3",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 3,
+          "outcome": "blocked_before_operation",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l3",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 1,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l3",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 2,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l3",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 3,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l3",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 1,
+          "outcome": "blocked_before_operation",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l3",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 2,
+          "outcome": "blocked_before_operation",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l3",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 3,
+          "outcome": "blocked_before_operation",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l3",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 1,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l3",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 2,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l3",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 3,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l3",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 1,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l3",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 2,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l3",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 3,
+          "outcome": "unattributed_fault",
+          "hypothesis_supported": true
+        },
+        {
+          "level": "l3",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 1,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l3",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 2,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        },
+        {
+          "level": "l3",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 3,
+          "outcome": "controlled_local_effect",
+          "hypothesis_supported": null
+        }
+      ],
+      "finding": {
+        "static_checked_at_l2": true,
+        "runtime_checked_at_l2": false,
+        "runtime_checked_at_l3": true,
+        "crosstu_checked_at_l3": false,
+        "runtime_coverage_differs_l2_vs_l3": true,
+        "crosstu_never_checked": true,
+        "emitted_but_not_effective_count": 0,
+        "control_validity": true,
+        "hypothesis_supported": true
+      },
+      "artifact_sha256": {
+        "src/fortify_copy.c": "cbacb94591a97f225227652cb2394dc368e7e89a2fc6d1a96818f0558fdd9afa",
+        "src/sink.c": "e1b0de140a6f2f22b7a1aa87482307e2bb731b960e8c42e3bac4a53d0a61e26f",
+        "src/sink.h": "06d791abf8afb2fda68eadc62489b809864403be6f54bd3947870395db0c0149",
+        "Makefile": "d286c80d700311aed2219965d5ea4fc54130062097236d11f22d52d814fef7e6",
+        "fortify_off": "fda3b63143068f673423f880d330ad4711c6869af17f3eca1c508f799efc80da",
+        "fortify_l2": "b9e20682be0dd694440743cfbda6f1de6f1475dd8216b7d7b41be786ec018656",
+        "fortify_l3": "eeec5d4a2fdb153d38f8382a4631a8fb8696e889904728bba732b7f08644e985"
+      },
+      "collector_sha256": "e89c666e8143d910ff7fb92c21fa43cc82e7e30eb7a387417def1485968ad7f4",
+      "outcomes_sha256": "a6ddb82e7d435814a3470b6bc7221938755ef2314228c5168c3278c8a90a58b5",
+      "full_manifest_sha256": "5566df60a2232526cee7b68bb2a58e4c8e18bc9a0ce0e0271188450554a33542",
+      "observations": [
+        {
+          "level": "off",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=static n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=static n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=static n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": "malloc(): corrupted top size\n"
+        },
+        {
+          "level": "off",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": "malloc(): corrupted top size\n"
+        },
+        {
+          "level": "off",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": "malloc(): corrupted top size\n"
+        },
+        {
+          "level": "off",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=runtime n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=runtime n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=runtime n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=crosstu n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=crosstu n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "off",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=crosstu n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l2",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": true,
+          "emitted_chk": true,
+          "stdout": "",
+          "stderr": "*** buffer overflow detected ***: terminated\n"
+        },
+        {
+          "level": "l2",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": true,
+          "emitted_chk": true,
+          "stdout": "",
+          "stderr": "*** buffer overflow detected ***: terminated\n"
+        },
+        {
+          "level": "l2",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": true,
+          "emitted_chk": true,
+          "stdout": "",
+          "stderr": "*** buffer overflow detected ***: terminated\n"
+        },
+        {
+          "level": "l2",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": true,
+          "stdout": "completed mode=static n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l2",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": true,
+          "stdout": "completed mode=static n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l2",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": true,
+          "stdout": "completed mode=static n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l2",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": "malloc(): corrupted top size\n"
+        },
+        {
+          "level": "l2",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": "malloc(): corrupted top size\n"
+        },
+        {
+          "level": "l2",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": "malloc(): corrupted top size\n"
+        },
+        {
+          "level": "l2",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=runtime n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l2",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=runtime n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l2",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=runtime n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l2",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "level": "l2",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "level": "l2",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "level": "l2",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=crosstu n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l2",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=crosstu n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l2",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=crosstu n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l3",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": true,
+          "emitted_chk": true,
+          "stdout": "",
+          "stderr": "*** buffer overflow detected ***: terminated\n"
+        },
+        {
+          "level": "l3",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": true,
+          "emitted_chk": true,
+          "stdout": "",
+          "stderr": "*** buffer overflow detected ***: terminated\n"
+        },
+        {
+          "level": "l3",
+          "variant": "static",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": true,
+          "emitted_chk": true,
+          "stdout": "",
+          "stderr": "*** buffer overflow detected ***: terminated\n"
+        },
+        {
+          "level": "l3",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": true,
+          "stdout": "completed mode=static n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l3",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": true,
+          "stdout": "completed mode=static n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l3",
+          "variant": "static",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": true,
+          "stdout": "completed mode=static n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l3",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": true,
+          "emitted_chk": true,
+          "stdout": "",
+          "stderr": "*** buffer overflow detected ***: terminated\n"
+        },
+        {
+          "level": "l3",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": true,
+          "emitted_chk": true,
+          "stdout": "",
+          "stderr": "*** buffer overflow detected ***: terminated\n"
+        },
+        {
+          "level": "l3",
+          "variant": "runtime",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": -6,
+          "signal": "SIGABRT",
+          "overflow_completed": false,
+          "fortify_abort": true,
+          "emitted_chk": true,
+          "stdout": "",
+          "stderr": "*** buffer overflow detected ***: terminated\n"
+        },
+        {
+          "level": "l3",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": true,
+          "stdout": "completed mode=runtime n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l3",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": true,
+          "stdout": "completed mode=runtime n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l3",
+          "variant": "runtime",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": true,
+          "stdout": "completed mode=runtime n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l3",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 1,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "level": "l3",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 2,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "level": "l3",
+          "variant": "crosstu",
+          "mode": "attack",
+          "repeat": 3,
+          "returncode": -11,
+          "signal": "SIGSEGV",
+          "overflow_completed": false,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "level": "l3",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 1,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=crosstu n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l3",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 2,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=crosstu n=16 first=65\n",
+          "stderr": ""
+        },
+        {
+          "level": "l3",
+          "variant": "crosstu",
+          "mode": "safe",
+          "repeat": 3,
+          "returncode": 0,
+          "signal": null,
+          "overflow_completed": true,
+          "fortify_abort": false,
+          "emitted_chk": false,
+          "stdout": "completed mode=crosstu n=16 first=65\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ]
+}
