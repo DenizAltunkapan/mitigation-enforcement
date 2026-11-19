@@ -1,4 +1,4 @@
-# Synthesis across Labs 01–11
+# Synthesis across Labs 01–13
 
 This document ties the labs together under one question and states, for each,
 what was measured, what that observation supports, and what it does not. It is a
@@ -38,6 +38,8 @@ are built to keep those two apart.
 | [09 GOT overwrite under RELRO](../labs/09-relro-got/RESULTS.md) | New target and its mitigation: the GOT, not the saved return | 12 trials across host + Debian 13 VM, 2 cases: overwriting puts's GOT slot redirects the call under partial RELRO but faults under full RELRO | x86-64, white-box static address (no PIE leak); one slot and one call, not a full PLT/GOT attack |
 | [10 format-string vulnerability](../labs/10-format-string/RESULTS.md) | New bug class: a disclosure and write without an overflow | 24 trials across host + Debian 13 VM, 4 cases: a `%p` walk discloses a planted stack marker, `%n` changes a supplied local variable, FORTIFY aborts the same input, and a constant format prints it literally | x86-64; the marker is not a PIE-base leak and the attacker does not select an arbitrary write address |
 | [11 CET shadow stack](../labs/11-cet-shadow-stack/RESULTS.md) | Anchor: requested vs. observed enforcement | 48 trials, two environments: the same CET-note binary is exploited when its process's shadow stack is inactive and caught by a `SEGV_CPERR` fault once active; the activation chain breaks at a different link per environment (activated on the host, emitted in the no-CET VM), and a metadata-only inference is wrong exactly where CET is requested but unenforced | x86-64; host `user_shstk` supported but inactive by default, VM advertises no CET; shadow-stack half of CET only (no IBT); exploratory pilot |
+| [12 FORTIFY coverage](../labs/12-fortify-coverage/RESULTS.md) | Declared vs. observed on a compile-time check | 54 trials: a static-size copy is checked from `_FORTIFY_SOURCE=2`, a runtime-sized heap copy only at `=3`, a cross-TU copy at no level; `emitted` (`__memcpy_chk` present) and `effective` (an overflow aborts) recorded separately and agree on this toolchain. Reading the flag, or counting `__memcpy_chk`, cannot tell a checked copy from an unchecked one in the same binary | x86-64, gcc 15.2 / glibc 2.43, `-O2`, stack protector off to isolate FORTIFY; one toolchain; exploratory pilot |
+| [13 boundary instrumentation](../labs/13-boundary-instrumentation/RESULTS.md) | Declared vs. observed across a component boundary | 72 trials, main + shared library × four instrumentation configs × two overflow locations: a protection emitted into one component does not cross into the other. A main-binary-only hardening check gives **both** a false positive (main has canaries, the library overflow is unprotected) and a false negative (main has none, the library detects its own overflow) | x86-64; the stack protector family; FORTIFY disabled to isolate it; one toolchain; exploratory pilot |
 
 ## How the claims build on each other
 
@@ -89,6 +91,18 @@ are built to keep those two apart.
   [Lab 11 results](../labs/11-cet-shadow-stack/RESULTS.md) for the per-cell data).
   Where Labs 04–10 locate a mitigation on the prevent/detect/limit spectrum, Lab 11
   shows that even placing it there presumes enforcement that must itself be observed.
+- Labs 12 and 13 **generalize that axis to two more mitigation classes**, so the
+  declared-vs-observed gap is not special to CET. Lab 12 takes a compile-time check
+  (`_FORTIFY_SOURCE`): the same flag family checks a copy or not depending on
+  whether the compiler can prove the destination size at that call site — checked
+  for a static buffer, only at level 3 for a runtime-sized one, never across a
+  translation-unit boundary. Lab 13 takes a per-component build setting (the stack
+  protector): a protection emitted into the main executable does not reach an
+  uninstrumented shared library, nor vice versa, so a check that reads only the main
+  binary produces both a false positive and a false negative. In all three, the same
+  move recurs: the flag or ELF marker is a *declaration*, and whether the specific
+  operation is protected is a separate fact that must be measured at the call site,
+  the running process, or the owning component.
 
 The consistent thread: across the labs that test a repair (04–06, 08, 10) the only
 change that *prevents* the effect structurally rather than merely interrupting one

@@ -36,6 +36,7 @@ LABS = {
     "labs/10-format-string": ("capture-format-string.py", "export-format-string.py"),
     "labs/11-cet-shadow-stack": ("capture-cet.py", "export-cet.py"),
     "labs/12-fortify-coverage": ("capture-fortify-coverage.py", "export-fortify-coverage.py"),
+    "labs/13-boundary-instrumentation": ("capture-boundary.py", "export-boundary.py"),
 }
 
 # Per-run fields that must not be compared. Everything else in an observation is

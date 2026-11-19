@@ -139,7 +139,7 @@ LAB_POLICIES = {
 
 
 def _collector_policy(collector_filename):
-    """Labs 11 and 12 record the four states natively, so their policy lives in the
+    """Labs 11-13 record the four states natively, so their policy lives in the
     collector as the single source of truth. Import LAB_POLICY from the collector
     rather than restating it, so the unified report cannot drift from the
     capture-time classification."""
@@ -153,7 +153,8 @@ def _collector_policy(collector_filename):
 
 
 for _lab, _collector in (("11-cet-shadow-stack", "capture-cet.py"),
-                         ("12-fortify-coverage", "capture-fortify-coverage.py")):
+                         ("12-fortify-coverage", "capture-fortify-coverage.py"),
+                         ("13-boundary-instrumentation", "capture-boundary.py")):
     try:
         LAB_POLICIES[_lab] = _collector_policy(_collector)
     except (OSError, ImportError, AttributeError):

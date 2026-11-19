@@ -51,6 +51,13 @@ labs/12-fortify-coverage/fortify_off
 labs/12-fortify-coverage/fortify_l2
 labs/12-fortify-coverage/fortify_l3
 
+labs/13-boundary-instrumentation/libboundary_on.so
+labs/13-boundary-instrumentation/libboundary_off.so
+labs/13-boundary-instrumentation/boundary_both
+labs/13-boundary-instrumentation/boundary_main_only
+labs/13-boundary-instrumentation/boundary_lib_only
+labs/13-boundary-instrumentation/boundary_neither
+
 # Python
 __pycache__/
 *.pyc

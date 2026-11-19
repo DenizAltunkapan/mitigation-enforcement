@@ -59,6 +59,7 @@ COLLECTOR_FOR_LAB = {
     "labs/10-format-string": "scripts/capture-format-string.py",
     "labs/11-cet-shadow-stack": "scripts/capture-cet.py",
     "labs/12-fortify-coverage": "scripts/capture-fortify-coverage.py",
+    "labs/13-boundary-instrumentation": "scripts/capture-boundary.py",
 }
 
 
@@ -193,6 +194,16 @@ class ResultsConsistencyTests(unittest.TestCase):
             "Lab 12",
             "labs/12-fortify-coverage/evidence/2026-11-19.json",
             "labs/12-fortify-coverage/RESULTS.md",
+            {name: {1: ("host", name)}
+             for name in ("Compiler", "C library")},
+        )
+
+    def test_lab13_results_match_evidence(self):
+        # Host-only: one environment column (cell 1); Compiler and C library rows.
+        self._check(
+            "Lab 13",
+            "labs/13-boundary-instrumentation/evidence/2026-11-19.json",
+            "labs/13-boundary-instrumentation/RESULTS.md",
             {name: {1: ("host", name)}
              for name in ("Compiler", "C library")},
         )
