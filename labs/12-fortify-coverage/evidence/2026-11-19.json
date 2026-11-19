@@ -2,12 +2,12 @@
   "description": "Selected text evidence from complete Lab 12 captures (FORTIFY coverage: when is a buffer copy actually checked?). Binaries and disassembly remain in the capture directories. The coverage matrix and four research states are carried through unchanged; a coverage counter-finding exports like any complete capture. Checksums establish consistency, not authenticity.",
   "captures": [
     {
-      "name": "f12re",
+      "name": "cap",
       "environment": {
         "schema_version": 1,
         "label": "host",
         "label_is_operator_supplied": true,
-        "captured_at_utc": "2026-11-19T18:23:18.803259+00:00",
+        "captured_at_utc": "2026-11-19T22:07:57.386353+00:00",
         "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
         "architecture": "x86_64",
         "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
@@ -557,13 +557,13 @@
         "src/sink.c": "e1b0de140a6f2f22b7a1aa87482307e2bb731b960e8c42e3bac4a53d0a61e26f",
         "src/sink.h": "06d791abf8afb2fda68eadc62489b809864403be6f54bd3947870395db0c0149",
         "Makefile": "d286c80d700311aed2219965d5ea4fc54130062097236d11f22d52d814fef7e6",
-        "fortify_off": "4988f658b51eee7b78c0b4df6d15607c82a00653f869d9cf011805936ddedc69",
-        "fortify_l2": "fc05364d1c9d1708ccbfef6f52c717295bd814b59ad5b60834225f43a2ad4248",
-        "fortify_l3": "b73bc9609a00077d2100b40accc81b95ba6e32a9eddbbabb6a61d021bd0c2c12"
+        "fortify_off": "9ff078c16ee3061d9a7874244c9bc4c671976002644c0cea507fb3aec45d6b4a",
+        "fortify_l2": "092bde1723e00674dd23a710f58d32e8d4d61f6ae0c760835631d2dbbf95fcf1",
+        "fortify_l3": "4c70920b3c8fd83f1da74d479b58aac7d04642940979e3dbe1e03f6e8a75f08a"
       },
       "collector_sha256": "3714b88468ca7b990ef8173612d562cc0850046d3510f2ee1da9636e01a41616",
-      "outcomes_sha256": "f65c1e596a1468cb97ce780bb944ecc9c08b29ec7e9f068ece1df7577ba4709e",
-      "full_manifest_sha256": "5fb13e272c477691d888b0e6baeaf47f4189f1c3347a3f47315611ab2dad5aee",
+      "outcomes_sha256": "d4a51be142e50564e8eafe5a4b80b693ec9acf6260573eb35c6b819e8b9aa77d",
+      "full_manifest_sha256": "c48b13c06f6c0236a925a9bc295fd004b968bba9f5186f0c39f5cf9543eaca4b",
       "observations": [
         {
           "level": "off",

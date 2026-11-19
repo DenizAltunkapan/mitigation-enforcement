@@ -1,9 +1,9 @@
-# Exploit Evolution — research pre-registration (Phase 0)
+# Mitigation Enforcement — research pre-registration (Phase 0)
 #
 # Status: pre-registration. This file fixes the research questions, factors,
 # outcome taxonomy and exclusion rules BEFORE confirmatory captures are recorded,
 # so that later results cannot be reinterpreted to fit. It is the machine-readable
-# companion to paper/plan.md; the prose there is authoritative where they differ.
+# machine-readable research plan and pre-registration for the labs in this repo.
 #
 # This file describes intent. It does not itself run anything.
 
@@ -18,7 +18,7 @@ thesis: >
   break; this project measures whether they break on concrete binaries and
   environments.
 
-# The activation/coverage chain each measurement instruments (see paper/plan.md).
+# The activation/coverage chain each measurement instruments (see the activation_chain section below).
 activation_chain:
   - requested    # build flag asks for the mitigation
   - emitted      # instrumentation / ELF metadata is present
@@ -67,7 +67,7 @@ outcome_taxonomy:
   - environment_failure        # build/runtime failed for environmental reasons
   - not_executed               # the trial did not run
 
-# Four independent states recorded per capture/observation (see paper/plan.md).
+# Four independent states recorded per capture/observation (see the state_model section below).
 # A fully recorded counter-finding stays exportable:
 #   capture_complete=true, hypothesis_supported=false.
 state_model:
@@ -83,7 +83,7 @@ exclusions:
   - "A control that proves the bug did not actually trigger -> invalid_control."
   - "Inapplicable factor combinations are reported with a reason, never silently dropped."
 
-# Scope of the first confirmatory run (focused; see paper/plan.md Section 0).
+# Scope of the first confirmatory run (focused).
 scope_v1:
   labs: ["06", "07", "08", "09", "10"]          # VM replication under pinning
   new_labs: ["11", "12", "13"]                  # exploratory pilots now built

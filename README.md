@@ -1,7 +1,5 @@
 # Mitigation Enforcement
 
-*(artifact: Exploit Evolution)*
-
 [![Lab validation](https://github.com/DenizAltunkapan/mitigation-enforcement/actions/workflows/labs.yml/badge.svg)](https://github.com/DenizAltunkapan/mitigation-enforcement/actions/workflows/labs.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](README.md#run-the-checks)
@@ -33,7 +31,7 @@ explains a gap between the declaration and observed enforcement?
 - A CET-marked binary on a shadow-stack-capable CPU still redirects while its
   process shadow stack is inactive, and faults with `SEGV_CPERR` only once
   activated; `_FORTIFY_SOURCE` checks copies per call site (L2 static, L3
-  runtime, never cross-TU); and a stack protector does not cross a shared-library
+  runtime, cross-TU at none of the tested levels); and a stack protector does not cross a shared-library
   boundary. [Labs 11–13 results](docs/SYNTHESIS.md#key-results-and-evidence)
 
 These are bounded observations from the recorded environments, not claims about

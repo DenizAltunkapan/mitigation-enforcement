@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Record the actual, observed capabilities of the current environment.
 
-Phase 0 of the research plan (paper/plan.md). The per-lab collectors already
+Phase 0 of the research plan (research/plan.yaml). The per-lab collectors already
 record the compiler, linker, C library and kernel string of a capture. This probe
 records what they do not: the dynamic loader identity, CPU security features
 actually advertised (NX, SMEP/SMAP, user-space shadow stack, IBT), the ASLR

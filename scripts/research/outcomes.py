@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Outcome taxonomy and the four-state research model (Phase 0).
 
-This is the thin research layer the plan calls for (paper/plan.md Section 3,
+This is the thin research layer the plan calls for (research/plan.yaml,
 research/plan.yaml). It does not replace the per-lab collectors; it classifies the
 observations they already record, so a result can be read as data rather than only
 as pass/fail, and a counter-finding stays exportable.
@@ -28,7 +28,7 @@ OUTCOMES = (
     "not_executed",               # the trial did not run
 )
 
-# The four independent states (paper/plan.md 3.1). A fully recorded counter-finding
+# The four independent states (research/plan.yaml). A fully recorded counter-finding
 # stays exportable: capture_complete=True, hypothesis_supported=False.
 STATE_FIELDS = (
     "capture_complete",

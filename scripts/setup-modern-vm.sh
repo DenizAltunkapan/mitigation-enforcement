@@ -65,7 +65,7 @@ packages:
 EOF
 
 cat >"${META_DATA}" <<'EOF'
-instance-id: exploit-evolution-modern
+instance-id: mitigation-enforcement-modern
 local-hostname: modern
 EOF
 

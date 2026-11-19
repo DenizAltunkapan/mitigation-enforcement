@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "description": "Pinned identities of the environments used for Exploit Evolution confirmatory captures. Produced by scripts/research/probe_environment.py plus VM image hashes. See paper/plan.md and research/plan.yaml.",
+  "description": "Pinned identities of the environments used for the confirmatory captures. Produced by scripts/research/probe_environment.py plus VM image hashes. See research/plan.yaml.",
   "pinned_at": "2026-11-18",
   "environments": {
     "host": {

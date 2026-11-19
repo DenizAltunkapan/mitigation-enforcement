@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Classify committed lab evidence into the pre-registered outcome taxonomy.
 
-Read-only Phase 0 tool (paper/plan.md 3.3, research/plan.yaml). It reads each
+Read-only Phase 0 tool (research/plan.yaml). It reads each
 lab's committed portable evidence JSON, maps every observation to one of the nine
 outcome categories, and reports the four research states per capture
 (capture_complete / control_validity / hypothesis_supported /
@@ -27,7 +27,7 @@ tool is that this makes such a finding legible as data rather than a lost captur
 and it checks the taxonomy mapping is total and unambiguous. Note the scope limit:
 the legacy collectors still gate their COMPLETE marker on the expected result, so a
 live counter-finding is preserved by this research layer, not yet by the collectors
-themselves (new labs record the four states directly; see paper/plan.md Section 8).
+themselves (new labs record the four states directly; see research/plan.yaml).
 """
 import argparse
 import json

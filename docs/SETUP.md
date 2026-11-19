@@ -109,9 +109,9 @@ in a fresh clone; it provides serial login but has no SSH or GDB installed.
 Run inside each VM, using a new output directory whose parent exists:
 
 ```bash
-./scripts/capture-baseline.sh legacy /tmp/exploit-evolution-legacy
+./scripts/capture-baseline.sh legacy /tmp/mitigation-enforcement-legacy
 # In the modern VM:
-./scripts/capture-baseline.sh modern /tmp/exploit-evolution-modern
+./scripts/capture-baseline.sh modern /tmp/mitigation-enforcement-modern
 ```
 
 Captures environment versions, build commands, source copies, checksums,
@@ -143,7 +143,7 @@ Lab 04 uses a dedicated collector with repeated safe/oversized inputs, signal
 recording and checks of guard detection versus bounds-check rejection:
 
 ```bash
-python3 scripts/capture-stack-canary.py host /tmp/exploit-evolution-canary
+python3 scripts/capture-stack-canary.py host /tmp/mitigation-enforcement-canary
 ```
 
 Requires Linux and Python 3.8+; see the Lab 04 instructions for legacy-toolchain

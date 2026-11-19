@@ -1,5 +1,5 @@
 {
-  "title": "Exploit Evolution: Reproducible Evidence for Declared-versus-Observed Linux Exploit Mitigations",
+  "title": "Mitigation Enforcement: Reproducible Evidence for Declared-versus-Observed Linux Exploit Mitigations",
   "description": "Thirteen synthetic, local Linux labs spanning i386 and x86-64, including three controlled experiments that measure the gap between declared hardening and observed protection of a specific operation at run time, with committed, hash-anchored evidence and matched controls.",
   "upload_type": "software",
   "license": "MIT",

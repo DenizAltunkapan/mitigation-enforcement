@@ -2,12 +2,12 @@
   "description": "Selected text evidence from complete Lab 13 captures (partial instrumentation across a shared-library boundary). Binaries and disassembly remain in the capture directories. Coverage, baseline oracle and four research states are carried through unchanged; a counter-finding exports like any complete capture. Checksums establish consistency, not authenticity.",
   "captures": [
     {
-      "name": "b13-host",
+      "name": "cap",
       "environment": {
         "schema_version": 1,
         "label": "host",
         "label_is_operator_supplied": true,
-        "captured_at_utc": "2026-11-19T13:10:14.143500+00:00",
+        "captured_at_utc": "2026-11-19T22:08:53.605326+00:00",
         "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
         "architecture": "x86_64",
         "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
@@ -773,6 +773,8 @@
         "main_only_oracle_false_positives": 1,
         "main_only_oracle_false_negatives": 1,
         "emitted_but_not_effective_count": 0,
+        "deterministic": true,
+        "nondeterministic_cells": [],
         "control_validity": true,
         "hypothesis_supported": true
       },
@@ -781,16 +783,16 @@
         "src/boundary_lib.c": "c242e1bb260293e5c14b2d5c05079a0eede2750ed8569648f47ec9cfc053fed3",
         "src/boundary_lib.h": "6f0aded80cbd2ed20b482b6d73e805aba7635623ca943a5fa17de7fa709b60d5",
         "Makefile": "20a06b29419d0b93ca04d6ff02b8fbce6c86079ec79dadd30a09baa344c79144",
-        "libboundary_on.so": "a4e98adecd7d3691145a542c9b9bcb34a16b9e1babef69f6c7bd4de2c763dffd",
-        "libboundary_off.so": "6d8804c7d636c2593dad6b9db6e7f3839ad27f8da323a0111644b709c7248be9",
-        "boundary_both": "9b2bf2554c753e19f3797b0b307af93521841bca0d99d210f151d785c5614ade",
-        "boundary_main_only": "8abeb11a120f16988ac694b56d072aee2cf0ed18b80eb17719c8329cf65f5099",
-        "boundary_lib_only": "8fcde2b66b17aa9c02a42e87e5431479d0e7ec32a7b1012f8e3abb89edcd6dd8",
-        "boundary_neither": "14371dbcc0a47ddc83af6f59c0914769e84ea80d66115dd9a883e4c70aae3eae"
+        "libboundary_on.so": "43947c64a2a6e28af8022ec3130c95d9e927d80ca90b88680475cb6b629f5c19",
+        "libboundary_off.so": "7cb843d3c65b7525ece7b20403b4e8f7f75a0c0f456f0926a9dbaa1f11a7f309",
+        "boundary_both": "9b86990147ebe05ef81986aa9bdc99f90a63b10d1b25ef670431ac823c8c66b2",
+        "boundary_main_only": "19e207c6601a4d7d05add25f80001e5a8f5c4e0b3abd9d9c41f2aed804fc60d6",
+        "boundary_lib_only": "a4e585af48773378ef8c242fc710559cc48b85c8fa867792f50d7c2d3eec5ec6",
+        "boundary_neither": "1a23f591dee84b3208c585314e82afa35dfd95677583480be5c75d39cce39a97"
       },
-      "collector_sha256": "10bca2b23a41663ccd995458e1695b03a4e61173924d3f8a71ab86905f9d0cba",
-      "outcomes_sha256": "a6ddb82e7d435814a3470b6bc7221938755ef2314228c5168c3278c8a90a58b5",
-      "full_manifest_sha256": "2686ad849f77ef1eb413a9a9497fbf4dc556edd307aafff6e30a72883d6f2133",
+      "collector_sha256": "21881cb9c79618a7c906fa2da1ff842a6eb17fe34629f50edf38dbaa59c186d9",
+      "outcomes_sha256": "d4a51be142e50564e8eafe5a4b80b693ec9acf6260573eb35c6b819e8b9aa77d",
+      "full_manifest_sha256": "f4f8f82bae4c225d15262b94633cf9804b511465cc07f1ed4f9a9a4cb053e46b",
       "observations": [
         {
           "config": "neither",

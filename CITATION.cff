@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this work, please cite it as below."
-title: "Exploit Evolution: Reproducible Evidence for Declared-versus-Observed Linux Exploit Mitigations"
+title: "Mitigation Enforcement: Reproducible Evidence for Declared-versus-Observed Linux Exploit Mitigations"
 abstract: >-
   Thirteen synthetic, local Linux labs spanning i386 and x86-64, including three
   controlled experiments that measure the gap between declared hardening and

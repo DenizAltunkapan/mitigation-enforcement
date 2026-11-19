@@ -214,15 +214,21 @@ def capture(label, output):
                     observations.append(row)
                     (output / "observations.json").write_text(json.dumps(observations, indent=2) + "\n")
 
-    # Determinism: each (config, location, mode) cell must be single-valued.
+    # Determinism: each (config, location, mode) cell SHOULD be single-valued. A
+    # cell that varies across repeats is RECORDED, not aborted on (as in Labs 11
+    # and 12), so a fluctuating result stays an exportable observation rather than
+    # a lost capture. A non-deterministic capture is not an interpretable control
+    # baseline, so it only invalidates control_validity below.
+    nondeterministic_cells = []
     for cfg in CONFIGS:
         for loc in LOCATIONS:
             for mode in MODES:
                 cell = {(r["returncode"], r["copy_completed"], r["canary_abort"], r["bounds_rejected"])
                         for r in observations
                         if r["config"] == cfg and r["location"] == loc and r["mode"] == mode}
-                require(len(cell) == 1,
-                        "cell {}/{}/{} not deterministic: {}".format(cfg, loc, mode, cell))
+                if len(cell) > 1:
+                    nondeterministic_cells.append("%s/%s/%s" % (cfg, loc, mode))
+    deterministic = not nondeterministic_cells
 
     # Control validity:
     #   1. Every safe (in-bounds) run completes normally (rc == 0, copy_completed).
@@ -235,7 +241,7 @@ def capture(label, output):
                                 if r["config"] == "neither" and r["mode"] == "attack")
     fixed_ok = all(r["bounds_rejected"] and r["returncode"] == 2
                    for r in observations if r["mode"] == "fixed")
-    control_valid = bool(safe_ok and neither_unguarded and fixed_ok)
+    control_valid = bool(safe_ok and neither_unguarded and fixed_ok and deterministic)
 
     annotated = annotate(observations, LAB_POLICY)
     states = capture_states(observations, LAB_POLICY,
@@ -320,6 +326,8 @@ def capture(label, output):
         "main_only_oracle_false_positives": fp_count,
         "main_only_oracle_false_negatives": fn_count,
         "emitted_but_not_effective_count": emitted_not_effective,
+        "deterministic": deterministic,
+        "nondeterministic_cells": nondeterministic_cells,
         "control_validity": control_valid,
         "hypothesis_supported": states["hypothesis_supported"],
     }, indent=2) + "\n")

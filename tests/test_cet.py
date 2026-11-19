@@ -127,10 +127,18 @@ class CetShadowStackTests(unittest.TestCase):
                 and reaches("cet_full", "default"),
             )
             # Activation depends on emission: a true positive finding on this lab.
-            self.assertEqual(
-                finding["tunable_does_not_activate_shstk_without_cet_note"],
-                active("cet_none", "shstk") is False,
-            )
+            # The collector only asserts this on a CET-capable environment
+            # (shstk_environment_capable); on a host that emits no CET note at all
+            # the field is False by construction, so we only check the positive
+            # claim where the note is actually emittable.
+            if cet_full_note:
+                self.assertEqual(
+                    finding["tunable_does_not_activate_shstk_without_cet_note"],
+                    active("cet_none", "shstk") is False,
+                )
+            else:
+                self.assertFalse(
+                    finding["tunable_does_not_activate_shstk_without_cet_note"])
 
             # Metadata-only oracle: the inference rule a note-only checker applies,
             # compared to runtime truth. Each cell is self-consistent, and a cell is
@@ -146,9 +154,14 @@ class CetShadowStackTests(unittest.TestCase):
                                  "oracle false_positive flag inconsistent: %r" % cell)
                 counted_fps += int(is_fp)
             self.assertEqual(oracle["false_positive_count"], counted_fps)
-            if active("cet_full", "default") is False and reaches("cet_full", "default"):
-                # A CET-capable host: the note-only rule MUST be wrong for at least
-                # the cet_full/default cell — the paper's central claim, measured.
+            if (cet_full_note and active("cet_full", "default") is False
+                    and reaches("cet_full", "default")):
+                # A CET-capable environment where the shadow stack is inactive by
+                # default: the note IS present, so the metadata-only rule says
+                # "protected", yet the attack reaches the oracle -- a true false
+                # positive, the paper's central claim. (Without the cet_full_note
+                # guard this would also fire on a CET-less host, where the rule
+                # correctly says "not protected" and the FP count is 0.)
                 self.assertGreaterEqual(oracle["false_positive_count"], 1)
                 self.assertEqual(finding["metadata_only_false_positives"],
                                  oracle["false_positive_count"])
