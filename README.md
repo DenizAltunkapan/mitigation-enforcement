@@ -3,8 +3,7 @@
 [![Lab validation](https://github.com/DenizAltunkapan/mitigation-enforcement/actions/workflows/labs.yml/badge.svg)](https://github.com/DenizAltunkapan/mitigation-enforcement/actions/workflows/labs.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](README.md#run-the-checks)
-<!-- On release, add the Zenodo CONCEPT DOI badge (resolves to the latest version):
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24382066.svg)](https://doi.org/10.5281/zenodo.24382066)
 
 
 A systems-security study comparing legacy i386 and modern x86-64 Linux
@@ -80,9 +79,21 @@ All experiments use synthetic, local programs. They do not target real systems.
 The C examples deliberately exercise undefined behavior; use disposable VMs for
 manual experiments. A host run does not replace the recorded VM measurements.
 
+## Paper
+
+The companion paper is included in this repository at
+[`paper/main.pdf`](paper/main.pdf) and archived as a preprint on Zenodo:
+
+> Deniz Altunkapan. *Present but Not Protecting: A Controlled, Reproducible Study
+> of When Linux Exploit Mitigations Actually Enforce.* Preprint, 2026.
+> [doi:10.5281/zenodo.24382446](https://doi.org/10.5281/zenodo.24382446)
+
 ## Citing
 
-See [CITATION.cff](CITATION.cff). A versioned snapshot will be archived on Zenodo
-at release; the version DOI and concept DOI badge must be added before publication.
+To cite this artifact (code and evidence), see [CITATION.cff](CITATION.cff) or use
+the Zenodo archive:
+
+- **Artifact (code and evidence):** [doi:10.5281/zenodo.24382066](https://doi.org/10.5281/zenodo.24382066) (concept DOI, resolves to the latest version)
+- **Paper (preprint):** [doi:10.5281/zenodo.24382446](https://doi.org/10.5281/zenodo.24382446) (concept DOI)
 
 MIT licensed; see [LICENSE](LICENSE).

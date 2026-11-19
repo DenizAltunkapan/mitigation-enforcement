@@ -10,6 +10,17 @@ type: software
 authors:
   - family-names: Altunkapan
     given-names: Deniz
+    orcid: "https://orcid.org/0009-0007-0646-2889"
+version: 1.0.0
+date-released: "2026-11-20"
+doi: "10.5281/zenodo.24382066"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.24382066"
+    description: "Concept DOI (resolves to the latest version)"
+  - type: doi
+    value: "10.5281/zenodo.24382067"
+    description: "Version DOI (v1.0.0)"
 license: MIT
 repository-code: "https://github.com/DenizAltunkapan/mitigation-enforcement"
 keywords:
@@ -18,3 +29,12 @@ keywords:
   - Intel CET shadow stack
   - FORTIFY_SOURCE
   - reproducible research
+preferred-citation:
+  type: article
+  title: "Present but Not Protecting: A Controlled, Reproducible Study of When Linux Exploit Mitigations Actually Enforce"
+  authors:
+    - family-names: Altunkapan
+      given-names: Deniz
+      orcid: "https://orcid.org/0009-0007-0646-2889"
+  year: 2026
+  doi: "10.5281/zenodo.24382446"
