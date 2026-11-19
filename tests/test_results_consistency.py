@@ -57,6 +57,7 @@ COLLECTOR_FOR_LAB = {
     "labs/08-code-reuse-chain": "scripts/capture-code-reuse.py",
     "labs/09-relro-got": "scripts/capture-relro.py",
     "labs/10-format-string": "scripts/capture-format-string.py",
+    "labs/11-cet-shadow-stack": "scripts/capture-cet.py",
 }
 
 

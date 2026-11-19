@@ -84,10 +84,19 @@ class LabPolicy:
                        happened, then a guard aborted: a stack canary, FORTIFY).
       expectation(obs): returns the pre-registered expected outcome for that trial's
                         mode, so hypothesis_supported is the observed==expected test.
-      block_signal(obs): optional extra predicate that, when it returns True, confirms
-                       a block for a lab that has a direct positive flag for it
-                       (e.g. Lab 10 safe_input_literal, Lab 07 mprotect_rejected). It
-                       is OR-ed with the generic fault/clean-reject signature.
+      block_signal(obs): optional predicate that confirms a block from a direct
+                       positive flag (e.g. Lab 10 safe_input_literal, Lab 07
+                       mprotect_rejected, Lab 11 a SEGV_CPERR control-protection
+                       fault). By default it is OR-ed with the generic fault/clean-
+                       reject signature (a positive flag OR a plain fault confirms
+                       the block). With strict_block_signal=True it REPLACES the
+                       generic signature, so a block is credited ONLY when the flag
+                       holds: this is for labs whose stop must be proven by a
+                       specific mechanism (Lab 11: a bare SIGSEGV is not a shadow-
+                       stack block; only SEGV_CPERR is).
+      strict_block_signal: see above; when True a fault that does not satisfy
+                       block_signal is NOT a block and falls through to
+                       unattributed_fault.
       unexpected_fault: when True, a terminating signal that is NOT the declared stop
                        signature is recorded as unattributed_fault instead of being
                        folded into repair_outcome.
@@ -99,16 +108,19 @@ class LabPolicy:
     """
 
     def __init__(self, effect_flags, repair_outcome, expectation,
-                 *, block_signal=None, unexpected_fault=True):
+                 *, block_signal=None, strict_block_signal=False, unexpected_fault=True):
         # repair_outcome is either a fixed outcome string or a callable
         # (observation) -> outcome, for labs whose stop kind depends on the binary
         # variant (e.g. Lab 05: a canary detects after the write, PIE blocks before).
         if not callable(repair_outcome):
             assert repair_outcome in OUTCOMES
+        if strict_block_signal:
+            assert block_signal is not None, "strict_block_signal needs a block_signal"
         self.effect_flags = tuple(effect_flags)
         self._repair_outcome = repair_outcome
         self.expectation = expectation
         self.block_signal = block_signal
+        self.strict_block_signal = strict_block_signal
         self.unexpected_fault = unexpected_fault
 
     def repair_outcome_for(self, observation):
@@ -121,9 +133,13 @@ class LabPolicy:
         """True iff the declared repair_outcome's stop signature is present for this
         observation (its positive signal, not merely 'no effect')."""
         outcome = self.repair_outcome_for(observation)
-        if outcome == "blocked_before_operation" and self.block_signal \
-                and self.block_signal(observation):
-            return True
+        if outcome == "blocked_before_operation" and self.block_signal:
+            if self.block_signal(observation):
+                return True
+            if self.strict_block_signal:
+                # The only accepted proof of this block is block_signal, which did
+                # not hold: do NOT fall back to the generic fault signature.
+                return False
         signature = STOP_SIGNATURE.get(outcome)
         return bool(signature and signature(observation))
 

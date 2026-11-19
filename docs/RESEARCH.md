@@ -116,10 +116,13 @@ isolate the effect of any one of those variables.
 
 [The root README](../README.md#run-the-checks) provides the local entry point.
 The baseline collector covers Labs 01–03; dedicated Python collectors cover
-Labs 04–10, one per lab. All build copies outside the source tree and refuse existing
-output directories. Captures include their collector source.
+Labs 04–11, one per lab. All build copies outside the source tree and refuse existing
+output directories. Captures include their collector source. Lab 11 additionally
+records the activation chain and the four research states at capture time, and
+writes its `COMPLETE` marker on capture completeness rather than on the expected
+outcome, so a counter-finding stays a complete capture.
 
-Full capture manifests permit integrity checks. The baseline and the Labs 04–10 exporters
+Full capture manifests permit integrity checks. The baseline and the Labs 04–11 exporters
 verify every manifest entry and exact artifact coverage before creating portable
 JSON snapshots. They reject incomplete captures, modified files, extra artifacts,
 duplicate entries and symlinks. They read data only and never execute captured

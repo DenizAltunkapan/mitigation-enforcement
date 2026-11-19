@@ -138,6 +138,25 @@ LAB_POLICIES = {
 }
 
 
+def _lab11_policy():
+    """Lab 11 records the four states natively, so its policy lives in the
+    collector (scripts/capture-cet.py) as the single source of truth. Import it
+    here rather than restating it, so the unified report cannot drift from the
+    capture-time classification."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "capture_cet", ROOT / "scripts" / "capture-cet.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.LAB_POLICY
+
+
+try:
+    LAB_POLICIES["11-cet-shadow-stack"] = _lab11_policy()
+except (OSError, ImportError, AttributeError):
+    pass  # Lab 11 not present; the classifier still runs over the other labs.
+
+
 def lab_dir(lab):
     return ROOT / "labs" / lab
 

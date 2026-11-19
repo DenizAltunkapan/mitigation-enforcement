@@ -26,7 +26,7 @@ prevents the underlying error?
 
 These are bounded observations from the recorded environments, not claims about
 arbitrary systems. The [complete key results and evidence table](docs/SYNTHESIS.md#key-results-and-evidence)
-covers all ten labs; the [research record](docs/RESEARCH.md) tracks failed
+covers all eleven labs; the [research record](docs/RESEARCH.md) tracks failed
 cases and open replications.
 
 ## Labs
@@ -43,10 +43,13 @@ cases and open replications.
 | [08](labs/08-code-reuse-chain/README.md) | Code reuse under a non-executable stack |
 | [09](labs/09-relro-got/README.md) | GOT overwrite under partial versus full RELRO |
 | [10](labs/10-format-string/README.md) | Format-string disclosure, write primitive and FORTIFY |
+| [11](labs/11-cet-shadow-stack/README.md) | CET shadow stack: requested vs. observed enforcement (anchor lab) |
 
 Labs 01–03 have a [cross-VM baseline comparison](docs/BASELINE-COMPARISON.md).
-Labs 04–10 keep their results and capture evidence in the respective lab
-directories.
+Labs 04–11 keep their results and capture evidence in the respective lab
+directories. Lab 11 is the anchor for the declared-vs-observed thesis and the
+first lab to record the four research states at capture time (see
+[research/plan.yaml](research/plan.yaml)).
 
 ## Run the checks
 

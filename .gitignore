@@ -43,6 +43,10 @@ labs/10-format-string/format_plain
 labs/10-format-string/format_fortified
 labs/10-format-string/format_fixed
 
+labs/11-cet-shadow-stack/cet_full
+labs/11-cet-shadow-stack/cet_none
+labs/11-cet-shadow-stack/shstk_probe
+
 # Python
 __pycache__/
 *.pyc

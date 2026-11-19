@@ -1,4 +1,4 @@
-# Synthesis across Labs 01–10
+# Synthesis across Labs 01–11
 
 This document ties the labs together under one question and states, for each,
 what was measured, what that observation supports, and what it does not. It is a
@@ -37,6 +37,7 @@ are built to keep those two apart.
 | [08 code reuse under NX](../labs/08-code-reuse-chain/RESULTS.md) | Primitive extended: avoid NX instead of disabling it | 18 process trials across host + Debian 13 VM, 3 control-flow cases plus an in-process NX control: a jump onto the non-executable stack faults while an ordered chain of in-binary functions reaches the oracle; a bounds check prevents it | x86-64, white-box static addresses (no PIE leak); a minimal ordered chain, not a libc ROP toolkit; CET disabled |
 | [09 GOT overwrite under RELRO](../labs/09-relro-got/RESULTS.md) | New target and its mitigation: the GOT, not the saved return | 12 trials across host + Debian 13 VM, 2 cases: overwriting puts's GOT slot redirects the call under partial RELRO but faults under full RELRO | x86-64, white-box static address (no PIE leak); one slot and one call, not a full PLT/GOT attack |
 | [10 format-string vulnerability](../labs/10-format-string/RESULTS.md) | New bug class: a disclosure and write without an overflow | 24 trials across host + Debian 13 VM, 4 cases: a `%p` walk discloses a planted stack marker, `%n` changes a supplied local variable, FORTIFY aborts the same input, and a constant format prints it literally | x86-64; the marker is not a PIE-base leak and the attacker does not select an arbitrary write address |
+| [11 CET shadow stack](../labs/11-cet-shadow-stack/RESULTS.md) | Anchor: requested vs. observed enforcement | 24 trials, host pilot: the *same* CET-note binary reaches an in-binary hijack when its process's shadow stack is inactive (behaving exactly like the uninstrumented reference) and is caught by a `SEGV_CPERR` control-protection fault once activated; the `SHSTK` tunable does not activate the shadow stack for a binary without the CET note (activation depends on emission, measured per process) | x86-64 host with `user_shstk` supported but inactive by default; shadow-stack half of CET only (no IBT); exploratory pilot, VM replication open |
 
 ## How the claims build on each other
 
@@ -102,9 +103,11 @@ Honest negatives are part of the evidence, not omissions:
   input and a stale (wrong-process) base both produce `SIGSEGV` without reaching
   the oracle, which is what isolates the deliberate target placement and the
   same-process leak as the enabling factors.
-- **Collectors retain failed captures without `COMPLETE`.** A build or runtime
-  result that does not match the stated expectation is kept for diagnosis rather
-  than silently dropped.
+- **Legacy collectors (Labs 04–10) retain failed captures without `COMPLETE`.** A
+  build or runtime result that does not match the stated expectation is kept for
+  diagnosis rather than silently dropped, but it is not marked `COMPLETE`. Lab 11
+  deliberately differs: it writes `COMPLETE` on capture completeness and records the
+  hypothesis outcome separately, so a counter-finding is a complete capture.
 
 ## Limits that apply across the labs
 
