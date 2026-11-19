@@ -264,24 +264,32 @@ def capture(label, output):
 
     # The per-process activation table, built FROM the observations (not a probe):
     # for each (profile, runtime) the status every tested process actually reported.
+    # Non-uniform status within a cell is NOT a hard error: it is recorded (the cell
+    # maps to None) and surfaces as non-determinism below, so the capture still
+    # completes and exports rather than being discarded.
     activated = {}
     for profile in PROFILES:
         for runtime in RUNTIMES:
             states_seen = {r["shstk_active"] for r in observations
                            if r["profile"] == profile and r["runtime"] == runtime}
-            require(len(states_seen) == 1,
-                    "shstk status not consistent within {}/{}: {}".format(profile, runtime, states_seen))
-            activated.setdefault(profile, {})[runtime] = states_seen.pop()
+            activated.setdefault(profile, {})[runtime] = (
+                states_seen.pop() if len(states_seen) == 1 else None)
 
-    # Determinism: each (profile, runtime, mode) cell must be single-valued.
+    # Determinism: each (profile, runtime, mode) cell SHOULD be single-valued. A
+    # divergence across repeats is a genuine reliability finding, so it is RECORDED
+    # (deterministic=False, with the offending cells) rather than aborting before the
+    # capture is written. A non-deterministic capture completes and exports; it
+    # simply cannot be a valid control or pass the regression gate.
+    nondeterministic_cells = []
     for profile in PROFILES:
         for runtime in RUNTIMES:
             for mode in MODES:
                 cell = {(r["returncode"], r["hijacked"], r["shstk_active"], r["segv_cperr"])
                         for r in observations
                         if r["profile"] == profile and r["runtime"] == runtime and r["mode"] == mode}
-                require(len(cell) == 1,
-                        "cell {}/{}/{} not deterministic: {}".format(profile, runtime, mode, cell))
+                if len(cell) != 1:
+                    nondeterministic_cells.append("%s/%s/%s" % (profile, runtime, mode))
+    deterministic = not nondeterministic_cells
 
     # Control validity: the UNINSTRUMENTED reference must actually reach hijack()
     # under the attack (proving the overflow and the layout are real), and every
@@ -293,7 +301,8 @@ def capture(label, output):
     safe_controls_return = all(
         r["returned_safely"] and r["returncode"] == 0
         for r in observations if r["mode"] == "safe")
-    control_valid = bool(ref_attack_reaches and safe_controls_return)
+    # A non-deterministic capture is not an interpretable control baseline.
+    control_valid = bool(ref_attack_reaches and safe_controls_return and deterministic)
 
     annotated = annotate(observations, LAB_POLICY)
     states = capture_states(observations, LAB_POLICY,
@@ -409,6 +418,8 @@ def capture(label, output):
         # emission, measured per process.
         "tunable_does_not_activate_shstk_without_cet_note":
             shstk_environment_capable and activated["cet_none"]["shstk"] is False,
+        "deterministic": deterministic,
+        "nondeterministic_cells": nondeterministic_cells,
         "control_validity": control_valid,
         "hypothesis_supported": states["hypothesis_supported"],
     }, indent=2) + "\n")

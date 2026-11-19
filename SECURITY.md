@@ -7,7 +7,7 @@ project to attack systems without authorization.
 
 If you find a vulnerability in the capture scripts, VM launchers, validation
 tooling or other repository infrastructure, please report it privately through
-[GitHub's vulnerability reporting page](https://github.com/DenizAltunkapan/exploit-evolution/security/advisories/new).
+[GitHub's vulnerability reporting page](https://github.com/DenizAltunkapan/mitigation-enforcement/security/advisories/new).
 Include the affected component, impact and reproduction steps. Please avoid
 posting a working infrastructure exploit in a public issue before the maintainer
 has had a chance to review it.

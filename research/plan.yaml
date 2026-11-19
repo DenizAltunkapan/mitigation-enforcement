@@ -54,7 +54,10 @@ factors:
 # classified into exactly one. "Blocked early" is a valid protection result;
 # "program never started" is not a protection result at all.
 outcome_taxonomy:
-  - blocked_before_operation   # the invalid operation was prevented
+  # "operation" is the mechanism-specific protected effect (for SHSTK, the
+  # unauthorized return transfer); it does not imply that a preceding overwrite
+  # was repaired or prevented.
+  - blocked_before_operation   # the protected effect was prevented
   - detected_after_operation   # the operation happened, then was detected/aborted
   - controlled_local_effect    # a supplied-pointer / in-binary effect occurred
   - unattributed_fault         # a fault not attributable to a specific guarantee
@@ -83,12 +86,12 @@ exclusions:
 # Scope of the first confirmatory run (focused; see paper/plan.md Section 0).
 scope_v1:
   labs: ["06", "07", "08", "09", "10"]          # VM replication under pinning
-  new_labs: ["11", "14", "13", "20"]            # built after replication is pinned
+  new_labs: ["11", "12", "13"]                  # exploratory pilots now built
   external_corpus: false                         # deferred to v2 (QuickSafe subset)
   note: >
-    The host+VM captures recorded on 2026-11-18 were produced CONCURRENTLY with
-    this pre-registration, not provably after it, so they are EXPLORATORY/PILOT,
-    not a confirmatory dataset. A true confirmatory run commits and publishes this
-    pre-registration and the environment lock FIRST, then re-captures Labs 06-10
-    under the pinned environments. Git commit order alone does not establish
-    temporal pre-registration; this note records the honest status.
+    The host+VM captures for Labs 06-11 and the host captures for Labs 12-13 were
+    produced CONCURRENTLY with this pre-registration, not provably after it, so
+    they are EXPLORATORY/PILOT, not a confirmatory dataset. A true confirmatory
+    run commits and publishes this pre-registration and the environment lock
+    FIRST, then re-captures the declared scope. Git commit order alone does not
+    establish temporal pre-registration; this note records the honest status.

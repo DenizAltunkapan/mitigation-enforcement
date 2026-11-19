@@ -209,24 +209,31 @@ def capture(label, output):
                     observations.append(row)
                     (output / "observations.json").write_text(json.dumps(observations, indent=2) + "\n")
 
-    # Determinism: each (level, variant, mode) cell must be single-valued.
+    # Determinism: each (level, variant, mode) cell SHOULD be single-valued. A
+    # divergence across repeats is a genuine reliability finding, so it is RECORDED
+    # (deterministic=False, with the offending cells) rather than aborting before the
+    # capture is written. A non-deterministic capture completes and exports; it
+    # simply cannot be a valid control or pass the regression gate.
+    nondeterministic_cells = []
     for level in LEVELS:
         for variant in VARIANTS:
             for mode in MODES:
                 cell = {(r["returncode"], r["overflow_completed"], r["fortify_abort"])
                         for r in observations
                         if r["level"] == level and r["variant"] == variant and r["mode"] == mode}
-                require(len(cell) == 1,
-                        "cell {}/{}/{} not deterministic: {}".format(level, variant, mode, cell))
+                if len(cell) != 1:
+                    nondeterministic_cells.append("%s/%s/%s" % (level, variant, mode))
+    deterministic = not nondeterministic_cells
 
     # Control validity: every safe (in-bounds) run must complete normally, and the
     # unguarded (off) attacks must NOT abort via FORTIFY (they either complete or
     # fault for another reason) — proving the FORTIFY aborts elsewhere are FORTIFY's.
+    # A non-deterministic capture is not an interpretable control baseline.
     safe_ok = all(r["overflow_completed"] and r["returncode"] == 0
                   for r in observations if r["mode"] == "safe")
     off_not_fortified = not any(r["fortify_abort"]
                                 for r in observations if r["level"] == "off")
-    control_valid = bool(safe_ok and off_not_fortified)
+    control_valid = bool(safe_ok and off_not_fortified and deterministic)
 
     annotated = annotate(observations, LAB_POLICY)
     states = capture_states(observations, LAB_POLICY,
@@ -286,6 +293,8 @@ def capture(label, output):
             not checked("l2", "crosstu") and not checked("l3", "crosstu"),
         # Emitted-but-not-effective cells (chk present yet inert): 0 is the clean case.
         "emitted_but_not_effective_count": emitted_effective_disagreements,
+        "deterministic": deterministic,
+        "nondeterministic_cells": nondeterministic_cells,
         "control_validity": control_valid,
         "hypothesis_supported": states["hypothesis_supported"],
     }, indent=2) + "\n")

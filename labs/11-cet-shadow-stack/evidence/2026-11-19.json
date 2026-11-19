@@ -2,12 +2,12 @@
   "description": "Selected text evidence from complete Lab 11 captures (CET shadow-stack requested-vs-enforced). Binaries and disassembly remain in the capture directories. The four research states and the activation chain are carried through unchanged; a counter-finding exports like any complete capture. Checksums establish consistency, not authenticity.",
   "captures": [
     {
-      "name": "cet-host-v3",
+      "name": "c11re",
       "environment": {
         "schema_version": 1,
         "label": "host",
         "label_is_operator_supplied": true,
-        "captured_at_utc": "2026-11-19T12:06:21.709329+00:00",
+        "captured_at_utc": "2026-11-19T18:24:00.578073+00:00",
         "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.43",
         "architecture": "x86_64",
         "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
@@ -313,18 +313,20 @@
         "metadata_only_false_positives": 1,
         "metadata_only_inference_would_be_wrong": true,
         "tunable_does_not_activate_shstk_without_cet_note": true,
+        "deterministic": true,
+        "nondeterministic_cells": [],
         "control_validity": true,
         "hypothesis_supported": true
       },
       "artifact_sha256": {
         "src/shadow_stack.c": "80da01a578561452905823bf84a8f9d11c246a00aca01f4fd55c183f4ae198cd",
         "Makefile": "a928d6701a55c4a9ba3dee3cd71867ee6b484c67c5bd0906c2b91e30c6c62a2b",
-        "cet_full": "bb99e7104a142586d936fffd8e3a5ebbfbe8ebf2ed06329a763c4396002f1ae9",
-        "cet_none": "12fab5d820399404bc3b489232a10fd7060b599e27aa020349d73e74678fe00b"
+        "cet_full": "18af210a101faa25f6a39e5ec3c44f57948ea6623cba0cd0f4822685e0c8fc67",
+        "cet_none": "97f9745344bd166619ff5699677ee228ce296f230e7a1cd443a7ebd277386fb7"
       },
-      "collector_sha256": "e66413fb89cd299d3b18f4e1e11ed6b69f552d1c238e371934c693cddba31897",
-      "outcomes_sha256": "a6ddb82e7d435814a3470b6bc7221938755ef2314228c5168c3278c8a90a58b5",
-      "full_manifest_sha256": "49f928f825375d9de20b4d55f979965f31f6a5903156a263914656808b3ed6a5",
+      "collector_sha256": "5f2ffd5a03e690adf3efb0f22f61dee68c14524e5600cae5c501d636ec465600",
+      "outcomes_sha256": "f65c1e596a1468cb97ce780bb944ecc9c08b29ec7e9f068ece1df7577ba4709e",
+      "full_manifest_sha256": "3741bec3f93ed8b5b5a79c4f54abac5a77a4c59d50b7fc95573eac90c340f7a9",
       "observations": [
         {
           "profile": "cet_full",
@@ -737,12 +739,12 @@
       ]
     },
     {
-      "name": "cm",
+      "name": "c11",
       "environment": {
         "schema_version": 1,
         "label": "modern",
         "label_is_operator_supplied": true,
-        "captured_at_utc": "2026-11-19T12:05:59.034055+00:00",
+        "captured_at_utc": "2026-11-19T18:24:42.451289+00:00",
         "platform": "Linux-6.12.105+deb13-amd64-x86_64-with-glibc2.41",
         "architecture": "x86_64",
         "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
@@ -1048,18 +1050,20 @@
         "metadata_only_false_positives": 0,
         "metadata_only_inference_would_be_wrong": false,
         "tunable_does_not_activate_shstk_without_cet_note": false,
+        "deterministic": true,
+        "nondeterministic_cells": [],
         "control_validity": true,
         "hypothesis_supported": true
       },
       "artifact_sha256": {
         "src/shadow_stack.c": "80da01a578561452905823bf84a8f9d11c246a00aca01f4fd55c183f4ae198cd",
         "Makefile": "a928d6701a55c4a9ba3dee3cd71867ee6b484c67c5bd0906c2b91e30c6c62a2b",
-        "cet_full": "0d57310be5883233f5e57ade0628f4255c728ad8f28dd69d64d634feac338907",
-        "cet_none": "8c6483d43d5c2e30d8ddfddde23fb2af9e29803e13a07ad4a01b532486bf70ab"
+        "cet_full": "842169f6714ed4e6d21707637d70d0312e25ccadd422c20b82e99e4de6d1dcfa",
+        "cet_none": "b75e6dcd7a958d1468c9b5d3ca10c4934419f3e0b556023fbde798c34736ecbf"
       },
-      "collector_sha256": "e66413fb89cd299d3b18f4e1e11ed6b69f552d1c238e371934c693cddba31897",
-      "outcomes_sha256": "a6ddb82e7d435814a3470b6bc7221938755ef2314228c5168c3278c8a90a58b5",
-      "full_manifest_sha256": "78a84b7ad866b3272be6ed80067044eaf6ccb8e925b8d38aedc45bb4761980e5",
+      "collector_sha256": "5f2ffd5a03e690adf3efb0f22f61dee68c14524e5600cae5c501d636ec465600",
+      "outcomes_sha256": "f65c1e596a1468cb97ce780bb944ecc9c08b29ec7e9f068ece1df7577ba4709e",
+      "full_manifest_sha256": "05040aa8f979abc61fcf788b49d70d1cc7e15c993ca227f344bb365b71fcf5c9",
       "observations": [
         {
           "profile": "cet_full",

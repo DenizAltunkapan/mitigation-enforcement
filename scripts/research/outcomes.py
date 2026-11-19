@@ -209,11 +209,19 @@ def controls_held(observations, policy):
     control_rows = [o for o in observations if policy.expectation(o) is None]
     if not control_rows:
         return True  # no declared controls in this capture; nothing to invalidate
+    # Outcomes that make a control uninterpretable and therefore invalidate the
+    # capture. This includes `unreachable` (e.g. a safe run that exited 0 without
+    # its completion marker) -- the case a looser "did not crash" check would wrongly
+    # admit, and the one the collectors reject via their strict control
+    # preconditions. It deliberately does NOT include `blocked_before_operation` or
+    # `detected_after_operation`, because a negative control (a length-matched
+    # padding run with no crafted address) is SUPPOSED to be stopped, not to produce
+    # the effect; rejecting those would break a legitimate control (e.g. Lab 05's
+    # `padding`).
+    invalidating = ("unattributed_fault", "environment_failure",
+                    "not_executed", "unreachable")
     for o in control_rows:
-        outcome = classify(o, policy)
-        # A control must not have crashed in an unattributed way, and must not be
-        # a mitigation "repair" (a control is supposed to run, not be stopped).
-        if outcome in ("unattributed_fault", "environment_failure", "not_executed"):
+        if classify(o, policy) in invalidating:
             return False
     return True
 

@@ -65,9 +65,21 @@ class CetShadowStackTests(unittest.TestCase):
             self.assertEqual(len(observations), 2 * 2 * 2 * 3)  # profile*runtime*mode*repeat
 
             chain = json.loads((output / "activation_chain.json").read_text())
-            # Emission is a build fact, true on any toolchain with CET support.
-            self.assertTrue(chain["emitted"]["cet_full"]["cet_note_present"])
+            # cet_none must never carry a CET note (it is built -fcf-protection=none).
+            # cet_full carries one only on a toolchain/CPU target that emits it; the
+            # collector treats a missing note as a valid "chain breaks at emitted"
+            # result (e.g. a QEMU guest without CET), so we do NOT require the note
+            # here -- that would make the test stricter than the collector's own
+            # contract and fail on a CET-less host. We assert only the invariant:
+            # cet_full's emission must be at least as strong as cet_none's.
             self.assertFalse(chain["emitted"]["cet_none"]["cet_note_present"])
+            cet_full_note = chain["emitted"]["cet_full"]["cet_note_present"]
+            if not cet_full_note:
+                # No CET note emittable here: the chain breaks at `emitted`, no
+                # profile can activate the shadow stack. This is the VM-style
+                # environment; nothing further about activation can be required.
+                self.assertFalse(chain["activated"]["cet_full"]["default"])
+                self.assertFalse(chain["activated"]["cet_full"]["shstk"])
 
             def rows_for(profile, runtime):
                 return [r for r in observations if r["profile"] == profile
@@ -189,6 +201,13 @@ class CetShadowStackTests(unittest.TestCase):
                 r["hijacked"], r["returned_safely"] = True, False
                 r["returncode"], r["signal"] = 42, None
                 r["shstk_active"], r["segv_cperr"] = True, None
+                # Also force the environment-capability fields the expectation reads,
+                # so the pre-registered outcome is BLOCK (enforcement expected) on ANY
+                # host -- including one whose real build emits no CET note. Without
+                # this, _environment_can_enforce would be False on a CET-less host and
+                # the expectation would collapse to EFFECT, so the intended
+                # counter-finding (expected BLOCK, observed effect) would not arise.
+                r["cet_note_present"], r["cpu_user_shstk"] = True, True
                 stem = "{profile}.{runtime}.{mode}.{repeat}".format(**r)
                 (output / (stem + ".stdout.txt")).write_text(
                     "victim returned normally\nHIJACK: control-flow redirected\n")

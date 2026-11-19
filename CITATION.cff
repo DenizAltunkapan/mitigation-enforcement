@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Exploit Evolution: Reproducible Evidence for Declared-versus-Observed Linux Exploit Mitigations"
+abstract: >-
+  Thirteen synthetic, local Linux labs spanning i386 and x86-64, including three
+  controlled experiments that measure the gap between declared hardening and
+  observed protection of a specific operation at run time, with committed,
+  hash-anchored evidence and matched controls.
+type: software
+authors:
+  - family-names: Altunkapan
+    given-names: Deniz
+license: MIT
+repository-code: "https://github.com/DenizAltunkapan/mitigation-enforcement"
+keywords:
+  - memory safety
+  - exploit mitigations
+  - Intel CET shadow stack
+  - FORTIFY_SOURCE
+  - reproducible research
