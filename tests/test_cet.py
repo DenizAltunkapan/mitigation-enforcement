@@ -74,6 +74,13 @@ class CetShadowStackTests(unittest.TestCase):
             # cet_full's emission must be at least as strong as cet_none's.
             self.assertFalse(chain["emitted"]["cet_none"]["cet_note_present"])
             cet_full_note = chain["emitted"]["cet_full"]["cet_note_present"]
+            # The collector gates its CET-capability findings on BOTH the note and
+            # the CPU flag (shstk_environment_capable), so a runner that emits the
+            # note on a CPU without user_shstk is not a CET-capable environment.
+            # Mirror that definition here; checking the note alone would expect a
+            # finding the collector deliberately does not claim.
+            shstk_capable = cet_full_note and all(
+                r["cpu_user_shstk"] for r in observations)
             if not cet_full_note:
                 # No CET note emittable here: the chain breaks at `emitted`, no
                 # profile can activate the shadow stack. This is the VM-style
@@ -128,10 +135,10 @@ class CetShadowStackTests(unittest.TestCase):
             )
             # Activation depends on emission: a true positive finding on this lab.
             # The collector only asserts this on a CET-capable environment
-            # (shstk_environment_capable); on a host that emits no CET note at all
-            # the field is False by construction, so we only check the positive
-            # claim where the note is actually emittable.
-            if cet_full_note:
+            # (note emitted AND CPU advertises user_shstk); anywhere else the field
+            # is False by construction, so we only check the positive claim where
+            # the environment could actually enforce.
+            if shstk_capable:
                 self.assertEqual(
                     finding["tunable_does_not_activate_shstk_without_cet_note"],
                     active("cet_none", "shstk") is False,
