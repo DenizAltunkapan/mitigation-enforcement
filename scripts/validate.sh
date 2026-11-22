@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT}"
 
-# Required for the host labs (01-10) and the evidence integrity checks.
+# Required for the host labs (01-13) and the evidence integrity checks.
 for tool in python3 gcc make readelf objdump nm gdb getconf sha256sum; do
     if ! command -v "${tool}" >/dev/null 2>&1; then
         echo "Validation requires ${tool}. See README.md for prerequisites." >&2

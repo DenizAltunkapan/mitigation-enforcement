@@ -2,7 +2,7 @@
 #
 # Status: pre-registration. This file fixes the research questions, factors,
 # outcome taxonomy and exclusion rules BEFORE confirmatory captures are recorded,
-# so that later results cannot be reinterpreted to fit. It is the machine-readable
+# so that later results cannot be reinterpreted to fit. It is the
 # machine-readable research plan and pre-registration for the labs in this repo.
 #
 # This file describes intent. It does not itself run anything.
