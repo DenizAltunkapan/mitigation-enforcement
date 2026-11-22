@@ -65,7 +65,10 @@ class CaptureBaselineTests(unittest.TestCase):
                     artifact = manifest.parent / name
                     self.assertEqual(hashlib.sha256(artifact.read_bytes()).hexdigest(), digest)
 
-    @unittest.skipUnless(shutil.which("gcc"), "requires host compiler")
+    @unittest.skipUnless(
+        all(shutil.which(tool) for tool in ("gcc", "make", "readelf", "objdump")),
+        "requires host compiler and binutils",
+    )
     def test_failed_build_has_no_completion_marker(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "failed"

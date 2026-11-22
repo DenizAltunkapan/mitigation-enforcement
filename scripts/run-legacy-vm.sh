@@ -41,8 +41,8 @@ case "${OFFLINE:-0}" in
 esac
 
 exec qemu-system-i386 \
-    "${ACCEL_OPTS[@]}" \
-    "${SNAPSHOT_OPTS[@]}" \
+    ${ACCEL_OPTS[@]+"${ACCEL_OPTS[@]}"} \
+    ${SNAPSHOT_OPTS[@]+"${SNAPSHOT_OPTS[@]}"} \
     -m 512 \
     -drive file="${DISK}",format=qcow2 \
     "${NETWORK_OPTS[@]}" \
