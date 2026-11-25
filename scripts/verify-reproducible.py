@@ -39,6 +39,30 @@ LABS = {
     "labs/13-boundary-instrumentation": ("capture-boundary.py", "export-boundary.py"),
 }
 
+# Some labs measure a CPU feature, so their committed host evidence can only be
+# reproduced on hardware that has it. Reproducing Lab 11 on a machine without
+# user_shstk is not a failure of the collector: the shadow stack cannot activate,
+# so `cpu_user_shstk`, `shstk_active` and `segv_cperr` necessarily differ from
+# evidence recorded on a CET-capable host. Such a lab is reported as SKIPPED with
+# the reason, never as reproduced, so a green run never implies a check that did
+# not happen.
+def cpu_has(flag):
+    try:
+        with open("/proc/cpuinfo", encoding="utf-8", errors="replace") as handle:
+            return any(flag in line for line in handle if line.startswith("flags"))
+    except OSError:
+        return False
+
+
+# lab -> (predicate, reason shown when it does not hold).
+REQUIRED_CPU_FEATURE = {
+    "labs/11-cet-shadow-stack": (
+        lambda: cpu_has("user_shstk"),
+        "CPU does not advertise user_shstk; the committed host evidence records "
+        "an active shadow stack that cannot occur here",
+    ),
+}
+
 # Per-run fields that must not be compared. Everything else in an observation is
 # a measured outcome and must match.
 VARIABLE_FIELDS = {
@@ -110,7 +134,13 @@ def reproduce(lab, collector, exporter):
 
 def main():
     failures = []
+    skipped = []
     for lab, (collector, exporter) in LABS.items():
+        requirement = REQUIRED_CPU_FEATURE.get(lab)
+        if requirement and not requirement[0]():
+            print("reproducing %s ... SKIPPED (%s)" % (lab, requirement[1]), flush=True)
+            skipped.append("%s: %s" % (lab, requirement[1]))
+            continue
         print("reproducing %s ..." % lab, flush=True)
         errors = reproduce(lab, collector, exporter)
         if errors:
@@ -124,7 +154,13 @@ def main():
         for error in failures:
             print("  - " + error, file=sys.stderr)
         return 1
-    print("\nAll host captures reproduced from their committed collectors.")
+    if skipped:
+        print("\n%d lab(s) skipped for a missing CPU feature:" % len(skipped))
+        for reason in skipped:
+            print("  - " + reason)
+        print("Every other host capture reproduced from its committed collector.")
+    else:
+        print("\nAll host captures reproduced from their committed collectors.")
     return 0
 
 

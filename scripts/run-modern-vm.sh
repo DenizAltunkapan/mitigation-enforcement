@@ -39,8 +39,8 @@ case "${OFFLINE:-0}" in
 esac
 
 exec qemu-system-x86_64 \
-    "${ACCEL_OPTS[@]}" \
-    "${SNAPSHOT_OPTS[@]}" \
+    ${ACCEL_OPTS[@]+"${ACCEL_OPTS[@]}"} \
+    ${SNAPSHOT_OPTS[@]+"${SNAPSHOT_OPTS[@]}"} \
     -m 2048 \
     -smp 2 \
     -drive file="${DISK}",if=virtio,format=qcow2 \

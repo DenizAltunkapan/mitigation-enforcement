@@ -161,14 +161,15 @@ class CetShadowStackTests(unittest.TestCase):
                                  "oracle false_positive flag inconsistent: %r" % cell)
                 counted_fps += int(is_fp)
             self.assertEqual(oracle["false_positive_count"], counted_fps)
-            if (cet_full_note and active("cet_full", "default") is False
+            if (shstk_capable and active("cet_full", "default") is False
                     and reaches("cet_full", "default")):
                 # A CET-capable environment where the shadow stack is inactive by
-                # default: the note IS present, so the metadata-only rule says
-                # "protected", yet the attack reaches the oracle -- a true false
-                # positive, the paper's central claim. (Without the cet_full_note
-                # guard this would also fire on a CET-less host, where the rule
-                # correctly says "not protected" and the FP count is 0.)
+                # default: the oracle's rule (note present AND CPU advertises
+                # user_shstk) says "protected", yet the attack reaches the oracle
+                # -- a true false positive, the paper's central claim. The guard
+                # must match that rule exactly: a runner that emits the note on a
+                # CPU without user_shstk makes the rule say "not protected", so
+                # the FP count is legitimately 0 and nothing is claimed here.
                 self.assertGreaterEqual(oracle["false_positive_count"], 1)
                 self.assertEqual(finding["metadata_only_false_positives"],
                                  oracle["false_positive_count"])

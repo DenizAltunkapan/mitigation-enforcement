@@ -150,7 +150,7 @@ echo "reboot on its own before closing this window."
 echo
 
 qemu-system-i386 \
-    "${ACCEL_OPTS[@]}" \
+    ${ACCEL_OPTS[@]+"${ACCEL_OPTS[@]}"} \
     -m 512 \
     -drive file="${DISK}",format=qcow2 \
     -cdrom "${PRESEEDED_ISO}" \
