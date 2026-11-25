@@ -31,9 +31,9 @@ arbitrary code execution.
 | 08: code reuse under NX | [Host + Debian 13 VM capture](../labs/08-code-reuse-chain/RESULTS.md) with portable JSON evidence across 3 control-flow cases in each environment (18 process trials) and an in-process NX control: a jump onto the non-executable stack faults in the [stack] mapping while an ordered chain of in-binary functions redirects control flow; a bounds check prevents it | CET/shadow-stack and libc-gadget variants are out of scope; white-box static addresses (no PIE leak) |
 | 09: GOT overwrite under RELRO | [Host + Debian 13 VM capture](../labs/09-relro-got/RESULTS.md) with portable JSON evidence across 2 cases in each environment (12 trials): overwriting puts's GOT slot redirects the call under partial RELRO (status 42) but faults under full RELRO (SIGSEGV) | One slot and one call, not a full PLT/GOT attack; white-box static address (no PIE leak) |
 | 10: format-string vulnerability | [Host + Debian 13 VM capture](../labs/10-format-string/RESULTS.md) with portable JSON evidence across 4 cases in each environment (24 trials): a `%p` walk discloses a planted stack marker, `%n` changes a program-supplied local variable (status 42), FORTIFY aborts the same input (SIGABRT), and a constant format prints it literally | The disclosure is not the PIE-base leak of Lab 06, and the attacker does not select an arbitrary write address |
-| 11: CET shadow stack | [Host + Debian 13 VM capture](../labs/11-cet-shadow-stack/RESULTS.md) with portable JSON evidence across 2 profiles and 2 runtime states in each environment (48 trials): a CET-marked binary redirects while its shadow stack is inactive and faults with `SEGV_CPERR` once active | IBT (indirect branch tracking) half of CET is out of scope; exploratory pilot |
-| 12: FORTIFY coverage | [Host capture](../labs/12-fortify-coverage/RESULTS.md) with portable JSON evidence across 3 size-knowledge variants and 3 levels (54 trials): static copies checked from `=2`, runtime from `=3`, and cross-TU at none | Single modern toolchain; VM replication |
-| 13: boundary instrumentation | [Host capture](../labs/13-boundary-instrumentation/RESULTS.md) with portable JSON evidence across 4 instrumentation configs and 2 components (72 trials): canary emitted into one component does not protect the other | Single modern toolchain; VM replication |
+| 11: CET shadow stack | [Host + Debian 13 VM capture](../labs/11-cet-shadow-stack/RESULTS.md) with portable JSON evidence across 2 profiles and 2 runtime states in each environment (48 trials): a CET-marked binary redirects while its shadow stack is inactive and faults with `SEGV_CPERR` once active on the host | IBT (indirect branch tracking) half of CET is out of scope; modern VM lacks CET support and does not independently replicate active shadow-stack enforcement; exploratory pilot |
+| 12: FORTIFY coverage | [Host capture](../labs/12-fortify-coverage/RESULTS.md) with portable JSON evidence across 3 size-knowledge variants and 3 levels (54 trials): static copies checked from `=2`, runtime from `=3`, and cross-TU at none | Single modern toolchain; VM replication; exploratory pilot |
+| 13: boundary instrumentation | [Host capture](../labs/13-boundary-instrumentation/RESULTS.md) with portable JSON evidence across 4 instrumentation configs and 2 components (72 trials): canary emitted into one component does not protect the other | Single modern toolchain; VM replication; exploratory pilot |
 
 The Lab 01–03 guides now use the [verified VM comparison](BASELINE-COMPARISON.md).
 It pairs the recovered Debian 7 capture from 26 October with the Debian 13
@@ -106,11 +106,12 @@ breaks at different links across environments: missing runtime activation on the
 and missing hardware/compiler emission in the VM.
 
 Lab 12's [results](../labs/12-fortify-coverage/RESULTS.md) measure `_FORTIFY_SOURCE`
-coverage across size-knowledge variants. Emitted code (`__memcpy_chk`) and runtime
+coverage across size-knowledge variants for the evaluated toolchain (GCC 15.2.0 and
+glibc 2.43 at `-O2`). Under this evaluation, emitted code (`__memcpy_chk`) and runtime
 effectiveness agree per call site: a static buffer copy is checked from `=2`, a heap
 allocation with runtime size only at `=3`, and a cross-translation-unit copy at neither
 level. Neither the compiler flag nor counting `__memcpy_chk` symbols proves that a
-particular copy operation is protected.
+particular copy operation is protected across arbitrary toolchains or optimization levels.
 
 Lab 13's [results](../labs/13-boundary-instrumentation/RESULTS.md) measure stack-protector
 enforcement across a shared-library boundary. A canary emitted into the main executable
@@ -175,8 +176,11 @@ run fresh captures independently using the documented commands.
 
 ## Next experiments, in order
 
-Labs 06–11 have now been replicated in the Debian 13 VM; each carries host and
-modern captures with matching findings. Labs 12–13 carry exploratory host captures.
+Labs 06–10 have now been replicated in the Debian 13 VM; each carries host and
+modern captures with matching findings. Lab 11 has captures in both environments
+supporting the environment-dependent hypothesis, but because the modern VM lacks CET
+CPU and compiler support, it does not independently replicate active shadow-stack
+enforcement. Labs 12–13 carry exploratory host captures.
 The remaining open work is:
 
 1. Validate a clean legacy installation independently of the recovered image. The completed
