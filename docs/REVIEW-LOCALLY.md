@@ -32,6 +32,18 @@ python3 scripts/capture-format-string.py host /tmp/format-string-review
 python3 scripts/export-format-string.py /tmp/format-string-review \
   --output /tmp/format-string-review.json
 
+python3 scripts/capture-cet.py host /tmp/cet-review
+python3 scripts/export-cet.py /tmp/cet-review \
+  --output /tmp/cet-review.json
+
+python3 scripts/capture-fortify-coverage.py host /tmp/fortify-review
+python3 scripts/export-fortify-coverage.py /tmp/fortify-review \
+  --output /tmp/fortify-review.json
+
+python3 scripts/capture-boundary.py host /tmp/boundary-review
+python3 scripts/export-boundary.py /tmp/boundary-review \
+  --output /tmp/boundary-review.json
+
 # Optional Labs 01–03 host capture and verified text export:
 bash scripts/capture-baseline.sh host /tmp/baseline-review
 python3 scripts/export-baseline.py /tmp/baseline-review \
